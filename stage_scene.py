@@ -17,6 +17,26 @@ map2_posy = 0
 mapSpeed = 500
 
 #player
+player = None
+
+class Player:
+    def __init__(self):
+        self.x = 250
+        self.y = 50
+        self.deadcheck = False
+        self.image = load_image(os.path.join(os.getcwd(), 'player', 'player.png'))
+
+    def handle_event(self):
+        events = get_events()
+        for event in events:
+            if event.type == SDL_QUIT:
+                mainframe.quit()
+
+    def update(self):
+        handle_events()
+
+    def draw(self):
+
 
 class Map:
     def __init__(self, name, subname, posy):
@@ -50,21 +70,24 @@ class Map:
 
 
 def initialize():
+    #map
     global totalmap
     global map1
     global map2
+    #player
+
+    #map
     map1 = [Map(1, 0, 2000)]
     map2 = [Map(2, 0, 2000)]
     totalmap = {1:map1, 2:map2}
+    #player
+
 
 def handle_events():
-    global map
     events = get_events()
     for event in events:
         if event.type == SDL_QUIT:
             mainframe.quit()
-        if (event.type, event.key) == (SDL_KEYDOWN, SDLK_UP):
-            map.y = -1100
 
 def update():
     # map
