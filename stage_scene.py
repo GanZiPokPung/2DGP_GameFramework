@@ -36,7 +36,7 @@ class Player:
         handle_events()
 
     def draw(self):
-
+        self.image.clip_draw(0, 0, 50, 50, self.x, self.y)
 
 class Map:
     def __init__(self, name, subname, posy):
@@ -75,13 +75,14 @@ def initialize():
     global map1
     global map2
     #player
+    global player
 
     #map
     map1 = [Map(1, 0, 2000)]
     map2 = [Map(2, 0, 2000)]
     totalmap = {1:map1, 2:map2}
     #player
-
+    player = Player()
 
 def handle_events():
     events = get_events()
@@ -94,6 +95,10 @@ def update():
     currentmaplist = totalmap.get(currentmap)
     for map in currentmaplist:
         map.update(currentmaplist)
+
+    #player
+    player.update()
+
     delay(0.01)
 
 def draw():
@@ -101,6 +106,9 @@ def draw():
     # map
     for map in totalmap.get(currentmap):
         map.draw()
+
+    #player
+    player.draw()
     update_canvas()
 
 def pause():
