@@ -24,6 +24,7 @@ class Player:
         self.x = 250
         self.y = 50
         self.deadcheck = False
+        self.frame = 0
         self.image = load_image(os.path.join(os.getcwd(), 'player', 'player.png'))
 
     def handle_event(self):
@@ -34,9 +35,10 @@ class Player:
 
     def update(self):
         handle_events()
+        self.frame = (self.frame + 1) % 7
 
     def draw(self):
-        self.image.clip_draw(0, 0, 50, 50, self.x, self.y)
+        self.image.clip_draw(self.frame * 50, 0, 50, 50, self.x, self.y)
 
 class Map:
     def __init__(self, name, subname, posy):
