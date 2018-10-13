@@ -14,7 +14,7 @@ map1 = None
 map1_posy = 0
 map2 = None
 map2_posy = 0
-mapSpeed = 500
+mapSpeed = 150
 
 #player
 player = None
@@ -23,23 +23,97 @@ class Player:
     def __init__(self):
         self.x = 250
         self.y = 50
+        self.dirX = 0
+        self.dirY = 0
+        #status
         self.deadcheck = False
+        self.turncheck = False
+        #key
+        self.pushLcheck = False
+        self.pushRcheck = False
+        #frame
+        self.frameID = 0
         self.frame = 0
+        self.reformframe = 0
+        #image
         self.image = load_image(os.path.join(os.getcwd(), 'player', 'player.png'))
 
-    def handle_event(self):
-        events = get_events()
-        for event in events:
-            if event.type == SDL_QUIT:
-                mainframe.quit()
+    def handle_events(self, event):
+        if event.type == SDL_KEYDOWN:
+            if event.key == SDLK_UP:
+                self.dirY += 1
+            elif event.key == SDLK_DOWN:
+                self.dirY -= 1
+            elif event.key == SDLK_LEFT:
+                if self.pushRcheck == False:
+                    self.turncheck = False
+                    self.frameID = 1
+                    self.frame = 0
+                    self.reformframe = 6
+                    self.turncheck = True
+                self.dirX -= 1
+                self.pushLcheck = True
+            elif event.key == SDLK_RIGHT:
+                if self.pushLcheck == False:
+                    self.turncheck = False
+                    self.frameID = 2
+                    self.frame = 0
+                    self.reformframe = 6
+                    self.turncheck = True
+                self.dirX += 1
+                self.pushRcheck = True
+        elif event.type == SDL_KEYUP:
+            if event.key == SDLK_UP:
+                self.dirY -= 1
+            if event.key == SDLK_DOWN:
+                self.dirY += 1
+            elif event.key == SDLK_LEFT:
+                if self.pushRcheck == True:
+                    self.turncheck = True
+                    self.frameID = 2
+                    self.frame = 0
+                    self.reformframe = 6
+                    self.turncheck = True
+                else:
+                    self.turncheck = False
+                self.dirX += 1
+                self.pushLcheck = False
+            elif event.key == SDLK_RIGHT:
+                if self.pushLcheck == True:
+                    self.turncheck = True
+                    self.frameID = 1
+                    self.frame = 0
+                    self.reformframe = 6
+                    self.turncheck = True
+                else:
+                    self.turncheck = False
+                self.dirX -= 1
+                self.pushRcheck = False
+
+        if(self.pushLcheck == True) and (self.pushRcheck == True):
+            self.turncheck = False
+
 
     def update(self):
-        handle_events()
-        self.frame = (self.frame + 1) % 7
+        global stage_time
+        stage_time += 0.1
+        if self.turncheck == True:
+            if self.frame < 6:
+                self.frame = (self.frame + 1) % 7
+        else:
+            if self.reformframe == 0:
+                self.frameID = 0
+                self.frame = (self.frame + 1) % 7
+            else:
+                self.reformframe = self.reformframe - 2
+                self.frame = self.reformframe
+
+        self.y += self.dirY * 5
+        self.x += self.dirX * 5
 
     def draw(self):
-        self.image.clip_draw(self.frame * 50, 0, 50, 50, self.x, self.y)
-
+        self.image.clip_draw(self.frame * 70, self.frameID * 70, 70, 70, self.x, self.y)
+        print(str(self.pushLcheck) + " " + str(self.pushRcheck))
 class Map:
     def __init__(self, name, subname, posy):
         self.name = name
@@ -68,7 +142,7 @@ class Map:
 
     def draw(self):
             self.image.draw(self.x, self.y)
-            print(self.y)
+            #print(self.y)
 
 
 def initialize():
@@ -91,6 +165,8 @@ def handle_events():
     for event in events:
         if event.type == SDL_QUIT:
             mainframe.quit()
+        #player
+        player.handle_events(event)
 
 def update():
     # map
@@ -101,7 +177,7 @@ def update():
     #player
     player.update()
 
-    delay(0.01)
+    delay(0.04)
 
 def draw():
     clear_canvas()
