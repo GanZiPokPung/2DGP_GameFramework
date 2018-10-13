@@ -1,6 +1,6 @@
 import mainframe
 from pico2d import *
-#import title_scene
+import title_scene
 
 name = "StartScene"
 image = None
@@ -15,16 +15,16 @@ def handle_events():
 
 def update():
     global logo_time
-
     if(logo_time > 1.0) :
         logo_time = 0
+        mainframe.change_state(title_scene)
     delay(0.01)
     logo_time += 0.01
 
 def draw():
     global image
     clear_canvas()
-    image.draw(400, 300)
+    image.draw(275, 350)
     update_canvas()
 
 def pause():

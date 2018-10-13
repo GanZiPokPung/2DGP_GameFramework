@@ -1,20 +1,84 @@
 import mainframe
 from pico2d import *
 
+# default
 name = "StageScene"
 image = None
-logo_time = 0.0
+stage_time = 0.0
+stage = 0
+
+# map
+totalmap = None
+currentmap = 1
+map1 = None
+map1_posy = 0
+map2 = None
+map2_posy = 0
+mapSpeed = 500
+
+#player
+
+class Map:
+    def __init__(self, name, subname, posy):
+        self.name = name
+        self.subname = subname
+        self.width = 500
+        self.height = 4000
+        # 250
+        self.x = self.width / 2
+        # 2000
+        self.y = posy
+        self.pushcheck = False
+        self.endCheck = False
+        self.image = load_image(os.path.join(os.getcwd(), 'map', 'Stage' + str(name) + '_' + str(subname) + '.png'))
+
+    def update(self, mapList):
+        self.y = self.y - (mapSpeed / 100)
+        # 맵 이동 구간 체크
+        # self.height / 2 = 2000
+        # self.width + 2000 => 4000 + 2000 = 6000
+        if(self.pushcheck == False) and (self.y < 2000):
+            mapList.append(Map(self.name, 1, 6000))
+            self.pushcheck = True
+        else:
+            if self.y < -2500:
+                mapList.pop(0)
+
+    def draw(self):
+            self.image.draw(self.x, self.y)
+            print(self.y)
+
 
 def initialize():
-    pass
+    global totalmap
+    global map1
+    global map2
+    map1 = [Map(1, 0, 2000)]
+    map2 = [Map(2, 0, 2000)]
+    totalmap = {1:map1, 2:map2}
+
 def handle_events():
-    pass
+    global map
+    events = get_events()
+    for event in events:
+        if event.type == SDL_QUIT:
+            mainframe.quit()
+        if (event.type, event.key) == (SDL_KEYDOWN, SDLK_UP):
+            map.y = -1100
 
 def update():
-    pass
+    # map
+    currentmaplist = totalmap.get(currentmap)
+    for map in currentmaplist:
+        map.update(currentmaplist)
+    delay(0.01)
 
 def draw():
-    pass
+    clear_canvas()
+    # map
+    for map in totalmap.get(currentmap):
+        map.draw()
+    update_canvas()
 
 def pause():
     pass
@@ -23,5 +87,4 @@ def resume():
     pass
 
 def exit():
-    global image
-    del(image)
+    pass
