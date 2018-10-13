@@ -177,7 +177,7 @@ def update():
     #player
     player.update()
 
-    delay(0.04)
+    delay(0.015)
 
 def draw():
     clear_canvas()
