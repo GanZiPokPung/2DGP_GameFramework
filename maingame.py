@@ -2,7 +2,8 @@ import mainframe
 import pico2d
 
 import start_scene
+import static
 
-pico2d.open_canvas(500, 700)
+pico2d.open_canvas(static.canvas_width, static.canvas_height)
 mainframe.run(start_scene)
 pico2d.clear_canvas()

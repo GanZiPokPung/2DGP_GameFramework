@@ -3,6 +3,7 @@ from pico2d import *
 
 from map import Map
 from player import Player
+from monster import *
 
 # default
 name = "StageScene"
@@ -20,6 +21,12 @@ mapSpeed = 150
 #player
 player = None
 
+#bullet
+bullets = []
+
+#monster
+monsterpatterns = []
+monsters = []
 
 def initialize():
     #map
@@ -43,6 +50,11 @@ def handle_events():
     for event in events:
         if event.type == SDL_QUIT:
             mainframe.quit()
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_q):
+            # monsters.append((Warrior(200, 800, 50, 0.5, 0.5, 'Left', 'warrior_other')))
+            # monsters.append((Bird(200, 800, 5, 2, 2)))
+            # monsters.append(Dragon(200, 800, 5, 2, 2))
+            monsters.append(Dragon_Strong(100, 800, 50, 2, 2))
         #player
         player.handle_events(event)
 
@@ -54,8 +66,20 @@ def update():
     for map in currentmaplist:
         map.update(currentmaplist)
 
-    #player
+    # player
     player.update()
+
+    # monster
+    for monster in monsters:
+        erasecheck = monster.update()
+        if erasecheck == True:
+            monsters.remove(monster)
+
+    # bullet
+    for bullet in bullets:
+        erasecheck = bullet.update()
+        if erasecheck == True:
+            bullets.remove(bullet)
 
     delay(0.015)
 
@@ -67,6 +91,14 @@ def draw():
 
     #player
     player.draw()
+
+    # bullet
+    for bullet in bullets:
+        bullet.draw()
+
+    # monster
+    for monster in monsters:
+        monster.draw()
 
     update_canvas()
 

@@ -1,6 +1,7 @@
 import mainframe
 from pico2d import *
 import title_scene
+import static
 
 name = "StartScene"
 image = None
@@ -8,7 +9,7 @@ logo_time = 0.0
 
 def initialize():
     global image
-    image = load_image(os.path.join(os.getcwd(),'scene', 'kpu_credit.png'))
+    image = load_image(os.path.join(os.getcwd(), 'scene', 'kpu_credit.png'))
 
 def handle_events():
     events = get_events()
@@ -24,7 +25,7 @@ def update():
 def draw():
     global image
     clear_canvas()
-    image.draw(275, 350)
+    image.draw(static.canvas_width / 2, static.canvas_height / 2)
     update_canvas()
 
 def pause():

@@ -1,16 +1,21 @@
 from pico2d import *
 
+import math
+import static
+
+import stage_scene
+import custom_math
+
 class Bullet:
     image = None
     size = None
-    def __init__(self, posX, posY, speed, type, rootType, sizeX, sizeY):
+    def __init__(self, posX, posY, angle, speed, type, rootType, sizeX, sizeY):
         self.posX = posX
         self.posY = posY
-        self.speed = speed
+        self.angle = angle
+        self.speed = speed / 10
         self.type = type
         self.rootType = rootType
-        self.sizeX = sizeX
-        self.sizeY = sizeY
         # image
         if Bullet.image == None:
             self.initialize_image()
@@ -20,6 +25,9 @@ class Bullet:
             self.initialize_size()
         self.pngSizeX = Bullet.size.get(self.type)[0]
         self.pngSizeY = Bullet.size.get(self.type)[1]
+        #size
+        self.sizeX = self.pngSizeX * sizeX
+        self.sizeY = self.pngSizeY * sizeY
         # frame type
         self.frame = 0
         self.maxFrame = 0
@@ -59,7 +67,22 @@ class Bullet:
                         'Thunder':      [100, 200]}
 
     def update(self):
-        pass
+        self.posX += math.cos(math.radians(self.angle)) * self.speed
+        self.posY += math.sin(math.radians(self.angle)) * self.speed
+
+        # 맵 밖을 나가면 총알을 없앤다.
+        if (self.posX < 0 - self.sizeX) or (self.posX > static.canvas_width + self.sizeX):
+            return True
+        elif (self.posY < 0 - self.sizeY) or (self.posY > static.canvas_height + self.sizeY):
+            return True
+        else:
+            return False
+
 
     def draw(self):
-        pass
+        # No Sprite
+        self.image.clip_draw(0, 0,
+                             self.pngSizeX, self.pngSizeY,
+                             self.posX, self.posY,
+                             self.sizeX, self.sizeY)
+        # Sprite
