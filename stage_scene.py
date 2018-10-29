@@ -52,9 +52,9 @@ def handle_events():
             mainframe.quit()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_q):
             # monsters.append((Warrior(200, 800, 50, 0.5, 0.5, 'Left', 'warrior_other')))
-            # monsters.append((Bird(200, 800, 5, 2, 2)))
+            monsters.append((Bird(200, 800, 5, 2, 2)))
             # monsters.append(Dragon(200, 800, 5, 2, 2))
-            monsters.append(Dragon_Strong(100, 800, 50, 2, 2))
+            # monsters.append(Dragon_Strong(100, 800, 50, 2, 2))
         #player
         player.handle_events(event)
 
@@ -92,13 +92,13 @@ def draw():
     #player
     player.draw()
 
-    # bullet
-    for bullet in bullets:
-        bullet.draw()
-
     # monster
     for monster in monsters:
         monster.draw()
+
+    # bullet
+    for bullet in bullets:
+        bullet.draw()
 
     update_canvas()
 

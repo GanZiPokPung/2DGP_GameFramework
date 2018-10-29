@@ -151,9 +151,9 @@ class Player:
         # 공격(추후 상점 추가시 고칠 예정)
         if self.pushAttcheck == True :
             if Player.BulletTime > 0.75:
-                stage_scene.bullets.append(Bullet(self.x, self.y, 90 - 15, 250, 'BlueCircle', 0, 2, 2))
-                stage_scene.bullets.append(Bullet(self.x, self.y, 90, 250, 'BlueCircle', 0, 2, 2))
-                stage_scene.bullets.append(Bullet(self.x, self.y, 90 + 15, 250, 'BlueCircle', 0, 2, 2))
+                stage_scene.bullets.append(Bullet(self.x, self.y, 90 - 15, 250, 'Eagle', 0, 2, 2))
+                stage_scene.bullets.append(Bullet(self.x, self.y, 90, 250, 'Eagle', 0, 2, 2))
+                stage_scene.bullets.append(Bullet(self.x, self.y, 90 + 15, 250, 'Eagle', 0, 2, 2))
                 Player.BulletTime = 0
 
     def draw(self):
