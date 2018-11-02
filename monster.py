@@ -1,4 +1,5 @@
 from pico2d import *
+import game_world
 import stage_scene
 from bullet import Bullet
 import custom_math

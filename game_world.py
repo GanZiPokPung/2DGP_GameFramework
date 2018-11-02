@@ -1,5 +1,5 @@
 
-objects = [[], []]
+objects = [[], [], []]
 
 # object layer 로 넣은 obj를 분류하여 그 리스트에 추가함
 def add_object(obj, layer):
@@ -8,9 +8,16 @@ def add_object(obj, layer):
 # layer를 순회하여 obj를 찾아서 지움
 def remove_object(obj):
     for i in range(len(objects)):
-        if obj in objects[i]:
-            objects[i].remove(obj)
-            del obj
+        for j in objects[i]:
+
+            if j == obj:
+                objects[i].remove(j)
+                del j
+                return 0
+
+        # if obj in objects[i]:
+        #     objects[i].remove(obj)
+        #     del obj
 
 # layer를 순회하여 obj들을 모두 지움
 def clear():

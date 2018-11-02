@@ -1,9 +1,13 @@
 import mainframe
 from pico2d import *
+from static import *
 
 from map import Map
 from player import Player
 from monster import *
+
+import game_world
+
 
 # default
 name = "StageScene"
@@ -21,12 +25,12 @@ mapSpeed = 150
 #player
 player = None
 
-#bullet
-bullets = []
-
-#monster
-monsterpatterns = []
-monsters = []
+# #bullet
+# bullets = []
+#
+# #monster
+# monsterpatterns = []
+# monsters = []
 
 def initialize():
     #map
@@ -45,6 +49,8 @@ def initialize():
     #player
     player = Player()
 
+    game_world.add_object(player, PLAYER)
+
 def handle_events():
     events = get_events()
     for event in events:
@@ -52,7 +58,7 @@ def handle_events():
             mainframe.quit()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_q):
             # monsters.append((Warrior(200, 800, 50, 0.5, 0.5, 'Left', 'warrior_other')))
-            monsters.append((Bird(200, 800, 5, 2, 2)))
+            game_world.add_object(Bird(200, 800, 5, 2, 2), MONSTER)
             # monsters.append(Dragon(200, 800, 5, 2, 2))
             # monsters.append(Dragon_Strong(100, 800, 50, 2, 2))
         #player
@@ -66,20 +72,10 @@ def update():
     for map in currentmaplist:
         map.update(currentmaplist)
 
-    # player
-    player.update()
-
-    # monster
-    for monster in monsters:
-        erasecheck = monster.update()
-        if erasecheck == True:
-            monsters.remove(monster)
-
-    # bullet
-    for bullet in bullets:
-        erasecheck = bullet.update()
-        if erasecheck == True:
-            bullets.remove(bullet)
+    for game_object in game_world.all_objects():
+        erase = game_object.update()
+        if erase == True :
+            game_world.remove_object(game_object)
 
     delay(0.015)
 
@@ -89,16 +85,8 @@ def draw():
     for map in totalmap.get(currentmap):
         map.draw()
 
-    #player
-    player.draw()
-
-    # monster
-    for monster in monsters:
-        monster.draw()
-
-    # bullet
-    for bullet in bullets:
-        bullet.draw()
+    for game_object in game_world.all_objects():
+        game_object.draw()
 
     update_canvas()
 
@@ -109,4 +97,4 @@ def resume():
     pass
 
 def exit():
-    pass
+    game_world.clear()

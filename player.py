@@ -1,7 +1,9 @@
 from pico2d import *
+from static import *
 
 import stage_scene
 from bullet import Bullet
+import game_world
 
 class Player:
     MoveSpeed = 50 / 10
@@ -151,10 +153,12 @@ class Player:
         # 공격(추후 상점 추가시 고칠 예정)
         if self.pushAttcheck == True :
             if Player.BulletTime > 0.75:
-                stage_scene.bullets.append(Bullet(self.x, self.y, 90 - 15, 250, 'Eagle', 0, 2, 2))
-                stage_scene.bullets.append(Bullet(self.x, self.y, 90, 250, 'Eagle', 0, 2, 2))
-                stage_scene.bullets.append(Bullet(self.x, self.y, 90 + 15, 250, 'Eagle', 0, 2, 2))
+                game_world.add_object(Bullet(self.x, self.y, 90 - 15, 250, 'Eagle', 0, 2, 2), MONSTER)
+                game_world.add_object(Bullet(self.x, self.y, 90, 250, 'Eagle', 0, 2, 2), MONSTER)
+                game_world.add_object(Bullet(self.x, self.y, 90 + 15, 250, 'Eagle', 0, 2, 2), MONSTER)
                 Player.BulletTime = 0
+
+        return False
 
     def draw(self):
         self.image.clip_draw(self.frame * 70, self.frameID * 70, 70, 70, self.x, self.y)
