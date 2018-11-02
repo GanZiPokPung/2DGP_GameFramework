@@ -34,37 +34,61 @@ class Bullet:
 
     def initialize_image(self):
         Bullet.image = { # player bullet
-                        'BlueCircle':   load_image(os.path.join(os.getcwd(), 'bullet', 'player', 'BlueCircle.png')),
-                        'Eagle':        load_image(os.path.join(os.getcwd(), 'bullet', 'player', 'Eagle.png')),
-                        'ExplodeMiss':  load_image(os.path.join(os.getcwd(), 'bullet', 'player', 'ExplodeMiss.png')),
-                        'GreenWeak':    load_image(os.path.join(os.getcwd(), 'bullet', 'player', 'GreenWeak.png')),
-                        'GreenNormal':  load_image(os.path.join(os.getcwd(), 'bullet', 'player', 'GreenNormal.png')),
-                        'GreenStrong':  load_image(os.path.join(os.getcwd(), 'bullet', 'player', 'GreenStrong.png')),
-                        'PurpleWeak':   load_image(os.path.join(os.getcwd(), 'bullet', 'player', 'PurpleWeak.png')),
-                        'PurpleNormal': load_image(os.path.join(os.getcwd(), 'bullet', 'player', 'PurpleNormal.png')),
-                        'PurpleStrong': load_image(os.path.join(os.getcwd(), 'bullet', 'player', 'PurpleStrong.png')),
-                        'PurpleMax':    load_image(os.path.join(os.getcwd(), 'bullet', 'player', 'PurpleMax.png')),
-                        'Rug':          load_image(os.path.join(os.getcwd(), 'bullet', 'player', 'Rug.png')),
-                        'SmallCircle':  load_image(os.path.join(os.getcwd(), 'bullet', 'player', 'SmallCircle.png')),
-                        'SmallMiss':    load_image(os.path.join(os.getcwd(), 'bullet', 'player', 'SmallMiss.png')),
-                        'Thunder':      load_image(os.path.join(os.getcwd(), 'bullet', 'player', 'Thunder.png'))
-                         # monster bullet
+                'BlueCircle':       load_image(os.path.join(os.getcwd(), 'bullet', 'player', 'BlueCircle.png')),
+                'Eagle':            load_image(os.path.join(os.getcwd(), 'bullet', 'player', 'Eagle.png')),
+                'ExplodeMiss':      load_image(os.path.join(os.getcwd(), 'bullet', 'player', 'ExplodeMiss.png')),
+                'GreenWeak':        load_image(os.path.join(os.getcwd(), 'bullet', 'player', 'GreenWeak.png')),
+                'GreenNormal':      load_image(os.path.join(os.getcwd(), 'bullet', 'player', 'GreenNormal.png')),
+                'GreenStrong':      load_image(os.path.join(os.getcwd(), 'bullet', 'player', 'GreenStrong.png')),
+                'PurpleWeak':       load_image(os.path.join(os.getcwd(), 'bullet', 'player', 'PurpleWeak.png')),
+                'PurpleNormal':     load_image(os.path.join(os.getcwd(), 'bullet', 'player', 'PurpleNormal.png')),
+                'PurpleStrong':     load_image(os.path.join(os.getcwd(), 'bullet', 'player', 'PurpleStrong.png')),
+                'PurpleMax':        load_image(os.path.join(os.getcwd(), 'bullet', 'player', 'PurpleMax.png')),
+                'Rug':              load_image(os.path.join(os.getcwd(), 'bullet', 'player', 'Rug.png')),
+                'SmallCircle':      load_image(os.path.join(os.getcwd(), 'bullet', 'player', 'SmallCircle.png')),
+                'SmallMiss':        load_image(os.path.join(os.getcwd(), 'bullet', 'player', 'SmallMiss.png')),
+                'Thunder':          load_image(os.path.join(os.getcwd(), 'bullet', 'player', 'Thunder.png')),
+                 # monster bulletmonster
+                'Small_A':          load_image(os.path.join(os.getcwd(), 'bullet', 'monster', 'Small_A.png')),
+                'Small_B':          load_image(os.path.join(os.getcwd(), 'bullet', 'monster', 'Small_B.png')),
+                'Small_Anim':       load_image(os.path.join(os.getcwd(), 'bullet', 'monster', 'Small_Anim.png')),
+                'BlueCircle_M':     load_image(os.path.join(os.getcwd(), 'bullet', 'monster', 'BlueCircle.png')),
+                'BlueCircle_Anim':  load_image(os.path.join(os.getcwd(), 'bullet', 'monster', 'BlueCircle_Anim.png')),
+                'RedCircle':        load_image(os.path.join(os.getcwd(), 'bullet', 'monster', 'RedCircle.png')),
+                'RedSun':           load_image(os.path.join(os.getcwd(), 'bullet', 'monster', 'RedSun.png')),
+                'Missile':          load_image(os.path.join(os.getcwd(), 'bullet', 'monster', 'Missile.png')),
+                'YellowCircle_Anim':load_image(os.path.join(os.getcwd(), 'bullet', 'monster', 'YellowCircle_Anim.png')),
+                'Y':                load_image(os.path.join(os.getcwd(), 'bullet', 'monster', 'Y.png'))
                         }
     def initialize_size(self):
-        Bullet.size  = {'BlueCircle':   [36, 36],
-                        'Eagle':        [75, 49],
-                        'ExplodeMiss':  [48, 22],
-                        'GreenWeak':    [36, 36],
-                        'GreenNormal':  [28, 28],
-                        'GreenStrong':  [32, 32],
-                        'PurpleWeak':   [26, 26],
-                        'PurpleNormal': [26, 26],
-                        'PurpleStrong': [32, 32],
-                        'PurpleMax':    [48, 48],
-                        'Rug':          [24, 24],
-                        'SmallCircle':  [8, 8],
-                        'SmallMiss':    [16, 16],
-                        'Thunder':      [100, 200]}
+        Bullet.size  = {
+                        # player
+                        'BlueCircle':           [36, 36],
+                        'Eagle':                [75, 49],
+                        'ExplodeMiss':          [48, 22],
+                        'GreenWeak':            [36, 36],
+                        'GreenNormal':          [28, 28],
+                        'GreenStrong':          [32, 32],
+                        'PurpleWeak':           [26, 26],
+                        'PurpleNormal':         [26, 26],
+                        'PurpleStrong':         [32, 32],
+                        'PurpleMax':            [48, 48],
+                        'Rug':                  [24, 24],
+                        'SmallCircle':          [8, 8],
+                        'SmallMiss':            [16, 16],
+                        'Thunder':              [100, 200],
+                        # monster
+                        'Small_A':              [16, 16],
+                        'Small_B':              [12, 12],
+                        'Small_Anim':           [142 / 8, 10, 8],
+                        'BlueCircle_M':         [92, 98],
+                        'BlueCircle_Anim':      [108 / 3, 38, 3],
+                        'RedCircle':            [91, 92],
+                        'RedSun':               [91, 92],
+                        'Missile':              [24, 24],
+                        'YellowCircle_Anim':    [336 / 6, 61, 6],
+                        'Y':                    [90, 270 / 3, 3]
+        }
 
     def update(self):
         self.posX += math.cos(math.radians(self.angle)) * self.speed

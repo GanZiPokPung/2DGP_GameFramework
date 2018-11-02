@@ -1,4 +1,5 @@
 from pico2d import *
+from static import *
 import game_world
 import stage_scene
 from bullet import Bullet
@@ -90,9 +91,9 @@ class Warrior(Monster):
             self.anglespeed = 0
 
         if self.imageType == 'warrior':
-            self.shootDelay = 4
+            self.shootDelay = 8
         if self.imageType == 'warrior_other':
-            self.shootDelay = 3
+            self.shootDelay = 6
 
     def draw(self):
         self.image.clip_draw(0, 0, self.pngSizeX, self.pngSizeY, self.posX, self.posY, self.sizeX, self.sizeY)
@@ -107,7 +108,10 @@ class Warrior(Monster):
 
         if self.shootTime > self.shootDelay:
             angle = custom_math.angle_between([self.posX, self.posY], [stage_scene.player.x, stage_scene.player.y])
-            stage_scene.bullets.append(Bullet(self.posX, self.posY, angle, 10, 'BlueCircle', '', 0.5, 0.5))
+            if self.imageType == 'warrior':
+                game_world.add_object(Bullet(self.posX, self.posY, angle, 20, 'Small_A', '', 1, 1), BULLET)
+            if self.imageType == 'warrior_other':
+                game_world.add_object(Bullet(self.posX, self.posY, angle, 40, 'Small_B', '', 2, 2), BULLET)
             self.shootTime = 0
 
     def modify_difficulty(self):

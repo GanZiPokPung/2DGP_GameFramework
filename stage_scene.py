@@ -57,8 +57,8 @@ def handle_events():
         if event.type == SDL_QUIT:
             mainframe.quit()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_q):
-            # monsters.append((Warrior(200, 800, 50, 0.5, 0.5, 'Left', 'warrior_other')))
-            game_world.add_object(Bird(200, 800, 5, 2, 2), MONSTER)
+            game_world.add_object(Warrior(200, 800, 50, 0.5, 0.5, 'Left', 'warrior_other'), MONSTER)
+            # game_world.add_object(Bird(200, 800, 5, 2, 2), MONSTER)
             # monsters.append(Dragon(200, 800, 5, 2, 2))
             # monsters.append(Dragon_Strong(100, 800, 50, 2, 2))
         #player
