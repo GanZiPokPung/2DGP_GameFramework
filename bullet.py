@@ -9,13 +9,15 @@ import custom_math
 class Bullet:
     image = None
     size = None
-    def __init__(self, posX, posY, angle, speed, type, rootType, sizeX, sizeY):
+    def __init__(self, posX, posY, angle, speed, imageType, rootType, bulletType, sizeX, sizeY):
         self.posX = posX
         self.posY = posY
         self.angle = angle
+        self.rotAngle = 0
         self.speed = speed / 10
-        self.type = type
+        self.type = imageType
         self.rootType = rootType
+        self.bulletType = bulletType
         # image
         if Bullet.image == None:
             self.initialize_image()
@@ -30,7 +32,10 @@ class Bullet:
         self.sizeY = self.pngSizeY * sizeY
         # frame type
         self.frame = 0
-        self.maxFrame = 0
+        if self.bulletType == 'Anim':
+            self.maxFrame = Bullet.size.get(self.type)[2]
+        else:
+            self.maxFrame = 0
 
     def initialize_image(self):
         Bullet.image = { # player bullet
@@ -80,19 +85,23 @@ class Bullet:
                         # monster
                         'Small_A':              [16, 16],
                         'Small_B':              [12, 12],
-                        'Small_Anim':           [142 / 8, 10, 8],
+                        'Small_Anim':           [142 // 8, 10, 8],
                         'BlueCircle_M':         [92, 98],
-                        'BlueCircle_Anim':      [108 / 3, 38, 3],
+                        'BlueCircle_Anim':      [108 // 3, 38, 3],
                         'RedCircle':            [91, 92],
                         'RedSun':               [91, 92],
                         'Missile':              [24, 24],
-                        'YellowCircle_Anim':    [336 / 6, 61, 6],
-                        'Y':                    [90, 270 / 3, 3]
+                        'YellowCircle_Anim':    [336 // 6, 61, 6],
+                        'Y':                    [90, 270 // 3, 3]
         }
 
     def update(self):
         self.posX += math.cos(math.radians(self.angle)) * self.speed
         self.posY += math.sin(math.radians(self.angle)) * self.speed
+
+        if self.maxFrame != 0:
+            self.frame = (self.frame + 1) % self.maxFrame
+        self.rotAngle += 20
 
         # 맵 밖을 나가면 총알을 없앤다.
         if (self.posX < 0 - self.sizeX) or (self.posX > static.canvas_width + self.sizeX):
@@ -103,10 +112,18 @@ class Bullet:
             return False
 
 
+
     def draw(self):
-        # No Sprite
-        self.image.clip_draw(0, 0,
-                             self.pngSizeX, self.pngSizeY,
-                             self.posX, self.posY,
-                             self.sizeX, self.sizeY)
-        # Sprite
+
+        if self.bulletType == 'Rotate':
+            self.image.clip_composite_draw(self.frame * self.pngSizeX, 0,
+                                           self.pngSizeX, self.pngSizeY,
+                                           math.radians(self.rotAngle), '',
+                                           self.posX, self.posY,
+                                           self.sizeX, self.sizeY)
+        else:
+            # No Sprite
+            self.image.clip_draw(self.frame * self.pngSizeX, 0,
+                                 self.pngSizeX, self.pngSizeY,
+                                 self.posX, self.posY,
+                                 self.sizeX, self.sizeY)

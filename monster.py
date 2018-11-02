@@ -91,9 +91,18 @@ class Warrior(Monster):
             self.anglespeed = 0
 
         if self.imageType == 'warrior':
-            self.shootDelay = 8
+            self.shootDelay = random.randint(7, 12)
+            self.shootSpeed = 20
+            self.bulletsizeX = 1
+            self.bulletsizeY = 1
         if self.imageType == 'warrior_other':
-            self.shootDelay = 6
+            self.shootDelay = random.randint(5, 10)
+            self.shootSpeed = 40
+            self.bulletsizeX = 2
+            self.bulletsizeY = 2
+
+        self.originShootDelay = self.shootDelay
+        self.originShootSpeed = self.shootSpeed
 
     def draw(self):
         self.image.clip_draw(0, 0, self.pngSizeX, self.pngSizeY, self.posX, self.posY, self.sizeX, self.sizeY)
@@ -109,13 +118,16 @@ class Warrior(Monster):
         if self.shootTime > self.shootDelay:
             angle = custom_math.angle_between([self.posX, self.posY], [stage_scene.player.x, stage_scene.player.y])
             if self.imageType == 'warrior':
-                game_world.add_object(Bullet(self.posX, self.posY, angle, 20, 'Small_A', '', 1, 1), BULLET)
+                game_world.add_object(Bullet(self.posX, self.posY, angle, self.shootSpeed, 'Small_A', '', '',
+                                             self.bulletsizeX, self.bulletsizeY), BULLET)
             if self.imageType == 'warrior_other':
-                game_world.add_object(Bullet(self.posX, self.posY, angle, 40, 'Small_B', '', 2, 2), BULLET)
+                game_world.add_object(Bullet(self.posX, self.posY, angle,self.shootSpeed, 'Small_B', '', '',
+                                             self.bulletsizeX, self.bulletsizeY), BULLET)
             self.shootTime = 0
 
-    def modify_difficulty(self):
-        pass
+    def modify_difficulty(self, difficulty):
+        self.shootDelay = self.originShootDelay / (1 + difficulty / 10)
+        self.shootSpeed = self.originShootSpeed * (1 + difficulty / 10)
 
 class Bird(Monster):
     image = None
@@ -127,6 +139,8 @@ class Bird(Monster):
         self.sizeX = self.pngSizeX * self.sizeX
         self.sizeY = self.pngSizeY * self.sizeY
         self.angle = 270
+        self.bulletsizeX = 0.4
+        self.bulletsizeY = 0.4
         #
         self.animTime = 0
         self.animSpeed = 0.1
@@ -141,12 +155,21 @@ class Bird(Monster):
         self.movePattern = [[posX, tmpPosY],[posX + random.randint(100, 200), tmpPosY]]
         self.moveLocation = 0
         self.moveT = 0
+        self.speedT = 1
+        self.originSpeedT = self.speedT
 
         self.shootDelay = 15
         self.shootterm = False
 
+        self.shootSpeed = 100
+
+        self.originShootDelay = self.shootDelay
+        self.originShootSpeed = self.shootSpeed
+
     def draw(self):
-        Bird.image.clip_draw(self.frame * self.pngSizeX, 3 * self.pngSizeY, self.pngSizeX, self.pngSizeY, self.posX, self.posY, self.sizeX, self.sizeY)
+        Bird.image.clip_draw(self.frame * self.pngSizeX, 3 * self.pngSizeY, self.pngSizeX, self.pngSizeY,
+                             self.posX, self.posY,
+                             self.sizeX, self.sizeY)
 
     def update_anim(self):
         self.animTime += self.animSpeed
@@ -165,7 +188,7 @@ class Bird(Monster):
                     self.moveMode = False
                     self.moveT = 0
                 else:
-                    self.moveT += 1
+                    self.moveT += self.speedT
                     self.posX, self.posY = custom_math.move_line(self.originPos,
                                                              self.movePattern[self.moveLocation],
                                                              self.moveT)
@@ -179,7 +202,7 @@ class Bird(Monster):
                     else:
                         self.moveLocation = 1
                 else:
-                    self.moveT += 1
+                    self.moveT += self.speedT
                     if self.moveLocation == 1:
                         self.posX, self.posY = custom_math.move_line(self.movePattern[1],
                                                                      self.movePattern[0],
@@ -190,19 +213,26 @@ class Bird(Monster):
                                                                      self.moveT)
         elif self.shootTime > self.shootDelay:
             if  self.shootterm == False:
-                stage_scene.bullets.append(Bullet(self.posX, self.posY, 270 - 10, 30, 'BlueCircle', '', 0.75, 0.75))
-                stage_scene.bullets.append(Bullet(self.posX, self.posY, 270, 30, 'BlueCircle', '', 0.75, 0.75))
-                stage_scene.bullets.append(Bullet(self.posX, self.posY, 270 + 10, 30, 'BlueCircle', '', 0.75, 0.75))
+                game_world.add_object(Bullet(self.posX, self.posY, 270 - 20, self.shootSpeed, 'RedSun', '', '',
+                                             self.bulletsizeX, self.bulletsizeY), BULLET)
+                game_world.add_object(Bullet(self.posX, self.posY, 270, self.shootSpeed, 'RedSun', '', '',
+                                             self.bulletsizeX, self.bulletsizeY), BULLET)
+                game_world.add_object(Bullet(self.posX, self.posY, 270 + 20, self.shootSpeed, 'RedSun', '', '',
+                                             self.bulletsizeX, self.bulletsizeY), BULLET)
                 self.shootterm = True
             if self.shootTime > self.shootDelay + 3:
-                stage_scene.bullets.append(Bullet(self.posX - 5, self.posY, 270 - 5, 30, 'BlueCircle', '', 0.75, 0.75))
-                stage_scene.bullets.append(Bullet(self.posX + 5, self.posY, 270 + 5, 30, 'BlueCircle', '', 0.75, 0.75))
+                game_world.add_object(Bullet(self.posX - 5, self.posY, 270 - 10, self.shootSpeed, 'RedSun', '', '',
+                                             self.bulletsizeX, self.bulletsizeY), BULLET)
+                game_world.add_object(Bullet(self.posX + 5, self.posY, 270 + 10, self.shootSpeed, 'RedSun', '', '',
+                                             self.bulletsizeX, self.bulletsizeY), BULLET)
                 self.shootTime = 0
                 self.shootterm = False
                 self.moveMode = True
 
-    def modify_difficulty(self):
-        pass
+    def modify_difficulty(self, difficulty):
+        self.shootDelay = self.originShootDelay / (1 + difficulty / 10)
+        self.shootSpeed = self.originShootSpeed * (1 + difficulty / 10)
+        self.speedT = self.originSpeedT + difficulty // 2
 
 class Dragon(Monster):
     image = None
@@ -214,6 +244,8 @@ class Dragon(Monster):
         self.sizeX = self.pngSizeX * self.sizeX
         self.sizeY = self.pngSizeY * self.sizeY
         self.angle = 270
+        self.bulletsizeX = 0.5
+        self.bulletsizeY = 0.5
         #
         self.animTime = 0
         self.animSpeed = 0.1
@@ -226,9 +258,16 @@ class Dragon(Monster):
         self.movePattern = [[100, 670], [400, 500], [400, 670], [100, 500]]
         self.moveLocation = 0
         self.moveT = 0
+        self.speedT = 1
+        self.originSpeedT = self.speedT
 
         self.shootDelay = 30
+        self.shootSpeed = 40
         self.shootterm = False
+
+        # difficulty
+        self.originShootDelay = self.shootDelay
+        self.originShootSpeed = self.shootSpeed
 
     def draw(self):
         Dragon.image.clip_draw(self.frame * self.pngSizeX, 3 * self.pngSizeY, self.pngSizeX, self.pngSizeY, self.posX,
@@ -247,7 +286,7 @@ class Dragon(Monster):
                 self.firstMode = False
                 self.moveT = 0
             else:
-                self.moveT += 1
+                self.moveT += self.speedT
                 self.posX, self.posY = custom_math.move_line(self.originPos,
                                                              self.movePattern[2],
                                                              self.moveT)
@@ -259,7 +298,7 @@ class Dragon(Monster):
                 else:
                     self.moveLocation += 1
             else:
-                self.moveT += 1
+                self.moveT += self.speedT
                 if self.moveLocation == 3:
                     dstLocation = 0
                 else:
@@ -272,33 +311,45 @@ class Dragon(Monster):
         self.shootTime += 0.01
         if (self.shootTime > self.shootDelay - 10 - 0.1) and (self.shootTime < self.shootDelay - 10 + 0.1)\
                 and (self.shootterm == False):
-            stage_scene.bullets.append(Bullet(self.posX, self.posY, 270 - 30, 40, 'BlueCircle', '', 1, 1))
-            stage_scene.bullets.append(Bullet(self.posX, self.posY, 270 + 30, 40, 'BlueCircle', '', 1, 1))
+            game_world.add_object(Bullet(self.posX, self.posY, 270 - 30, self.shootSpeed, 'RedCircle', '', '',
+                                         self.bulletsizeX, self.bulletsizeY), BULLET)
+            game_world.add_object(Bullet(self.posX, self.posY, 270 + 30, self.shootSpeed, 'RedCircle', '', '',
+                                         self.bulletsizeX, self.bulletsizeY), BULLET)
             self.shootterm = True
         elif (self.shootTime > self.shootDelay - 8 - 0.1) and (self.shootTime < self.shootDelay - 8 + 0.1) \
                 and (self.shootterm == False):
-            stage_scene.bullets.append(Bullet(self.posX - 5, self.posY, 270 - 5, 40, 'BlueCircle', '', 1, 1))
-            stage_scene.bullets.append(Bullet(self.posX + 5, self.posY, 270 + 5, 40, 'BlueCircle', '', 1, 1))
+            game_world.add_object(Bullet(self.posX - 5, self.posY, 270 - 5, self.shootSpeed, 'RedCircle', '', '',
+                                         self.bulletsizeX, self.bulletsizeY), BULLET)
+            game_world.add_object(Bullet(self.posX + 5, self.posY, 270 + 5, self.shootSpeed, 'RedCircle', '', '',
+                                         self.bulletsizeX, self.bulletsizeY), BULLET)
             self.shootterm = True
         elif (self.shootTime > self.shootDelay - 6 - 0.1) and (self.shootTime < self.shootDelay - 6 + 0.1) \
                 and (self.shootterm == False):
-            stage_scene.bullets.append(Bullet(self.posX, self.posY, 270 - 30, 40, 'BlueCircle', '', 1, 1))
-            stage_scene.bullets.append(Bullet(self.posX, self.posY, 270 + 30, 40, 'BlueCircle', '', 1, 1))
+            game_world.add_object(Bullet(self.posX, self.posY, 270 - 30, self.shootSpeed, 'RedCircle', '', '',
+                                         self.bulletsizeX, self.bulletsizeY), BULLET)
+            game_world.add_object(Bullet(self.posX, self.posY, 270 + 30, self.shootSpeed, 'RedCircle', '', '',
+                                         self.bulletsizeX, self.bulletsizeY), BULLET)
             self.shootterm = True
         elif (self.shootTime > self.shootDelay - 4 - 0.1) and (self.shootTime < self.shootDelay - 4 + 0.1) \
                 and (self.shootterm == False):
-            stage_scene.bullets.append(Bullet(self.posX - 5, self.posY, 270 - 5, 40, 'BlueCircle', '', 1, 1))
-            stage_scene.bullets.append(Bullet(self.posX + 5, self.posY, 270 + 5, 40, 'BlueCircle', '', 1, 1))
+            game_world.add_object(Bullet(self.posX - 5, self.posY, 270 - 5, self.shootSpeed, 'RedCircle', '', '',
+                                         self.bulletsizeX, self.bulletsizeY), BULLET)
+            game_world.add_object(Bullet(self.posX + 5, self.posY, 270 + 5, self.shootSpeed, 'RedCircle', '', '',
+                                         self.bulletsizeX, self.bulletsizeY), BULLET)
             self.shootterm = True
         elif (self.shootTime > self.shootDelay - 2 - 0.1) and (self.shootTime < self.shootDelay - 2 + 0.1) \
                 and (self.shootterm == False):
-            stage_scene.bullets.append(Bullet(self.posX, self.posY, 270 - 30, 40, 'BlueCircle', '', 1, 1))
-            stage_scene.bullets.append(Bullet(self.posX, self.posY, 270 + 30, 40, 'BlueCircle', '', 1, 1))
+            game_world.add_object(Bullet(self.posX, self.posY, 270 - 30, self.shootSpeed, 'RedCircle', '', '',
+                                         self.bulletsizeX, self.bulletsizeY), BULLET)
+            game_world.add_object(Bullet(self.posX, self.posY, 270 + 30, self.shootSpeed, 'RedCircle', '', '',
+                                         self.bulletsizeX, self.bulletsizeY), BULLET)
             self.shootterm = True
         elif (self.shootTime > self.shootDelay - 0 - 0.1) and (self.shootTime < self.shootDelay - 0 + 0.1) \
                 and (self.shootterm == False):
-            stage_scene.bullets.append(Bullet(self.posX - 5, self.posY, 270 - 5, 40, 'BlueCircle', '', 1, 1))
-            stage_scene.bullets.append(Bullet(self.posX + 5, self.posY, 270 + 5, 40, 'BlueCircle', '', 1, 1))
+            game_world.add_object(Bullet(self.posX - 5, self.posY, 270 - 5, self.shootSpeed, 'RedCircle', '', '',
+                                         self.bulletsizeX, self.bulletsizeY), BULLET)
+            game_world.add_object(Bullet(self.posX + 5, self.posY, 270 + 5, self.shootSpeed, 'RedCircle', '', '',
+                                         self.bulletsizeX, self.bulletsizeY), BULLET)
             self.shootterm = True
         else:
             self.shootterm = False
@@ -306,8 +357,10 @@ class Dragon(Monster):
         if self.shootTime > self.shootDelay:
             self.shootTime = 0
 
-    def modify_difficulty(self):
-        pass
+    def modify_difficulty(self, difficulty):
+        self.shootDelay = self.originShootDelay / (1 + difficulty / 10)
+        self.shootSpeed = self.originShootSpeed * (1 + difficulty / 10)
+        self.speedT = self.originSpeedT + difficulty // 2
 
 class Dragon_Strong(Monster):
     image = None
@@ -320,6 +373,8 @@ class Dragon_Strong(Monster):
         self.sizeX = self.pngSizeX * self.sizeX
         self.sizeY = self.pngSizeY * self.sizeY
         self.angle = 270
+        self.bulletsizeX = 2
+        self.bulletsizeY = 2
         #
         self.animTime = 0
         self.animID = 5
@@ -330,10 +385,17 @@ class Dragon_Strong(Monster):
         self.firstMode = True
 
         self.anglespeed = 2
+        self.originAngleSpeed = self.anglespeed
         #
         self.bulletTime = 0
         self.bulletDelay = 2
         self.bulletAngle = 0
+
+        # difficulty
+        self.shootSpeed = 90
+
+        self.originShootSpeed = self.shootSpeed
+        self.originShootDelay = self.bulletDelay
 
     def draw(self):
         Dragon.image.clip_draw(self.frame * self.pngSizeX, self.animID * self.pngSizeY, self.pngSizeX, self.pngSizeY, self.posX,
@@ -379,10 +441,13 @@ class Dragon_Strong(Monster):
             self.posY += math.sin(math.radians(self.angle)) * self.speed
 
         self.bulletTime += 0.1
-        self.bulletAngle += 1
+        self.bulletAngle += 2
         if self.bulletTime > self.bulletDelay:
-            stage_scene.bullets.append(Bullet(self.posX, self.posY,  self.bulletAngle, 100, 'BlueCircle', '', 0.5, 0.5))
+            game_world.add_object(Bullet(self.posX, self.posY,  self.bulletAngle, self.shootSpeed, 'YellowCircle_Anim', '', 'Anim'
+                                              , self.bulletsizeX, self.bulletsizeY), BULLET)
             self.bulletTime = 0
 
-    def modify_difficulty(self):
-        pass
+    def modify_difficulty(self, difficulty):
+        self.shootDelay = self.originShootDelay / (1 + difficulty / 10)
+        self.shootSpeed = self.originShootSpeed * (1 + difficulty / 10)
+        self.originAngleSpeed = self.originAngleSpeed * (1 + difficulty / 10)
