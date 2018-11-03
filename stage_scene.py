@@ -8,7 +8,6 @@ from monster import *
 
 import game_world
 
-
 # default
 name = "StageScene"
 image = None
@@ -17,7 +16,7 @@ stage = 0
 
 # map
 totalmap = None
-currentmap = 1
+currentmap = 2
 map1 = None
 map2 = None
 mapSpeed = 150
@@ -27,10 +26,12 @@ player = None
 
 # #bullet
 # bullets = []
+
 #
 # #monster
 # monsterpatterns = []
 # monsters = []
+monsterpattern = None
 
 def initialize():
     #map
@@ -39,15 +40,17 @@ def initialize():
     global map2
     #player
     global player
-
+    global monsterpattern
     # map
     # stage 별로 리스트에 보관
     map1 = [Map(1, 0, 2000, mapSpeed)]
     map2 = [Map(2, 0, 2000, mapSpeed)]
     # 리스트 별로 딕셔너리에 스테이지 번호와 함께 보관
     totalmap = {1:map1, 2:map2}
-    #player
+    # player
     player = Player()
+    # monster
+    monsterpattern = Monster_Pattern()
 
     game_world.add_object(player, PLAYER)
 
@@ -57,10 +60,8 @@ def handle_events():
         if event.type == SDL_QUIT:
             mainframe.quit()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_q):
-            # game_world.add_object(Warrior(200, 800, 50, 0.5, 0.5, 'Left', 'warrior_other'), MONSTER)
-            # game_world.add_object(Bird(200, 800, 5, 2, 2), MONSTER)
-            # game_world.add_object(Dragon(200, 800, 5, 2, 2), MONSTER)
-            game_world.add_object(Dragon_Strong(100, 800, 50, 2, 2), MONSTER)
+            for object in monsterpattern.get_monster():
+                game_world.add_object(object, MONSTER)
         #player
         player.handle_events(event)
 

@@ -8,6 +8,169 @@ import static
 
 import random
 
+# monster pattern
+class Monster_Pattern:
+    monster_list = None
+    difficulty = None
+
+    def __init__(self):
+        if Monster_Pattern.difficulty == None:
+            Monster_Pattern.difficulty = 0
+
+    def get_monster(self):
+
+        select = random.randint(1, 10)
+
+        if select < 8:
+            subselect = random.randint(0, 8)
+            warrior_count = random.randint(4, 7 + Monster_Pattern.difficulty)
+            # warrior
+            # 왼쪽위치에서 왼쪽 방향
+            if subselect == 0:
+                warrior_pattern_left = [Warrior(200, 800, i,'Left', 'warrior')
+                                        for i in range(warrior_count)]
+                warrior_pattern_left.append(Warrior(200, 800,
+                                                    len(warrior_pattern_left) + 1, 'Left', 'warrior_other'))
+
+                for monster in warrior_pattern_left :
+                    monster.modify_difficulty(Monster_Pattern.difficulty)
+                    yield monster
+            # 오른쪽위치에서 오른쪽 방향
+            elif subselect == 1:
+                warrior_pattern_right = [Warrior(300, 800, i, 'Right', 'warrior')
+                                         for i in range(warrior_count)]
+                warrior_pattern_right.append(Warrior(300, 800,
+                                                     len(warrior_pattern_right) + 1, 'Right', 'warrior_other'))
+
+                for monster in warrior_pattern_right :
+                    monster.modify_difficulty(Monster_Pattern.difficulty)
+                    yield monster
+            elif subselect == 2:
+                warrior_pattern_center = [Warrior(300 + random.randint(-200, 200), 800, i, '', 'warrior')
+                                          for i in range(warrior_count)]
+                warrior_pattern_center.append(Warrior(300 + random.randint(-200, 200), 800,
+                                                      len(warrior_pattern_center) + 1, '', 'warrior_other'))
+
+                for monster in warrior_pattern_center :
+                    monster.modify_difficulty(Monster_Pattern.difficulty)
+                    yield monster
+            elif subselect == 3:
+                warrior_pattern_left_other = [Warrior(400, 800, i,'Left', 'warrior')
+                                        for i in range(warrior_count)]
+                warrior_pattern_left_other.append(Warrior(400, 800,
+                                                    len(warrior_pattern_left_other) + 1, 'Left', 'warrior_other'))
+
+                for monster in warrior_pattern_left_other :
+                    monster.modify_difficulty(Monster_Pattern.difficulty)
+                    yield monster
+            elif subselect == 4:
+                warrior_pattern_right_other = [Warrior(100, 800, i, 'Right', 'warrior')
+                                               for i in range(warrior_count)]
+                warrior_pattern_right_other.append(Warrior(100, 800,
+                                            len(warrior_pattern_right_other) + 1, 'Right', 'warrior_other'))
+
+                for monster in warrior_pattern_right_other :
+                    monster.modify_difficulty(Monster_Pattern.difficulty)
+                    yield monster
+            elif subselect == 5:
+                warrior_pattern_left = [Warrior(200, 800, i, 'Left', 'warrior')
+                                        for i in range(warrior_count)]
+                warrior_pattern_left.append(Warrior(200, 800,
+                                                    len(warrior_pattern_left) + 1, 'Left', 'warrior_other'))
+                warrior_pattern_right = [Warrior(300, 800, i, 'Right', 'warrior')
+                                         for i in range(warrior_count)]
+                warrior_pattern_right.append(Warrior(300, 800,
+                                                     len(warrior_pattern_right) + 1, 'Right', 'warrior_other'))
+
+                warrior_pattern_both_out = [[warrior_pattern_left[i], warrior_pattern_right[i]]
+                                               for i in range(warrior_count + 1)]
+
+                for monster in warrior_pattern_both_out:
+                    monster[0].modify_difficulty(Monster_Pattern.difficulty)
+                    monster[1].modify_difficulty(Monster_Pattern.difficulty)
+                    yield  monster[0]
+                    yield  monster[1]
+
+            elif subselect == 6:
+                warrior_pattern_left_other = [Warrior(400, 800, i, 'Left', 'warrior')
+                                              for i in range(warrior_count)]
+                warrior_pattern_left_other.append(Warrior(400, 800,
+                                                          len(warrior_pattern_left_other) + 1, 'Left', 'warrior_other'))
+                warrior_pattern_right_other = [Warrior(100, 800, i, 'Right', 'warrior')
+                                               for i in range(warrior_count)]
+                warrior_pattern_right_other.append(Warrior(100, 800,
+                                                           len(warrior_pattern_right_other) + 1, 'Right',
+                                                           'warrior_other'))
+
+                warrior_pattern_both_in = [[warrior_pattern_left_other[i], warrior_pattern_right_other[i]]
+                                              for i in range(warrior_count + 1)]
+
+                for monster in warrior_pattern_both_in:
+                    monster[0].modify_difficulty(Monster_Pattern.difficulty)
+                    monster[1].modify_difficulty(Monster_Pattern.difficulty)
+                    yield monster[0]
+                    yield monster[1]
+            elif subselect == 7:
+                warrior_pattern_left = [Warrior(200, 800, i, 'Left', 'warrior')
+                                        for i in range(warrior_count)]
+                warrior_pattern_left.append(Warrior(200, 800,
+                                                    len(warrior_pattern_left) + 1, 'Left', 'warrior_other'))
+                warrior_pattern_left_other = [Warrior(400, 800, i, 'Left', 'warrior')
+                                              for i in range(warrior_count)]
+                warrior_pattern_left_other.append(Warrior(400, 800,
+                                                          len(warrior_pattern_left_other) + 1, 'Left', 'warrior_other'))
+
+                warrior_pattern_both_left = [[warrior_pattern_left[i], warrior_pattern_left_other[i]]
+                                               for i in range(warrior_count + 1)]
+
+                for monster in warrior_pattern_both_left:
+                    monster[0].modify_difficulty(Monster_Pattern.difficulty)
+                    monster[1].modify_difficulty(Monster_Pattern.difficulty)
+                    yield  monster[0]
+                    yield  monster[1]
+
+            elif subselect == 8:
+                warrior_pattern_right = [Warrior(300, 800, i, 'Right', 'warrior')
+                                         for i in range(warrior_count)]
+                warrior_pattern_right.append(Warrior(300, 800,
+                                                     len(warrior_pattern_right) + 1, 'Right', 'warrior_other'))
+                warrior_pattern_right_other = [Warrior(100, 800, i, 'Right', 'warrior')
+                                               for i in range(warrior_count)]
+                warrior_pattern_right_other.append(Warrior(100, 800,
+                                                           len(warrior_pattern_right_other) + 1, 'Right',
+                                                           'warrior_other'))
+
+                warrior_pattern_both_right = [[warrior_pattern_right[i], warrior_pattern_right_other[i]]
+                                              for i in range(warrior_count + 1)]
+
+                for monster in warrior_pattern_both_right:
+                    monster[0].modify_difficulty(Monster_Pattern.difficulty)
+                    monster[1].modify_difficulty(Monster_Pattern.difficulty)
+                    yield monster[0]
+                    yield monster[1]
+
+        else:
+            subselect = random.randint(0, 2)
+            # Bird
+            if subselect == 0:
+                bird = Bird(300 + random.randint(-150, 150), 800)
+                bird.modify_difficulty(Monster_Pattern.difficulty)
+                yield bird
+            # Dragon
+            elif subselect == 1:
+                dragon = Dragon(200, 800)
+                dragon.modify_difficulty(Monster_Pattern.difficulty)
+                yield dragon
+            # Dragon_Strong
+            elif subselect == 2:
+                dragon_strong = Dragon_Strong(100, 800)
+                dragon_strong.modify_difficulty(Monster_Pattern.difficulty)
+                yield dragon_strong
+
+
+##########################################################################################
+
+# Monster Classes
 class Monster:
     def __init__(self, posX, posY, speed, sizeX, sizeY):
         self.posX = posX
@@ -18,6 +181,7 @@ class Monster:
         self.frame = 0
         self.shootTime = 0
         self.shootDelay = 0
+        self.time = 0
 
     def initialize(self):
         pass
@@ -45,11 +209,13 @@ class Monster:
     def update_AI(self):
         pass
 
-
 class Warrior(Monster):
     image = None
     size = None
-    def __init__(self, posX, posY, speed, sizeX, sizeY, LRtype, imageType):
+    def __init__(self, posX, posY, term, LRtype, imageType):
+        speed = 50
+        sizeX = 0.5
+        sizeY = 0.5
         Monster.__init__(self, posX, posY, speed, sizeX, sizeY)
         self.LRtype = LRtype
         self.imageType = imageType
@@ -68,6 +234,7 @@ class Warrior(Monster):
         #
         self.initialize()
         #
+        self.term = term
 
     def initialize_image(self):
         Warrior.image = {'warrior': load_image(os.path.join(os.getcwd(), 'monster', 'warrior.png')),
@@ -91,7 +258,7 @@ class Warrior(Monster):
             self.anglespeed = 0
 
         if self.imageType == 'warrior':
-            self.shootDelay = random.randint(7, 12)
+            self.shootDelay = random.randint(10, 20)
             self.shootSpeed = 20
             self.bulletsizeX = 1
             self.bulletsizeY = 1
@@ -101,9 +268,6 @@ class Warrior(Monster):
             self.bulletsizeX = 2
             self.bulletsizeY = 2
 
-        self.originShootDelay = self.shootDelay
-        self.originShootSpeed = self.shootSpeed
-
     def draw(self):
         self.image.clip_draw(0, 0, self.pngSizeX, self.pngSizeY, self.posX, self.posY, self.sizeX, self.sizeY)
 
@@ -111,6 +275,10 @@ class Warrior(Monster):
         pass
 
     def update_AI(self):
+        self.time += 0.1
+        if self.time < self.term:
+            return 1
+
         self.angle += self.anglespeed
         self.posX += math.cos(math.radians(self.angle)) * self.speed
         self.posY += math.sin(math.radians(self.angle)) * self.speed
@@ -126,12 +294,16 @@ class Warrior(Monster):
             self.shootTime = 0
 
     def modify_difficulty(self, difficulty):
-        self.shootDelay = self.originShootDelay / (1 + difficulty / 10)
-        self.shootSpeed = self.originShootSpeed * (1 + difficulty / 10)
+        self.shootDelay /= (1 + difficulty / 10)
+        self.shootSpeed *= (1 + difficulty / 10)
+        self.speed      *= (1 + difficulty / 10)
 
 class Bird(Monster):
     image = None
-    def __init__(self, posX, posY, speed, sizeX, sizeY):
+    def __init__(self, posX, posY):
+        speed = 5
+        sizeX = 2
+        sizeY = 2
         Monster.__init__(self, posX, posY, speed, sizeX, sizeY)
         self.pngSizeX = 100
         self.pngSizeY = 100
@@ -156,15 +328,11 @@ class Bird(Monster):
         self.moveLocation = 0
         self.moveT = 0
         self.speedT = 1
-        self.originSpeedT = self.speedT
 
         self.shootDelay = 15
         self.shootterm = False
 
         self.shootSpeed = 100
-
-        self.originShootDelay = self.shootDelay
-        self.originShootSpeed = self.shootSpeed
 
     def draw(self):
         Bird.image.clip_draw(self.frame * self.pngSizeX, 3 * self.pngSizeY, self.pngSizeX, self.pngSizeY,
@@ -230,13 +398,16 @@ class Bird(Monster):
                 self.moveMode = True
 
     def modify_difficulty(self, difficulty):
-        self.shootDelay = self.originShootDelay / (1 + difficulty / 10)
-        self.shootSpeed = self.originShootSpeed * (1 + difficulty / 10)
-        self.speedT = self.originSpeedT + difficulty // 2
+        self.shootDelay /= (1 + difficulty / 10)
+        self.shootSpeed *= (1 + difficulty / 10)
+        self.speedT     += difficulty // 2
 
 class Dragon(Monster):
     image = None
-    def __init__(self, posX, posY, speed, sizeX, sizeY):
+    def __init__(self, posX, posY):
+        speed = 5
+        sizeX = 2
+        sizeY = 2
         Monster.__init__(self, posX, posY, speed, sizeX, sizeY)
         self.pngSizeX = 128
         self.pngSizeY = 128
@@ -259,15 +430,10 @@ class Dragon(Monster):
         self.moveLocation = 0
         self.moveT = 0
         self.speedT = 1
-        self.originSpeedT = self.speedT
 
         self.shootDelay = 30
         self.shootSpeed = 40
         self.shootterm = False
-
-        # difficulty
-        self.originShootDelay = self.shootDelay
-        self.originShootSpeed = self.shootSpeed
 
     def draw(self):
         Dragon.image.clip_draw(self.frame * self.pngSizeX, 3 * self.pngSizeY, self.pngSizeX, self.pngSizeY, self.posX,
@@ -311,44 +477,44 @@ class Dragon(Monster):
         self.shootTime += 0.01
         if (self.shootTime > self.shootDelay - 10 - 0.1) and (self.shootTime < self.shootDelay - 10 + 0.1)\
                 and (self.shootterm == False):
-            game_world.add_object(Bullet(self.posX, self.posY, 270 - 30, self.shootSpeed, 'RedCircle', '', '',
+            game_world.add_object(Bullet(self.posX, self.posY, 270 - 30, self.shootSpeed, 'RedCircle', '', 'Rotate',
                                          self.bulletsizeX, self.bulletsizeY), BULLET)
-            game_world.add_object(Bullet(self.posX, self.posY, 270 + 30, self.shootSpeed, 'RedCircle', '', '',
+            game_world.add_object(Bullet(self.posX, self.posY, 270 + 30, self.shootSpeed, 'RedCircle', '', 'Rotate',
                                          self.bulletsizeX, self.bulletsizeY), BULLET)
             self.shootterm = True
         elif (self.shootTime > self.shootDelay - 8 - 0.1) and (self.shootTime < self.shootDelay - 8 + 0.1) \
                 and (self.shootterm == False):
-            game_world.add_object(Bullet(self.posX - 5, self.posY, 270 - 5, self.shootSpeed, 'RedCircle', '', '',
+            game_world.add_object(Bullet(self.posX - 5, self.posY, 270 - 5, self.shootSpeed, 'RedCircle', '', 'Rotate',
                                          self.bulletsizeX, self.bulletsizeY), BULLET)
-            game_world.add_object(Bullet(self.posX + 5, self.posY, 270 + 5, self.shootSpeed, 'RedCircle', '', '',
+            game_world.add_object(Bullet(self.posX + 5, self.posY, 270 + 5, self.shootSpeed, 'RedCircle', '', 'Rotate',
                                          self.bulletsizeX, self.bulletsizeY), BULLET)
             self.shootterm = True
         elif (self.shootTime > self.shootDelay - 6 - 0.1) and (self.shootTime < self.shootDelay - 6 + 0.1) \
                 and (self.shootterm == False):
-            game_world.add_object(Bullet(self.posX, self.posY, 270 - 30, self.shootSpeed, 'RedCircle', '', '',
+            game_world.add_object(Bullet(self.posX, self.posY, 270 - 30, self.shootSpeed, 'RedCircle', '', 'Rotate',
                                          self.bulletsizeX, self.bulletsizeY), BULLET)
-            game_world.add_object(Bullet(self.posX, self.posY, 270 + 30, self.shootSpeed, 'RedCircle', '', '',
+            game_world.add_object(Bullet(self.posX, self.posY, 270 + 30, self.shootSpeed, 'RedCircle', '', 'Rotate',
                                          self.bulletsizeX, self.bulletsizeY), BULLET)
             self.shootterm = True
         elif (self.shootTime > self.shootDelay - 4 - 0.1) and (self.shootTime < self.shootDelay - 4 + 0.1) \
                 and (self.shootterm == False):
-            game_world.add_object(Bullet(self.posX - 5, self.posY, 270 - 5, self.shootSpeed, 'RedCircle', '', '',
+            game_world.add_object(Bullet(self.posX - 5, self.posY, 270 - 5, self.shootSpeed, 'RedCircle', '', 'Rotate',
                                          self.bulletsizeX, self.bulletsizeY), BULLET)
-            game_world.add_object(Bullet(self.posX + 5, self.posY, 270 + 5, self.shootSpeed, 'RedCircle', '', '',
+            game_world.add_object(Bullet(self.posX + 5, self.posY, 270 + 5, self.shootSpeed, 'RedCircle', '', 'Rotate',
                                          self.bulletsizeX, self.bulletsizeY), BULLET)
             self.shootterm = True
         elif (self.shootTime > self.shootDelay - 2 - 0.1) and (self.shootTime < self.shootDelay - 2 + 0.1) \
                 and (self.shootterm == False):
-            game_world.add_object(Bullet(self.posX, self.posY, 270 - 30, self.shootSpeed, 'RedCircle', '', '',
+            game_world.add_object(Bullet(self.posX, self.posY, 270 - 30, self.shootSpeed, 'RedCircle', '', 'Rotate',
                                          self.bulletsizeX, self.bulletsizeY), BULLET)
-            game_world.add_object(Bullet(self.posX, self.posY, 270 + 30, self.shootSpeed, 'RedCircle', '', '',
+            game_world.add_object(Bullet(self.posX, self.posY, 270 + 30, self.shootSpeed, 'RedCircle', '', 'Rotate',
                                          self.bulletsizeX, self.bulletsizeY), BULLET)
             self.shootterm = True
         elif (self.shootTime > self.shootDelay - 0 - 0.1) and (self.shootTime < self.shootDelay - 0 + 0.1) \
                 and (self.shootterm == False):
-            game_world.add_object(Bullet(self.posX - 5, self.posY, 270 - 5, self.shootSpeed, 'RedCircle', '', '',
+            game_world.add_object(Bullet(self.posX - 5, self.posY, 270 - 5, self.shootSpeed, 'RedCircle', '', 'Rotate',
                                          self.bulletsizeX, self.bulletsizeY), BULLET)
-            game_world.add_object(Bullet(self.posX + 5, self.posY, 270 + 5, self.shootSpeed, 'RedCircle', '', '',
+            game_world.add_object(Bullet(self.posX + 5, self.posY, 270 + 5, self.shootSpeed, 'RedCircle', '', 'Rotate',
                                          self.bulletsizeX, self.bulletsizeY), BULLET)
             self.shootterm = True
         else:
@@ -358,14 +524,17 @@ class Dragon(Monster):
             self.shootTime = 0
 
     def modify_difficulty(self, difficulty):
-        self.shootDelay = self.originShootDelay / (1 + difficulty / 10)
-        self.shootSpeed = self.originShootSpeed * (1 + difficulty / 10)
-        self.speedT = self.originSpeedT + difficulty // 2
+        self.shootDelay /= (1 + difficulty / 10)
+        self.shootSpeed *= (1 + difficulty / 10)
+        self.speedT     += difficulty // 2
 
 class Dragon_Strong(Monster):
     image = None
 
-    def __init__(self, posX, posY, speed, sizeX, sizeY):
+    def __init__(self, posX, posY):
+        speed = 50
+        sizeX = 2
+        sizeY = 2
         Monster.__init__(self, posX, posY, speed, sizeX, sizeY)
         self.pngSizeX = 75
         self.pngSizeY = 70
@@ -378,14 +547,13 @@ class Dragon_Strong(Monster):
         #
         self.animTime = 0
         self.animID = 5
-        if Dragon.image == None:
-            Dragon.image = load_image(os.path.join(os.getcwd(), 'monster', 'dragon_other.png'))
+        if Dragon_Strong.image == None:
+            Dragon_Strong.image = load_image(os.path.join(os.getcwd(), 'monster', 'dragon_other.png'))
         #
         self.originPosY = self.posY
         self.firstMode = True
 
         self.anglespeed = 2
-        self.originAngleSpeed = self.anglespeed
         #
         self.bulletTime = 0
         self.bulletDelay = 2
@@ -394,11 +562,8 @@ class Dragon_Strong(Monster):
         # difficulty
         self.shootSpeed = 90
 
-        self.originShootSpeed = self.shootSpeed
-        self.originShootDelay = self.bulletDelay
-
     def draw(self):
-        Dragon.image.clip_draw(self.frame * self.pngSizeX, self.animID * self.pngSizeY, self.pngSizeX, self.pngSizeY, self.posX,
+        Dragon_Strong.image.clip_draw(self.frame * self.pngSizeX, self.animID * self.pngSizeY, self.pngSizeX, self.pngSizeY, self.posX,
                                self.posY, self.sizeX, self.sizeY)
 
     def update_anim(self):
@@ -448,6 +613,6 @@ class Dragon_Strong(Monster):
             self.bulletTime = 0
 
     def modify_difficulty(self, difficulty):
-        self.shootDelay = self.originShootDelay / (1 + difficulty / 10)
-        self.shootSpeed = self.originShootSpeed * (1 + difficulty / 10)
-        self.originAngleSpeed = self.originAngleSpeed * (1 + difficulty / 10)
+        self.shootDelay /= (1 + difficulty / 10)
+        self.shootSpeed *= (1 + difficulty / 10)
+        self.anglespeed *= (1 + difficulty / 10)

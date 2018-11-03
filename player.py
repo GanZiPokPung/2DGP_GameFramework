@@ -153,9 +153,9 @@ class Player:
         # 공격(추후 상점 추가시 고칠 예정)
         if self.pushAttcheck == True :
             if Player.BulletTime > 0.75:
-                game_world.add_object(Bullet(self.x, self.y, 90 - 15, 250, 'Eagle', 0, 2, 2), MONSTER)
-                game_world.add_object(Bullet(self.x, self.y, 90, 250, 'Eagle', 0, 2, 2), MONSTER)
-                game_world.add_object(Bullet(self.x, self.y, 90 + 15, 250, 'Eagle', 0, 2, 2), MONSTER)
+                game_world.add_object(Bullet(self.x, self.y, 90 - 15, 250, 'Eagle', 0, '',  2, 2), MONSTER)
+                game_world.add_object(Bullet(self.x, self.y, 90, 250, 'Eagle', 0, '', 2, 2), MONSTER)
+                game_world.add_object(Bullet(self.x, self.y, 90 + 15, 250, 'Eagle', 0, '',  2, 2), MONSTER)
                 Player.BulletTime = 0
 
         return False
