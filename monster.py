@@ -45,6 +45,7 @@ class Monster_Pattern:
                 for monster in warrior_pattern_right :
                     monster.modify_difficulty(Monster_Pattern.difficulty)
                     yield monster
+            # 중앙 방향
             elif subselect == 2:
                 warrior_pattern_center = [Warrior(300 + random.randint(-200, 200), 800, i, '', 'warrior')
                                           for i in range(warrior_count)]
@@ -54,6 +55,7 @@ class Monster_Pattern:
                 for monster in warrior_pattern_center :
                     monster.modify_difficulty(Monster_Pattern.difficulty)
                     yield monster
+            # 오른쪽위치에서 왼쪽 방향
             elif subselect == 3:
                 warrior_pattern_left_other = [Warrior(400, 800, i,'Left', 'warrior')
                                         for i in range(warrior_count)]
@@ -63,6 +65,7 @@ class Monster_Pattern:
                 for monster in warrior_pattern_left_other :
                     monster.modify_difficulty(Monster_Pattern.difficulty)
                     yield monster
+            # 왼쪽위치에서 오른쪽 방향
             elif subselect == 4:
                 warrior_pattern_right_other = [Warrior(100, 800, i, 'Right', 'warrior')
                                                for i in range(warrior_count)]
@@ -72,6 +75,7 @@ class Monster_Pattern:
                 for monster in warrior_pattern_right_other :
                     monster.modify_difficulty(Monster_Pattern.difficulty)
                     yield monster
+            # 양쪽에서 바깥쪽 방향
             elif subselect == 5:
                 warrior_pattern_left = [Warrior(200, 800, i, 'Left', 'warrior')
                                         for i in range(warrior_count)]
@@ -90,7 +94,7 @@ class Monster_Pattern:
                     monster[1].modify_difficulty(Monster_Pattern.difficulty)
                     yield  monster[0]
                     yield  monster[1]
-
+            # 양쪽에서 안쪽 방향
             elif subselect == 6:
                 warrior_pattern_left_other = [Warrior(400, 800, i, 'Left', 'warrior')
                                               for i in range(warrior_count)]
@@ -110,6 +114,7 @@ class Monster_Pattern:
                     monster[1].modify_difficulty(Monster_Pattern.difficulty)
                     yield monster[0]
                     yield monster[1]
+            # 양쪽에서 왼쪽 방향
             elif subselect == 7:
                 warrior_pattern_left = [Warrior(200, 800, i, 'Left', 'warrior')
                                         for i in range(warrior_count)]
@@ -128,7 +133,7 @@ class Monster_Pattern:
                     monster[1].modify_difficulty(Monster_Pattern.difficulty)
                     yield  monster[0]
                     yield  monster[1]
-
+            # 양쪽에서 오른쪽 방향
             elif subselect == 8:
                 warrior_pattern_right = [Warrior(300, 800, i, 'Right', 'warrior')
                                          for i in range(warrior_count)]
@@ -148,7 +153,7 @@ class Monster_Pattern:
                     monster[1].modify_difficulty(Monster_Pattern.difficulty)
                     yield monster[0]
                     yield monster[1]
-
+        # warrior가 아닌 네임드급 몬스터들
         else:
             subselect = random.randint(0, 2)
             # Bird
