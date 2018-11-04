@@ -63,7 +63,7 @@ class Bullet:
                 'RedSun':           load_image(os.path.join(os.getcwd(), 'bullet', 'monster', 'RedSun.png')),
                 'Missile':          load_image(os.path.join(os.getcwd(), 'bullet', 'monster', 'Missile.png')),
                 'YellowCircle_Anim':load_image(os.path.join(os.getcwd(), 'bullet', 'monster', 'YellowCircle_Anim.png')),
-                'Y':                load_image(os.path.join(os.getcwd(), 'bullet', 'monster', 'Y.png'))
+                'Y':                load_image(os.path.join(os.getcwd(), 'bullet', 'monster', 'Y2.png'))
                         }
     def initialize_size(self):
         Bullet.size  = {
@@ -92,7 +92,7 @@ class Bullet:
                         'RedSun':               [91, 92],
                         'Missile':              [24, 24],
                         'YellowCircle_Anim':    [336 // 6, 61, 6],
-                        'Y':                    [90, 270 // 3, 3]
+                        'Y':                    [270 // 3, 90, 3]
         }
 
     def update(self):
