@@ -214,6 +214,9 @@ class Monster:
     def update_AI(self):
         pass
 
+    def modify_difficulty(self, difficulty):
+        pass
+
 class Warrior(Monster):
     image = None
     size = None
@@ -329,7 +332,7 @@ class Bird(Monster):
         self.moveMode = True
         self.firstMode = True
         tmpPosY = random.randint(500, 600)
-        self.movePattern = [[posX, tmpPosY],[posX + random.randint(100, 200), tmpPosY]]
+        self.movePattern = [[posX, tmpPosY], [posX + random.randint(100, 200), tmpPosY]]
         self.moveLocation = 0
         self.moveT = 0
         self.speedT = 1

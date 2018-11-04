@@ -5,6 +5,7 @@ from static import *
 from map import Map
 from player import Player
 from monster import *
+from boss import *
 
 import game_world
 
@@ -62,6 +63,8 @@ def handle_events():
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_q):
             for object in monsterpattern.get_monster():
                 game_world.add_object(object, MONSTER)
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_w):
+            game_world.add_object(BossHead(), BOSS)
         #player
         player.handle_events(event)
 
