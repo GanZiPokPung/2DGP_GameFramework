@@ -65,6 +65,18 @@ def handle_events():
                 game_world.add_object(object, MONSTER)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_w):
             game_world.add_object(BossHead(), BOSS)
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_e):
+            game_world.clear_layer(MONSTER)
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_1):
+            game_world.curtain_object(BOSS, 2).attackID = 0
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_2):
+            game_world.curtain_object(BOSS, 2).attackID = 1
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_3):
+            game_world.curtain_object(BOSS, 2).attackID = 2
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_4):
+            game_world.curtain_object(BOSS, 2).attackID = 3
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_5):
+            game_world.curtain_object(BOSS, 2).attackID = 4
         #player
         player.handle_events(event)
 

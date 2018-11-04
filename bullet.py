@@ -101,7 +101,9 @@ class Bullet:
 
         if self.maxFrame != 0:
             self.frame = (self.frame + 1) % self.maxFrame
-        self.rotAngle += 20
+
+        if self.bulletType == 'Rotate':
+            self.rotAngle += 20
 
         # 맵 밖을 나가면 총알을 없앤다.
         if (self.posX < 0 - self.sizeX) or (self.posX > static.canvas_width + self.sizeX):
@@ -111,11 +113,9 @@ class Bullet:
         else:
             return False
 
-
-
     def draw(self):
 
-        if self.bulletType == 'Rotate':
+        if self.bulletType == 'Rotate' or self.bulletType == 'RotateOnce':
             self.image.clip_composite_draw(self.frame * self.pngSizeX, 0,
                                            self.pngSizeX, self.pngSizeY,
                                            math.radians(self.rotAngle), '',

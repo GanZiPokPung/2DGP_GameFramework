@@ -9,7 +9,6 @@ def add_object(obj, layer):
 def remove_object(obj):
     for i in range(len(objects)):
         for j in objects[i]:
-
             if j == obj:
                 objects[i].remove(j)
                 del j
@@ -25,8 +24,26 @@ def clear():
         del obj
     objects.clear()
 
+def clear_layer(layer):
+    for obj in layer_objects(layer):
+        objects[layer].remove(obj)
+        del obj
+
 # 모든 오브젝트들을 순회돌며 yield함
 def all_objects():
     for i in range(len(objects)):
         for obj in objects[i]:
             yield obj
+
+# 특정 레이어만 순회돌며 yield함
+def layer_objects(layer):
+    for obj in objects[layer]:
+        yield obj
+
+# 특정 레이어의 오브젝트를 꺼내와서 yield함
+def curtain_object(layer, index):
+    find = 0
+    for j in objects[layer]:
+        if find == index:
+            return j
+        find += 1
