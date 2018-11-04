@@ -7,7 +7,7 @@ image = None
 
 def initialize():
     global image
-    image = load_image(os.path.join(os.getcwd(), 'scene', 'title.png'))
+    image = load_image(os.path.join(os.getcwd(), 'scene', 'title2.png'))
 
 def handle_events():
     events = get_events()
