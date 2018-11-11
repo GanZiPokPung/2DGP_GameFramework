@@ -529,8 +529,7 @@ class BossHand(Boss):
         if self.shootCount > self.shootMax:
             self.shootCout = 0
             self.attackInfoInit = False
+            
             return False
         else:
             return True
-
-        
