@@ -532,3 +532,5 @@ class BossHand(Boss):
             return False
         else:
             return True
+
+        
