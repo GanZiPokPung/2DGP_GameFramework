@@ -2,36 +2,42 @@ from pico2d import *
 from static import *
 from bullet import Bullet
 import static
+import mainframe
 import custom_math
 import game_world
 import random
 import stage_scene
 
+
 class Boss:
-    def __init__(self, posX, posY, speed, sizeX, sizeY):
+    def __init__(self, posX, posY, movespeed, sizeX, sizeY):
         self.posX = posX
         self.posY = posY
-        self.speed = speed / 10
+        self.moveSpeed = movespeed
+        #
         self.sizeX = sizeX
         self.sizeY = sizeY
+        #
         self.frame = 0
+        # shoot
+        self.shootCheck = False
         self.shootTime = 0
         self.shootDelay = 0
+        # default time
         self.time = 0
-
+        # delayTerm
         self.delayCheck = False
         self.delayTerm = 0
         self.delayTime = 0
 
-    def initialize(self):
-        pass
-
     def update(self):
-        self.shootTime += 0.1
-        self.time += 0.1
 
+        self.time += mainframe.frame_time
+
+        if self.shootCheck == True:
+            self.shootTime += mainframe.frame_time
         if self.delayCheck == True:
-            self.delayTime += 0.1
+            self.delayTime += mainframe.frame_time
 
         self.update_AI()
         self.update_anim()
@@ -48,23 +54,29 @@ class Boss:
     def modify_difficulty(self, difficulty):
         pass
 
+    def modify_abilities(self):
+        pass
+
 class BossHead(Boss):
     image = None
     def __init__(self):
         posX = 250
         posY = 950
-        speed = 10
+        moveSpeed = 10
         sizeX = 1.75
         sizeY = 1.75
-        Boss.__init__(self, posX, posY, speed, sizeX, sizeY)
-
-        # size
+        Boss.__init__(self, posX, posY, moveSpeed, sizeX, sizeY)
+        if BossHead.image == None:
+            BossHead.image = load_image(os.path.join(os.getcwd(), 'resources', 'boss', 'head.png'))
+        # size of png
         self.pngSizeX = 259
         self.pngSizeY = 125
-
+        # size
         self.sizeX = self.pngSizeX * self.sizeX
         self.sizeY = self.pngSizeY * self.sizeY
-
+        self.bulletsizeX = 0
+        self.bulletsizeY = 0
+        # AI를 위한 위치들
         self.originPos = [self.posX, self.posY]
         self.startPos = [250, 570]
         self.currentPos = []
@@ -73,39 +85,38 @@ class BossHead(Boss):
                             [self.startPos[0] + 5, self.startPos[1] + 5],
                             [self.startPos[0] + 5, self.startPos[1] - 5],
                             [self.startPos[0] - 5, self.startPos[1] + 5]]
-
+        # for AI check
         self.firstMode = True
         self.moveMode = False
         self.attackMode = False
         self.attacking = False
         self.attackInfoInit = False
+        # for attack type
         self.attackID = 99
-
+        # for attack term
         self.attackingTime = 0
         self.attackDelay = 0
-
+        # for AI move
         self.moveT_Curv = 0
         self.moveLocation = 2
         self.moveT = 0
-        self.speedT = 0.2
-
+        self.speedT = 20
+        self.curvSpeedT = 100
+        # for AI shooting
+        self.originShootDelay = 0
         self.shootDelay = 0
         self.shootSpeed = 0
-        self.bulletsizeX = 0
-        self.bulletsizeY = 0
         self.shootMax = 0
         self.shootCount = 0
         self.shootterm = False
         self.shootAngle = 0
         self.LR_decision = 0
 
-        if BossHead.image == None:
-            BossHead.image = load_image(os.path.join(os.getcwd(), 'boss', 'head.png'))
-
         #hand
-        self.initialize()
+        self.initializeHands()
+        self.modify_abilities()
 
-    def initialize(self):
+    def initializeHands(self):
         self.BossHandLeft = BossHand('Left', self)
         self.BossHandRight = BossHand('Right', self)
         game_world.add_object(self.BossHandLeft, BOSS)
@@ -127,7 +138,7 @@ class BossHead(Boss):
                 self.moveMode = True
                 self.moveT = 0
             else:
-                self.moveT += self.speedT
+                self.moveT += self.speedT * mainframe.frame_time
                 self.posX, self.posY = custom_math.move_line(self.originPos,
                                                              self.startPos,
                                                              self.moveT)
@@ -140,7 +151,7 @@ class BossHead(Boss):
                     else:
                         self.moveLocation += 1
                 else:
-                    self.moveT_Curv += self.speedT * 5
+                    self.moveT_Curv += self.curvSpeedT * mainframe.frame_time
                     if self.moveLocation == 4:
                         dstLocation = 0
                     else:
@@ -199,13 +210,18 @@ class BossHead(Boss):
     def modify_difficulty(self, difficulty):
         pass
 
+    def modify_abilities(self):
+        # delay
+        self.shootDelay = self.originShootDelay / 5
+
     def Pattern_Normal(self):
         if self.attackInfoInit == False:
-            self.shootDelay = 0.5
+            self.originShootDelay = 0.5
             self.shootSpeed = 50
             self.bulletsizeX = 1
             self.bulletsizeY = 1
             self.shootMax = 30
+            self.modify_abilities()
             self.attackInfoInit = True
 
         if self.shootTime > self.shootDelay:
@@ -227,7 +243,7 @@ class BossHead(Boss):
 
     def Pattern_Lazer_One(self):
         if self.attackInfoInit == False:
-            self.shootDelay = 0.5
+            self.originShootDelay = 0.5
             self.shootSpeed = 100
             self.bulletsizeX = 0.7
             self.bulletsizeY = 0.7
@@ -244,6 +260,8 @@ class BossHead(Boss):
             self.delayTerm = 5
 
             self.delayCheck = False
+
+            self.modify_abilities()
             self.attackInfoInit = True
 
         if self.delayCheck == False:
@@ -284,11 +302,12 @@ class BossHead(Boss):
 
     def Pattern_Lazer_Two(self):
         if self.attackInfoInit == False:
-            self.shootDelay = 0.5
+            self.originShootDelay = 0.5
             self.shootSpeed = 100
             self.bulletsizeX = 1.5
             self.bulletsizeY = 1.5
             self.shootAngle = 0
+            self.modify_abilities()
             self.attackInfoInit = True
 
         self.shootAngle += 0.4
@@ -323,52 +342,58 @@ class BossHand(Boss):
     def __init__(self, type, headinfo):
         posX = 0
         posY = 0
-        speed = 10
+        moveSpeed = 10
         sizeX = 1.75
         sizeY = 1.75
-        Boss.__init__(self, posX, posY, speed, sizeX, sizeY)
-        # size
+        Boss.__init__(self, posX, posY, moveSpeed, sizeX, sizeY)
+        #image
+        if BossHand.image == None:
+            BossHand.image = {'Left': load_image(os.path.join(os.getcwd(),'resources', 'boss', 'Hand_L.png')),
+                              'Right': load_image(os.path.join(os.getcwd(),'resources', 'boss', 'Hand_R.png'))}
+        self.type = type
+        self.image = BossHand.image.get(self.type)
+        # 부모
+        self.headinfo = headinfo
+        # size of png
         self.pngSizeX = 85
         self.pngSizeY = 49
+        # size
         self.sizeX = self.pngSizeX * self.sizeX
         self.sizeY = self.pngSizeY * self.sizeY
-
+        self.bulletsizeX = 0
+        self.bulletsizeY = 0
+        #
         self.angle = 270
-
+        self.angleSpeed = 350
+        # for AI check
         self.moveMode = True
         self.attackMode = False
         self.attackInfoInit = False
         self.attackID = 99
-
+        # for AI move
         self.moveLocation = 0
         self.moveT = 0
-        self.speedT = 1
-
+        self.speedT = 50
+        # for AI shoot
+        self.originShootDelay = 0
         self.shootDelay = 0
         self.shootSpeed = 0
-        self.bulletsizeX = 0
-        self.bulletsizeY = 0
+
         self.shootMax = 0
         self.shootCount = 0
         self.shootterm = False
         self.shootAngle = 0
+
         self.tmpCount = 0
 
-        if BossHand.image == None:
-            BossHand.image = {'Left': load_image(os.path.join(os.getcwd(), 'boss', 'Hand_L.png')),
-                              'Right': load_image(os.path.join(os.getcwd(), 'boss', 'Hand_R.png'))}
-
-        self.type = type
-        self.image = BossHand.image.get(self.type)
-        self.headinfo = headinfo
-
+        # for AI pos
         self.originPosX = []
         self.originPosY = []
         self.startPos   = []
         self.currentPos = []
 
-    def initialize(self):
-        pass
+        self.modify_difficulty(123)
+        self.modify_abilities()
 
     def draw(self):
         self.image.clip_draw(0, 0, self.pngSizeX, self.pngSizeY,
@@ -384,16 +409,16 @@ class BossHand(Boss):
                 if self.type == 'Left':
                     self.originPosX = self.headinfo.posX - 160
                     self.originPosY = self.headinfo.posY - 100
-                    self.angle += 5
+                    self.angle += self.angleSpeed * mainframe.frame_time
 
                 elif self.type == 'Right':
                     self.originPosX = self.headinfo.posX + 160
                     self.originPosY = self.headinfo.posY - 100
-                    self.angle -= 5
+                    self.angle -= self.angleSpeed * mainframe.frame_time
 
                 self.startPos = [self.originPosX, self.originPosY]
-                self.posX = self.originPosX + math.cos(math.radians(self.angle)) * 4
-                self.posY = self.originPosY + math.sin(math.radians(self.angle)) * 4
+                self.posX = self.originPosX + math.cos(math.radians(self.angle)) * 400 * mainframe.frame_time
+                self.posY = self.originPosY + math.sin(math.radians(self.angle)) * 400 * mainframe.frame_time
                 self.currentPos = [self.posX, self.posY]
 
                 if self.attackID == 0:
@@ -407,7 +432,7 @@ class BossHand(Boss):
                     self.moveT = 0
                     self.angle = 270
                 else:
-                    self.moveT += self.speedT * 5
+                    self.moveT += self.speedT * 5 * mainframe.frame_time
                     self.posX, self.posY = custom_math.move_line([self.startPos[0], self.startPos[1] - 90],
                                                                  self.startPos,
                                                                  self.moveT)
@@ -418,7 +443,7 @@ class BossHand(Boss):
                     self.moveT = 0
                     self.angle = 270
                 else:
-                    self.moveT += self.speedT * 5
+                    self.moveT += self.speedT * 5 * mainframe.frame_time
                     self.posX, self.posY = custom_math.move_line(self.currentPos,
                                                                  [self.startPos[0], self.startPos[1] - 90],
                                                                  self.moveT)
@@ -430,9 +455,12 @@ class BossHand(Boss):
     def modify_difficulty(self, difficulty):
         pass
 
+    def modify_abilities(self):
+        self.shootDelay = self.originShootDelay / 5
+
     def Pattern_Normal(self):
         if self.attackInfoInit == False:
-            self.shootDelay = random.randint(8, 10)
+            self.originShootDelay = random.randint(8, 10)
             self.shootSpeed = 80
             self.bulletsizeX = 2
             self.bulletsizeY = 2
@@ -443,6 +471,8 @@ class BossHand(Boss):
             self.delayTerm = 0.5
 
             self.delayCheck = False
+
+            self.modify_abilities()
             self.attackInfoInit = True
 
         if self.shootTime > self.shootDelay:
@@ -476,11 +506,12 @@ class BossHand(Boss):
 
     def Pattern_Special_One(self):
         if self.attackInfoInit == False:
-            self.shootDelay = 0.75
+            self.originShootDelay = 0.75
             self.shootSpeed = 50
             self.bulletsizeX = 2
             self.bulletsizeY = 2
             self.shootMax = 100
+            self.modify_abilities()
             self.attackInfoInit = True
 
         if self.shootTime > self.shootDelay:

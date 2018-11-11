@@ -5,10 +5,14 @@ import stage_scene
 from bullet import Bullet
 import custom_math
 import static
+import mainframe
+import player
 
 import random
 
 # monster pattern
+# 몬스터가 나오는 방식을 랜덤으로 가져오는 클래스이다.
+# 무한히 계속되는 게임이기 때문에 이것이 필요함
 class Monster_Pattern:
     monster_list = None
     difficulty = None
@@ -20,6 +24,9 @@ class Monster_Pattern:
     def get_monster(self):
 
         select = random.randint(1, 10)
+
+        # debug
+        # select = random.randint(8, 8)
 
         if select < 8:
             subselect = random.randint(0, 8)
@@ -156,9 +163,11 @@ class Monster_Pattern:
         # warrior가 아닌 네임드급 몬스터들
         else:
             subselect = random.randint(0, 2)
+            # debug
+            # subselect = random.randint(2, 2)
             # Bird
             if subselect == 0:
-                bird = Bird(300 + random.randint(-150, 150), 800)
+                bird = Bird(300 + random.randint(-70, 70), 800)
                 bird.modify_difficulty(Monster_Pattern.difficulty)
                 yield bird
             # Dragon
@@ -168,31 +177,34 @@ class Monster_Pattern:
                 yield dragon
             # Dragon_Strong
             elif subselect == 2:
-                dragon_strong = Dragon_Strong(100, 800)
+                dragon_strong = Dragon_Strong(50, 800)
                 dragon_strong.modify_difficulty(Monster_Pattern.difficulty)
                 yield dragon_strong
-
 
 ##########################################################################################
 
 # Monster Classes
 class Monster:
-    def __init__(self, posX, posY, speed, sizeX, sizeY):
+    def __init__(self, posX, posY, moveSpeed, sizeX, sizeY):
         self.posX = posX
         self.posY = posY
-        self.speed = speed / 10
+        self.moveSpeed = moveSpeed
         self.sizeX = sizeX
         self.sizeY = sizeY
         self.frame = 0
         self.shootTime = 0
         self.shootDelay = 0
+        self.shootCheck = False
         self.time = 0
 
-    def initialize(self):
+    def Modify_Abilities(self):
         pass
 
     def update(self):
-        self.shootTime += 0.1
+        self.time += mainframe.frame_time
+
+        if self.shootCheck == True:
+            self.shootTime += mainframe.frame_time
 
         self.update_AI()
         self.update_anim()
@@ -217,20 +229,26 @@ class Monster:
     def modify_difficulty(self, difficulty):
         pass
 
+    def modify_abilities(self):
+        pass
+
 class Warrior(Monster):
     image = None
     size = None
     def __init__(self, posX, posY, term, LRtype, imageType):
-        speed = 50
+        # 초기 난이도 능력치
+        moveSpeed = 30
         sizeX = 0.5
         sizeY = 0.5
-        Monster.__init__(self, posX, posY, speed, sizeX, sizeY)
+        Monster.__init__(self, posX, posY, moveSpeed, sizeX, sizeY)
+        # types
         self.LRtype = LRtype
         self.imageType = imageType
-        #
+        # image
         if Warrior.image == None:
             self.initialize_image()
         self.image = Warrior.image.get(self.imageType)
+        # png size
         if Warrior.size == None:
             self.initialize_size()
         self.pngSizeX = Warrior.size.get(self.imageType)[0]
@@ -238,15 +256,20 @@ class Warrior(Monster):
         # size
         self.sizeX = self.pngSizeX * self.sizeX
         self.sizeY = self.pngSizeY * self.sizeY
+        # 아래를 바라보는게 기본
         self.angle = 270
-        #
-        self.initialize()
-        #
-        self.term = term
+        # 타입에 따라 다른 행동을 하도록 초기화
+        self.initialize_type()
+        # 한꺼번에 나오지 않게 해준다. 줄지어 나올수 있도록 도와주는 변수
+        self.term = term / 3
+        # 부모
+        self.player = game_world.curtain_object(PLAYER, 0)
+        # modify
+        self.modify_abilities()
 
     def initialize_image(self):
-        Warrior.image = {'warrior': load_image(os.path.join(os.getcwd(), 'monster', 'warrior.png')),
-                         'warrior_other': load_image(os.path.join(os.getcwd(), 'monster', 'warrior_other.png'))
+        Warrior.image = {'warrior': load_image(os.path.join(os.getcwd(), 'resources', 'monster', 'warrior.png')),
+                         'warrior_other': load_image(os.path.join(os.getcwd(), 'resources', 'monster', 'warrior_other.png'))
                          }
 
     def initialize_size(self):
@@ -254,28 +277,29 @@ class Warrior(Monster):
                          'warrior_other': [147, 142]
                          }
 
-    def initialize(self):
-        if self.LRtype == 'Right' :
+    # 타입별 어떤 행동을 할지 결정
+    def initialize_type(self):
+        if self.LRtype == 'Right':
             # 나가는 오른쪽으로 점을 찍음
             self.anglespeed = 0.2
-        elif self.LRtype == 'Left' :
+        elif self.LRtype == 'Left':
             # 나가는 왼쪽으로 점을 찍음
             self.anglespeed = -0.2
-        else :
+        else:
             # 돌진
             self.anglespeed = 0
-
         if self.imageType == 'warrior':
-            self.shootDelay = random.randint(10, 20)
+            self.originShootDelay = random.randint(1, 2)
             self.shootSpeed = 20
             self.bulletsizeX = 1
             self.bulletsizeY = 1
         if self.imageType == 'warrior_other':
-            self.shootDelay = random.randint(5, 10)
+            self.originShootDelay = random.randint(2, 4)
             self.shootSpeed = 40
             self.bulletsizeX = 2
             self.bulletsizeY = 2
 
+    # 바꿔야함, 각도를 따라 이미지가 회전하도록
     def draw(self):
         self.image.clip_draw(0, 0, self.pngSizeX, self.pngSizeY, self.posX, self.posY, self.sizeX, self.sizeY)
 
@@ -283,13 +307,17 @@ class Warrior(Monster):
         pass
 
     def update_AI(self):
-        self.time += 0.1
+        # 아직 나올 텀이 아닐때에는 AI를 update하지 않음
         if self.time < self.term:
             return 1
 
+        if self.player.y > self.posY:
+            self.shootCheck = False
+        else:
+            self.shootCheck = True
         self.angle += self.anglespeed
-        self.posX += math.cos(math.radians(self.angle)) * self.speed
-        self.posY += math.sin(math.radians(self.angle)) * self.speed
+        self.posX += math.cos(math.radians(self.angle)) * self.moveSpeedPixelPerSecond * mainframe.frame_time
+        self.posY += math.sin(math.radians(self.angle)) * self.moveSpeedPixelPerSecond * mainframe.frame_time
 
         if self.shootTime > self.shootDelay:
             angle = custom_math.angle_between([self.posX, self.posY], [stage_scene.player.x, stage_scene.player.y])
@@ -302,83 +330,99 @@ class Warrior(Monster):
             self.shootTime = 0
 
     def modify_difficulty(self, difficulty):
-        self.shootDelay /= (1 + difficulty / 10)
+        self.originShootDelay /= (1 + difficulty / 10)
         self.shootSpeed *= (1 + difficulty / 10)
-        self.speed      *= (1 + difficulty / 10)
+        self.moveSpeed  *= (1 + difficulty / 10)
+        self.Modify_Abilities()
+
+    def modify_abilities(self):
+        # speed
+        self.moveSpeedMeterPerMinute = (self.moveSpeed * 1000.0 / 60.0)
+        self.moveSpeedMterPerSecond = (self.moveSpeedMeterPerMinute / 60.0)
+        self.moveSpeedPixelPerSecond = (self.moveSpeedMterPerSecond * PIXEL_PER_METER)
+        # delay
+        self.shootDelay = self.originShootDelay / 5
 
 class Bird(Monster):
     image = None
     def __init__(self, posX, posY):
-        speed = 5
+        moveSpeed = 0
         sizeX = 2
         sizeY = 2
-        Monster.__init__(self, posX, posY, speed, sizeX, sizeY)
+        Monster.__init__(self, posX, posY, moveSpeed, sizeX, sizeY)
+
+        if Bird.image == None:
+            Bird.image = load_image(os.path.join(os.getcwd(), 'resources', 'monster', 'bird.png'))
+        # size of png
         self.pngSizeX = 100
         self.pngSizeY = 100
         # size
         self.sizeX = self.pngSizeX * self.sizeX
         self.sizeY = self.pngSizeY * self.sizeY
-        self.angle = 270
         self.bulletsizeX = 0.4
         self.bulletsizeY = 0.4
-        #
-        self.animTime = 0
-        self.animSpeed = 0.1
-
-        if Bird.image == None:
-            Bird.image = load_image(os.path.join(os.getcwd(), 'monster', 'bird.png'))
-
+        # anim
+        self.animSpeed = 50
+        self.frameMax = 4
+        # angle
+        self.angle = 270
+        # AI를 위해 초기 자리를 저장해둠
         self.originPos = [self.posX, self.posY]
+        # AI Check
         self.moveMode = True
         self.firstMode = True
-        tmpPosY = random.randint(500, 600)
-        self.movePattern = [[posX, tmpPosY], [posX + random.randint(100, 200), tmpPosY]]
+        # 와리가리할 포지션을 정해둠
+        tempPosY = random.randint(500, 600)
+        self.movePattern = [[posX, tempPosY], [posX + random.randint(100, 200), tempPosY]]
         self.moveLocation = 0
         self.moveT = 0
-        self.speedT = 1
+        self.speedT = 20
+        # shoot
+        self.originShootDelay = 15
+        self.shootCount = 0
+        self.shootSpeed = 40
 
-        self.shootDelay = 15
-        self.shootterm = False
-
-        self.shootSpeed = 100
+        self.modify_abilities()
 
     def draw(self):
-        Bird.image.clip_draw(self.frame * self.pngSizeX, 3 * self.pngSizeY, self.pngSizeX, self.pngSizeY,
+        Bird.image.clip_draw(int(self.frame) * self.pngSizeX, 3 * self.pngSizeY, self.pngSizeX, self.pngSizeY,
                              self.posX, self.posY,
                              self.sizeX, self.sizeY)
 
     def update_anim(self):
-        self.animTime += self.animSpeed
-        if self.animTime > 0.8:
-            self.frame = (self.frame + 1) % 4
-            self.animTime = 0
+        TimeToFrameQuantity = self.frameMax * self.actionPerTime * mainframe.frame_time
+        self.frame = (self.frame + TimeToFrameQuantity) % 4
 
     def update_AI(self):
         #self.angle += self.anglespeed
+        self.modify_abilities()
+        # 이동 중일때
         if self.moveMode == True:
-            self.animSpeed = 0.15
+            self.animSpeed = 50
+            # 처음 등장시
             if self.firstMode == True:
                 if self.moveT >= 100:
-                    self.animSpeed = 0.1
                     self.firstMode = False
                     self.moveMode = False
                     self.moveT = 0
+                    self.shootCheck = True
                 else:
-                    self.moveT += self.speedT
+                    self.moveT += self.speedT * mainframe.frame_time
                     self.posX, self.posY = custom_math.move_line(self.originPos,
                                                              self.movePattern[self.moveLocation],
                                                              self.moveT)
+            # 이후
             else:
                 if self.moveT >= 100:
-                    self.animSpeed = 0.1
                     self.moveMode = False
+                    self.shootCheck = True
                     self.moveT = 0
                     if self.moveLocation == 1:
                         self.moveLocation = 0
                     else:
                         self.moveLocation = 1
                 else:
-                    self.moveT += self.speedT
+                    self.moveT += self.speedT * mainframe.frame_time
                     if self.moveLocation == 1:
                         self.posX, self.posY = custom_math.move_line(self.movePattern[1],
                                                                      self.movePattern[0],
@@ -387,83 +431,106 @@ class Bird(Monster):
                         self.posX, self.posY = custom_math.move_line(self.movePattern[0],
                                                                      self.movePattern[1],
                                                                      self.moveT)
-        elif self.shootTime > self.shootDelay:
-            if  self.shootterm == False:
-                game_world.add_object(Bullet(self.posX, self.posY, 270 - 20, self.shootSpeed, 'RedSun', '', '',
+        #공격시
+        elif self.shootCheck == True:
+            self.animSpeed = 50 * 0.5
+            startShootPos = 15
+            if self.shootCount == 0 and self.shootTime > self.shootDelay:
+                game_world.add_object(Bullet(self.posX, self.posY - startShootPos, 270 - 20, self.shootSpeed, 'RedSun', '', '',
                                              self.bulletsizeX, self.bulletsizeY), BULLET)
-                game_world.add_object(Bullet(self.posX, self.posY, 270, self.shootSpeed, 'RedSun', '', '',
+                game_world.add_object(Bullet(self.posX, self.posY - startShootPos, 270, self.shootSpeed, 'RedSun', '', '',
                                              self.bulletsizeX, self.bulletsizeY), BULLET)
-                game_world.add_object(Bullet(self.posX, self.posY, 270 + 20, self.shootSpeed, 'RedSun', '', '',
+                game_world.add_object(Bullet(self.posX, self.posY - startShootPos, 270 + 20, self.shootSpeed, 'RedSun', '', '',
                                              self.bulletsizeX, self.bulletsizeY), BULLET)
-                self.shootterm = True
-            if self.shootTime > self.shootDelay + 3:
-                game_world.add_object(Bullet(self.posX - 5, self.posY, 270 - 10, self.shootSpeed, 'RedSun', '', '',
+                self.shootCount += 1
+            elif self.shootCount == 1 and self.shootTime > self.shootDelay * 1.25:
+                game_world.add_object(Bullet(self.posX - 5, self.posY - startShootPos, 270 - 10, self.shootSpeed, 'RedSun', '', '',
                                              self.bulletsizeX, self.bulletsizeY), BULLET)
-                game_world.add_object(Bullet(self.posX + 5, self.posY, 270 + 10, self.shootSpeed, 'RedSun', '', '',
+                game_world.add_object(Bullet(self.posX + 5, self.posY - startShootPos, 270 + 10, self.shootSpeed, 'RedSun', '', '',
                                              self.bulletsizeX, self.bulletsizeY), BULLET)
+                self.shootCount += 1
+            elif self.shootCount == 2 and self.shootTime > self.shootDelay * 1.5:
                 self.shootTime = 0
-                self.shootterm = False
+                self.shootCount = 0
                 self.moveMode = True
+                self.shootCheck = False
 
     def modify_difficulty(self, difficulty):
-        self.shootDelay /= (1 + difficulty / 10)
+        self.originShootDelay /= (1 + difficulty / 10)
         self.shootSpeed *= (1 + difficulty / 10)
         self.speedT     += difficulty // 2
+        self.modify_abilities()
+
+    def modify_abilities(self):
+        # speed
+        self.timePerAction = 1.0 - self.animSpeed / 100
+        self.actionPerTime = 1.0 / self.timePerAction
+        # delay
+        self.shootDelay = self.originShootDelay / 5
 
 class Dragon(Monster):
     image = None
     def __init__(self, posX, posY):
-        speed = 5
+        speed = 0
         sizeX = 2
         sizeY = 2
         Monster.__init__(self, posX, posY, speed, sizeX, sizeY)
+        # image
+        if Dragon.image == None:
+            Dragon.image = load_image(os.path.join(os.getcwd(), 'resources', 'monster', 'dragon.png'))
+        # size of png
         self.pngSizeX = 128
         self.pngSizeY = 128
         # size
         self.sizeX = self.pngSizeX * self.sizeX
         self.sizeY = self.pngSizeY * self.sizeY
+        # angle
         self.angle = 270
         self.bulletsizeX = 0.5
         self.bulletsizeY = 0.5
         #
-        self.animTime = 0
-        self.animSpeed = 0.1
-
-        if Dragon.image == None:
-            Dragon.image = load_image(os.path.join(os.getcwd(), 'monster', 'dragon.png'))
-
+        self.animSpeed = 40
+        self.frameMax = 4
+        # AI를 위해 초기 위치를 저장
         self.originPos = [self.posX, self.posY]
-        self.firstMode = True
         self.movePattern = [[100, 670], [400, 500], [400, 670], [100, 500]]
         self.moveLocation = 0
+        # AI
+        self.firstMode = True
         self.moveT = 0
-        self.speedT = 1
-
-        self.shootDelay = 30
+        self.speedT = 50
+        # shoot
+        self.originShootDelay = 20
+        self.shootCount = 0
         self.shootSpeed = 40
         self.shootterm = False
 
+        self.modify_abilities()
+
     def draw(self):
-        Dragon.image.clip_draw(self.frame * self.pngSizeX, 3 * self.pngSizeY, self.pngSizeX, self.pngSizeY, self.posX,
+        Dragon.image.clip_draw(int(self.frame) * self.pngSizeX, 3 * self.pngSizeY, self.pngSizeX, self.pngSizeY, self.posX,
                                self.posY, self.sizeX, self.sizeY)
 
     def update_anim(self):
-        self.animTime += self.animSpeed
-        if self.animTime > 0.55:
-            self.frame = (self.frame + 1) % 4
-            self.animTime = 0
+        TimeToFrameQuantity = self.frameMax * self.actionPerTime * mainframe.frame_time
+        self.frame = (self.frame + TimeToFrameQuantity) % 4
 
     def update_AI(self):
         #self.angle += self.anglespeed
+        self.modify_abilities()
+        # 처음 등장시
         if self.firstMode == True:
+            self.animSpeed = 60
             if self.moveT >= 100:
                 self.firstMode = False
                 self.moveT = 0
+                self.shootCheck = True
             else:
-                self.moveT += self.speedT
+                self.moveT += self.speedT * mainframe.frame_time
                 self.posX, self.posY = custom_math.move_line(self.originPos,
                                                              self.movePattern[2],
                                                              self.moveT)
+        # 이후
         else:
             if self.moveT >= 100:
                 self.moveT = 0
@@ -472,7 +539,7 @@ class Dragon(Monster):
                 else:
                     self.moveLocation += 1
             else:
-                self.moveT += self.speedT
+                self.moveT += self.speedT * mainframe.frame_time
                 if self.moveLocation == 3:
                     dstLocation = 0
                 else:
@@ -482,103 +549,127 @@ class Dragon(Monster):
                                                               self.movePattern[self.moveLocation - 1],
                                                               self.movePattern[self.moveLocation],
                                                               self.moveT)
-        self.shootTime += 0.01
-        if (self.shootTime > self.shootDelay - 10 - 0.1) and (self.shootTime < self.shootDelay - 10 + 0.1)\
-                and (self.shootterm == False):
-            game_world.add_object(Bullet(self.posX, self.posY, 270 - 30, self.shootSpeed, 'RedCircle', '', 'Rotate',
-                                         self.bulletsizeX, self.bulletsizeY), BULLET)
-            game_world.add_object(Bullet(self.posX, self.posY, 270 + 30, self.shootSpeed, 'RedCircle', '', 'Rotate',
-                                         self.bulletsizeX, self.bulletsizeY), BULLET)
-            self.shootterm = True
-        elif (self.shootTime > self.shootDelay - 8 - 0.1) and (self.shootTime < self.shootDelay - 8 + 0.1) \
-                and (self.shootterm == False):
-            game_world.add_object(Bullet(self.posX - 5, self.posY, 270 - 5, self.shootSpeed, 'RedCircle', '', 'Rotate',
-                                         self.bulletsizeX, self.bulletsizeY), BULLET)
-            game_world.add_object(Bullet(self.posX + 5, self.posY, 270 + 5, self.shootSpeed, 'RedCircle', '', 'Rotate',
-                                         self.bulletsizeX, self.bulletsizeY), BULLET)
-            self.shootterm = True
-        elif (self.shootTime > self.shootDelay - 6 - 0.1) and (self.shootTime < self.shootDelay - 6 + 0.1) \
-                and (self.shootterm == False):
-            game_world.add_object(Bullet(self.posX, self.posY, 270 - 30, self.shootSpeed, 'RedCircle', '', 'Rotate',
-                                         self.bulletsizeX, self.bulletsizeY), BULLET)
-            game_world.add_object(Bullet(self.posX, self.posY, 270 + 30, self.shootSpeed, 'RedCircle', '', 'Rotate',
-                                         self.bulletsizeX, self.bulletsizeY), BULLET)
-            self.shootterm = True
-        elif (self.shootTime > self.shootDelay - 4 - 0.1) and (self.shootTime < self.shootDelay - 4 + 0.1) \
-                and (self.shootterm == False):
-            game_world.add_object(Bullet(self.posX - 5, self.posY, 270 - 5, self.shootSpeed, 'RedCircle', '', 'Rotate',
-                                         self.bulletsizeX, self.bulletsizeY), BULLET)
-            game_world.add_object(Bullet(self.posX + 5, self.posY, 270 + 5, self.shootSpeed, 'RedCircle', '', 'Rotate',
-                                         self.bulletsizeX, self.bulletsizeY), BULLET)
-            self.shootterm = True
-        elif (self.shootTime > self.shootDelay - 2 - 0.1) and (self.shootTime < self.shootDelay - 2 + 0.1) \
-                and (self.shootterm == False):
-            game_world.add_object(Bullet(self.posX, self.posY, 270 - 30, self.shootSpeed, 'RedCircle', '', 'Rotate',
-                                         self.bulletsizeX, self.bulletsizeY), BULLET)
-            game_world.add_object(Bullet(self.posX, self.posY, 270 + 30, self.shootSpeed, 'RedCircle', '', 'Rotate',
-                                         self.bulletsizeX, self.bulletsizeY), BULLET)
-            self.shootterm = True
-        elif (self.shootTime > self.shootDelay - 0 - 0.1) and (self.shootTime < self.shootDelay - 0 + 0.1) \
-                and (self.shootterm == False):
-            game_world.add_object(Bullet(self.posX - 5, self.posY, 270 - 5, self.shootSpeed, 'RedCircle', '', 'Rotate',
-                                         self.bulletsizeX, self.bulletsizeY), BULLET)
-            game_world.add_object(Bullet(self.posX + 5, self.posY, 270 + 5, self.shootSpeed, 'RedCircle', '', 'Rotate',
-                                         self.bulletsizeX, self.bulletsizeY), BULLET)
-            self.shootterm = True
-        else:
-            self.shootterm = False
 
-        if self.shootTime > self.shootDelay:
+        startShootPos = (self.pngSizeY / 2 + 15)
+        if (self.shootTime > self.shootDelay - self.shootDelay)\
+                and (self.shootTime < self.shootDelay - self.shootDelay + 0.1)\
+                and (self.shootCount == 0):
+            game_world.add_object(Bullet(self.posX, self.posY - startShootPos, 270 - 30, self.shootSpeed, 'RedCircle', '', 'Rotate',
+                                         self.bulletsizeX, self.bulletsizeY), BULLET)
+            game_world.add_object(Bullet(self.posX, self.posY - startShootPos, 270 + 30, self.shootSpeed, 'RedCircle', '', 'Rotate',
+                                         self.bulletsizeX, self.bulletsizeY), BULLET)
+            self.shootCount += 1
+        elif (self.shootTime > self.shootDelay - (self.shootDelay * 0.8) - 0.1)\
+                and (self.shootTime < self.shootDelay - (self.shootDelay * 0.8) + 0.1) \
+                and (self.shootCount == 1):
+            game_world.add_object(Bullet(self.posX - 5, self.posY - startShootPos, 270 - 5, self.shootSpeed, 'RedCircle', '', 'Rotate',
+                                         self.bulletsizeX, self.bulletsizeY), BULLET)
+            game_world.add_object(Bullet(self.posX + 5, self.posY - startShootPos, 270 + 5, self.shootSpeed, 'RedCircle', '', 'Rotate',
+                                         self.bulletsizeX, self.bulletsizeY), BULLET)
+            self.shootCount += 1
+        elif (self.shootTime > self.shootDelay - (self.shootDelay * 0.6) - 0.1)\
+                and (self.shootTime < self.shootDelay - (self.shootDelay * 0.6) + 0.1) \
+                and (self.shootCount == 2):
+            game_world.add_object(Bullet(self.posX, self.posY - startShootPos, 270 - 40, self.shootSpeed, 'RedCircle', '', 'Rotate',
+                                         self.bulletsizeX, self.bulletsizeY), BULLET)
+            game_world.add_object(Bullet(self.posX, self.posY - startShootPos, 270, self.shootSpeed, 'RedCircle', '', 'Rotate',
+                                         self.bulletsizeX, self.bulletsizeY), BULLET)
+            game_world.add_object(Bullet(self.posX, self.posY - startShootPos, 270 + 40, self.shootSpeed, 'RedCircle', '', 'Rotate',
+                                         self.bulletsizeX, self.bulletsizeY), BULLET)
+            self.shootCount += 1
+        elif (self.shootTime > self.shootDelay - (self.shootDelay * 0.4) - 0.1) \
+             and (self.shootTime < self.shootDelay - (self.shootDelay * 0.4) + 0.1) \
+             and (self.shootCount == 3):
+            game_world.add_object(Bullet(self.posX - 5, self.posY - startShootPos, 270 - 5, self.shootSpeed, 'RedCircle', '', 'Rotate',
+                                         self.bulletsizeX, self.bulletsizeY), BULLET)
+            game_world.add_object(Bullet(self.posX + 5, self.posY - startShootPos, 270 + 5, self.shootSpeed, 'RedCircle', '', 'Rotate',
+                                         self.bulletsizeX, self.bulletsizeY), BULLET)
+            self.shootCount += 1
+        elif (self.shootTime > self.shootDelay - (self.shootDelay * 0.2) - 0.1) \
+             and (self.shootTime < self.shootDelay - (self.shootDelay * 0.2) + 0.1) \
+             and (self.shootCount == 4):
+            game_world.add_object(Bullet(self.posX, self.posY - startShootPos, 270 - 30, self.shootSpeed, 'RedCircle', '', 'Rotate',
+                                         self.bulletsizeX, self.bulletsizeY), BULLET)
+            game_world.add_object(Bullet(self.posX, self.posY - startShootPos, 270 + 30, self.shootSpeed, 'RedCircle', '', 'Rotate',
+                                         self.bulletsizeX, self.bulletsizeY), BULLET)
+            self.shootCount += 1
+        elif (self.shootTime > self.shootDelay - 0 - 0.1) \
+                and (self.shootTime < self.shootDelay - 0) \
+                and (self.shootCount == 5):
+            game_world.add_object(Bullet(self.posX, self.posY - startShootPos, 270 - 40, self.shootSpeed, 'RedCircle', '', 'Rotate',
+                                         self.bulletsizeX, self.bulletsizeY), BULLET)
+            game_world.add_object(Bullet(self.posX, self.posY - startShootPos, 270, self.shootSpeed, 'RedCircle', '', 'Rotate',
+                                         self.bulletsizeX, self.bulletsizeY), BULLET)
+            game_world.add_object(Bullet(self.posX, self.posY - startShootPos, 270 + 40, self.shootSpeed, 'RedCircle', '', 'Rotate',
+                                         self.bulletsizeX, self.bulletsizeY), BULLET)
+            self.shootCount += 1
+        elif self.shootCount == 6:
+            self.shootCount = 0
+
+        if self.shootTime > self.shootDelay * 1.15:
             self.shootTime = 0
 
+        # print(self.shootCount)
+
     def modify_difficulty(self, difficulty):
-        self.shootDelay /= (1 + difficulty / 10)
+        self.originShootDelay /= (1 + difficulty / 10)
         self.shootSpeed *= (1 + difficulty / 10)
         self.speedT     += difficulty // 2
+        self.modify_abilities()
+
+    def modify_abilities(self):
+        # speed
+        self.timePerAction = 1.0 - self.animSpeed / 100
+        self.actionPerTime = 1.0 / self.timePerAction
+        # delay
+        self.shootDelay = self.originShootDelay / 5
 
 class Dragon_Strong(Monster):
     image = None
 
     def __init__(self, posX, posY):
-        speed = 50
+        moveSpeed = 50
         sizeX = 2
         sizeY = 2
-        Monster.__init__(self, posX, posY, speed, sizeX, sizeY)
+        Monster.__init__(self, posX, posY, moveSpeed, sizeX, sizeY)
+        # image
+        if Dragon_Strong.image == None:
+            Dragon_Strong.image = load_image(os.path.join(os.getcwd(), 'resources', 'monster', 'dragon_other.png'))
+        # size of png
         self.pngSizeX = 75
         self.pngSizeY = 70
         # size
         self.sizeX = self.pngSizeX * self.sizeX
         self.sizeY = self.pngSizeY * self.sizeY
-        self.angle = 270
         self.bulletsizeX = 2
         self.bulletsizeY = 2
-        #
-        self.animTime = 0
+        # anim
+        self.frameMax = 10
+        self.animSpeed = 50
         self.animID = 5
-        if Dragon_Strong.image == None:
-            Dragon_Strong.image = load_image(os.path.join(os.getcwd(), 'monster', 'dragon_other.png'))
-        #
+
+        self.angle = 270
         self.originPosY = self.posY
         self.firstMode = True
 
-        self.anglespeed = 2
-        #
-        self.bulletTime = 0
-        self.bulletDelay = 2
+        self.anglespeed = 150
         self.bulletAngle = 0
+        self.bulletAngleSpeed = 50
+        #
+        self.originShootDelay = 1
 
         # difficulty
-        self.shootSpeed = 90
+        self.shootSpeed = 60
+
+        self.modify_abilities()
 
     def draw(self):
-        Dragon_Strong.image.clip_draw(self.frame * self.pngSizeX, self.animID * self.pngSizeY, self.pngSizeX, self.pngSizeY, self.posX,
+        Dragon_Strong.image.clip_draw(int(self.frame) * self.pngSizeX, self.animID * self.pngSizeY, self.pngSizeX, self.pngSizeY, self.posX,
                                self.posY, self.sizeX, self.sizeY)
 
     def update_anim(self):
-        self.animTime += 0.1
-        if self.animTime > 0.2:
-            self.frame = (self.frame + 1) % 10
-            self.animTime = 0
+        TimeToFrameQuantity = self.frameMax * self.actionPerTime * mainframe.frame_time
+        self.frame = (self.frame + TimeToFrameQuantity) % 10
 
         if (self.angle > 0) and (self.angle < 0 + 22):
             self.animID = 1
@@ -598,29 +689,42 @@ class Dragon_Strong(Monster):
             self.animID = 0
 
     def update_AI(self):
-        self.angle += self.anglespeed
+        self.angle += self.anglespeed * mainframe.frame_time
         if self.angle >= 360:
             self.angle = 0
         if self.firstMode == True:
             if self.originPosY > 550:
-                self.posX += math.cos(math.radians(self.angle)) * self.speed
-                self.posY += math.sin(math.radians(self.angle)) * self.speed - 2
+                self.posX += math.cos(math.radians(self.angle)) * self.moveSpeedPixelPerSecond * mainframe.frame_time
+                self.posY += math.sin(math.radians(self.angle)) * self.moveSpeedPixelPerSecond * mainframe.frame_time - 2
                 self.originPosY += -2
             else:
                 self.firstMode = False
+                self.shootCheck = True
                 self.originPosY = 550
         else:
-            self.posX += math.cos(math.radians(self.angle)) * self.speed
-            self.posY += math.sin(math.radians(self.angle)) * self.speed
+            self.posX += math.cos(math.radians(self.angle)) * self.moveSpeedPixelPerSecond * mainframe.frame_time
+            self.posY += math.sin(math.radians(self.angle)) * self.moveSpeedPixelPerSecond * mainframe.frame_time
 
-        self.bulletTime += 0.1
-        self.bulletAngle += 2
-        if self.bulletTime > self.bulletDelay:
+
+        self.bulletAngle += self.bulletAngleSpeed * mainframe.frame_time
+        if self.shootTime > self.shootDelay:
             game_world.add_object(Bullet(self.posX, self.posY,  self.bulletAngle, self.shootSpeed, 'YellowCircle_Anim', '', 'Anim'
-                                              , self.bulletsizeX, self.bulletsizeY), BULLET)
-            self.bulletTime = 0
+                                        , self.bulletsizeY, self.bulletsizeY), BULLET)
+            self.shootTime = 0
 
     def modify_difficulty(self, difficulty):
-        self.shootDelay /= (1 + difficulty / 10)
+        self.originShootDelay /= (1 + difficulty / 10)
         self.shootSpeed *= (1 + difficulty / 10)
         self.anglespeed *= (1 + difficulty / 10)
+        self.modify_abilities()
+
+    def modify_abilities(self):
+        # speed
+        self.moveSpeedMeterPerMinute = (self.moveSpeed * 1000.0 / 60.0)
+        self.moveSpeedMterPerSecond = (self.moveSpeedMeterPerMinute / 60.0)
+        self.moveSpeedPixelPerSecond = (self.moveSpeedMterPerSecond * PIXEL_PER_METER)
+        # speed
+        self.timePerAction = 1.0 - self.animSpeed / 100
+        self.actionPerTime = 1.0 / self.timePerAction
+        # delay
+        self.shootDelay = self.originShootDelay / 5

@@ -2,33 +2,52 @@ from pico2d import *
 from static import *
 
 import stage_scene
+import mainframe
 from bullet import Bullet
 import game_world
 
+# Action Speed
+TIME_PER_ACTION = 0.4
+ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
+FRAMES_PER_ACTION = 7
+
+# Move Speed
+# 추후 변경 가능하도록 해야함
+
 class Player:
-    MoveSpeed = 50 / 10
-    BulletTime = 0
-    AnimTime = 0
+    image = None
     def __init__(self):
+        # position
         self.x = 250
         self.y = 50
         self.dirX = 0
         self.dirY = 0
-        #status
+        self.velocityX = 0
+        self.velocityY = 0
+        # status
         self.deadcheck = False
         self.turncheck = False
-        #key
+        # key
         self.pushLcheck = False
         self.pushRcheck = False
         self.pushAttcheck = False
-        #frame
+        # frame
         self.frameID = 0
         self.frame = 0
         self.reformframe = 0
-        #image
-        self.image = load_image(os.path.join(os.getcwd(), 'player', 'player.png'))
-        #bullet
+        # bullet
         #self.bullet = []
+        # time
+        self.BulletTime = 0
+        self.BulletDelay = 0.15
+        # speed
+        self.moveSpeed = 20
+        # image
+        if Player.image == None:
+            Player.image = load_image(os.path.join(os.getcwd(), 'resources', 'player', 'player.png'))
+
+        # modify
+        self.Modify_Abilities()
 
     def handle_events(self, event):
         # 이동 구현
@@ -49,9 +68,9 @@ class Player:
     # Move DownKey
     def Move_State_DownKey(self, key_state):
         if key_state == SDLK_UP:
-            self.dirY += 1
+            self.velocityY += self.moveSpeedPixelPerSecond
         elif key_state == SDLK_DOWN:
-            self.dirY -= 1
+            self.velocityY -= self.moveSpeedPixelPerSecond
         # 좌
         elif key_state == SDLK_LEFT:
             # pushRcheck가 켜져있다는 뜻은 동시에 눌리고 있다는 뜻이므로
@@ -63,7 +82,7 @@ class Player:
                 self.reformframe = 6
                 self.turncheck = True
             #
-            self.dirX -= 1
+            self.velocityX -= self.moveSpeedPixelPerSecond
             self.pushLcheck = True
         # 우
         elif key_state == SDLK_RIGHT:
@@ -76,14 +95,16 @@ class Player:
                 self.reformframe = 6
                 self.turncheck = True
             #
-            self.dirX += 1
+            self.velocityX += self.moveSpeedPixelPerSecond
             self.pushRcheck = True
+
+        self.dirX = clamp(-1, self.velocityX, 1)
     # Move UpKey
     def Move_State_UpKey(self, key_state):
         if key_state == SDLK_UP:
-            self.dirY -= 1
+            self.velocityY -= self.moveSpeedPixelPerSecond
         elif key_state == SDLK_DOWN:
-            self.dirY += 1
+            self.velocityY += self.moveSpeedPixelPerSecond
         # 좌
         elif key_state == SDLK_LEFT:
             # pushRcheck가 켜져있다는 뜻은 키를 뗌과 동시에 반대키가 눌리고 있다는 뜻이므로
@@ -97,6 +118,7 @@ class Player:
             else:
                 self.turncheck = False
             #
+            self.velocityX += self.moveSpeedPixelPerSecond
             self.dirX += 1
             self.pushLcheck = False
         # 우
@@ -112,6 +134,7 @@ class Player:
             else:
                 self.turncheck = False
             #
+            self.velocityX -= self.moveSpeedPixelPerSecond
             self.dirX -= 1
             self.pushRcheck = False
     # Att DownKey
@@ -123,46 +146,58 @@ class Player:
         if key_state == SDLK_s:
             self.pushAttcheck = False
 
+    def Modify_Abilities(self):
+        # speed
+        self.moveSpeedMeterPerMinute = (self.moveSpeed * 1000.0 / 60.0)
+        self.moveSpeedMterPerSecond = (self.moveSpeedMeterPerMinute / 60.0)
+        self.moveSpeedPixelPerSecond = (self.moveSpeedMterPerSecond * PIXEL_PER_METER)
+
     def update(self):
         #player_time
-        Player.BulletTime += 0.1
-        Player.AnimTime += 0.1
+        self.BulletTime += mainframe.frame_time
+
+        TimeToFrameQuantity = FRAMES_PER_ACTION * ACTION_PER_TIME * mainframe.frame_time
 
         if self.turncheck == True:
             # 회전 이동 상태일때
             # 회전 스프라이트 끝 장면에 프레임을 고정
             if self.frame < 6:
-                self.frame = (self.frame + 1) % 7
+               # self.frame = (self.frame + 1) % 7
+               self.frame = (self.frame + TimeToFrameQuantity) % 7
         else:
             # 만약 회전 이동 상태가 아니라면 IDLE 상태로 돌아오는
             # 스프라이트를 재생한다.(프레임을 거꾸로 돌린다)
-            if self.reformframe == 0:
+            if self.reformframe < 0:
                 self.frameID = 0
-                #IDLE 모션이 너무 빨라서 제한속도를 줌
-                if Player.AnimTime > 0.25 :
-                    self.frame = (self.frame + 1) % 7
-                    Player.AnimTime = 0
+                # self.frame = (self.frame + 1) % 7
+                self.frame = (self.frame + TimeToFrameQuantity) % 7
             else:
-                self.reformframe = self.reformframe - 1
+                self.reformframe = self.reformframe - TimeToFrameQuantity
                 self.frame = self.reformframe
 
         # 이동 계산
-        self.y += self.dirY * Player.MoveSpeed
-        self.x += self.dirX * Player.MoveSpeed
+        self.y += self.velocityY * mainframe.frame_time
+        self.x += self.velocityX * mainframe.frame_time
+
+        # 화면 내 이동
+        # boy.x = clamp(25, boy.x, 1600 - 25)
+
 
         # 공격(추후 상점 추가시 고칠 예정)
         if self.pushAttcheck == True :
-            if Player.BulletTime > 0.75:
-                game_world.add_object(Bullet(self.x, self.y, 90 - 15, 250, 'Eagle', 0, '',  2, 2), BULLET)
-                game_world.add_object(Bullet(self.x, self.y, 90, 250, 'Eagle', 0, '', 2, 2), BULLET)
-                game_world.add_object(Bullet(self.x, self.y, 90 + 15, 250, 'Eagle', 0, '',  2, 2), BULLET)
-                Player.BulletTime = 0
+            if self.BulletTime > self.BulletDelay:
+                game_world.add_object(Bullet(self.x, self.y, 90 - 15, 100, 'Eagle', 0, '',  2, 2), BULLET)
+                game_world.add_object(Bullet(self.x, self.y, 90, 100, 'Eagle', 0, '', 2, 2), BULLET)
+                game_world.add_object(Bullet(self.x, self.y, 90 + 15, 100, 'Eagle', 0, '',  2, 2), BULLET)
+                self.BulletTime = 0
 
         return False
 
     def draw(self):
-        self.image.clip_draw(self.frame * 70, self.frameID * 70, 70, 70, self.x, self.y)
+        Player.image.clip_draw(int(self.frame) * 70, self.frameID * 70, 70, 70, self.x, self.y)
 
         # DEBUG
         # print(str(self.pushLcheck) + " " + str(self.pushRcheck))
         # print(len(stage_scene.bullets))
+        # print(self.frame)
+        # print

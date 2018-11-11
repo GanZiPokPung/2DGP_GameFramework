@@ -12,7 +12,7 @@ class Map :
         self.y = posy
         self.pushcheck = False
         self.endCheck = False
-        self.image = load_image(os.path.join(os.getcwd(), 'map', 'Stage' + str(name) + '_' + str(subname) + '.png'))
+        self.image = load_image(os.path.join(os.getcwd(), 'resources', 'map', 'Stage' + str(name) + '_' + str(subname) + '.png'))
         #
         self.speed = mapSpeed
 

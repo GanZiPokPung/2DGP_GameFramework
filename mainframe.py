@@ -63,16 +63,24 @@ def quit():
     global running
     running = False
 
+import time
+frame_time = 0.0
+
 def run(start_scene):
     global running, stack
     running = True
     stack = [start_scene]
     start_scene.initialize()
 
+    global frame_time
+    current_time = time.time()
     while(running):
         stack[-1].handle_events()
         stack[-1].update()
         stack[-1].draw()
+        frame_time = time.time() - current_time
+        frame_rate = 1.0 / frame_time
+        current_time += frame_time
 
     while(isLenEmpty(stack) == False):
         stack[-1].exit()
