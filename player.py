@@ -49,6 +49,9 @@ class Player:
         # modify
         self.Modify_Abilities()
 
+    def get_rect(self):
+        return self.x - 10, self.y - 20, self.x + 10, self.y + 20
+
     def handle_events(self, event):
         # 이동 구현
         # 키를 눌렀다면?
@@ -186,9 +189,9 @@ class Player:
         # 공격(추후 상점 추가시 고칠 예정)
         if self.pushAttcheck == True :
             if self.BulletTime > self.BulletDelay:
-                game_world.add_object(Bullet(self.x, self.y, 90 - 15, 100, 'Eagle', 0, '',  2, 2), BULLET)
-                game_world.add_object(Bullet(self.x, self.y, 90, 100, 'Eagle', 0, '', 2, 2), BULLET)
-                game_world.add_object(Bullet(self.x, self.y, 90 + 15, 100, 'Eagle', 0, '',  2, 2), BULLET)
+                game_world.add_object(Bullet(self.x, self.y, 90 - 15, 10, 'Eagle', 0, '',  2, 2), BULLET)
+                game_world.add_object(Bullet(self.x, self.y, 90, 10, 'Eagle', 0, '', 2, 2), BULLET)
+                game_world.add_object(Bullet(self.x, self.y, 90 + 15, 10, 'Eagle', 0, '',  2, 2), BULLET)
                 self.BulletTime = 0
 
         return False
@@ -201,3 +204,8 @@ class Player:
         # print(len(stage_scene.bullets))
         # print(self.frame)
         # print
+
+    def draw_rect(self):
+        draw_rectangle(*self.get_rect())
+
+

@@ -26,7 +26,7 @@ class Monster_Pattern:
         select = random.randint(1, 10)
 
         # debug
-        # select = random.randint(8, 8)
+        select = random.randint(7, 7)
 
         if select < 8:
             subselect = random.randint(0, 8)
@@ -191,11 +191,17 @@ class Monster:
         self.moveSpeed = moveSpeed
         self.sizeX = sizeX
         self.sizeY = sizeY
+        self.rectSizeX = 0
+        self.rectSizeY = 0
         self.frame = 0
         self.shootTime = 0
         self.shootDelay = 0
         self.shootCheck = False
         self.time = 0
+
+    def get_rect(self):
+        return self.posX - self.rectSizeX, self.posY - self.rectSizeY,\
+               self.posX + self.rectSizeX, self.posY + self.rectSizeY
 
     def Modify_Abilities(self):
         pass
@@ -219,6 +225,9 @@ class Monster:
 
     def draw(self):
         pass
+
+    def draw_rect(self):
+        draw_rectangle(*self.get_rect())
 
     def update_anim(self):
         pass
@@ -253,9 +262,17 @@ class Warrior(Monster):
             self.initialize_size()
         self.pngSizeX = Warrior.size.get(self.imageType)[0]
         self.pngSizeY = Warrior.size.get(self.imageType)[1]
+
+        rectSizeX = Warrior.rectSize.get(self.imageType)[0]
+        rectSizeY = Warrior.rectSize.get(self.imageType)[1]
         # size
+        self.rectSizeX = (rectSizeX // 2) * self.sizeX
+        self.rectSizeY = (rectSizeY // 2) * self.sizeY
+
         self.sizeX = self.pngSizeX * self.sizeX
         self.sizeY = self.pngSizeY * self.sizeY
+
+
         # 아래를 바라보는게 기본
         self.angle = 270
         # 타입에 따라 다른 행동을 하도록 초기화
@@ -276,6 +293,10 @@ class Warrior(Monster):
         Warrior.size = {'warrior': [163, 173],
                          'warrior_other': [147, 142]
                          }
+        Warrior.rectSize = {'warrior': [100, 100],
+                        'warrior_other': [147, 142]
+                        }
+
 
     # 타입별 어떤 행동을 할지 결정
     def initialize_type(self):
@@ -289,12 +310,12 @@ class Warrior(Monster):
             # 돌진
             self.anglespeed = 0
         if self.imageType == 'warrior':
-            self.originShootDelay = random.randint(1, 2)
+            self.originShootDelay = random.randint(5, 10)
             self.shootSpeed = 20
             self.bulletsizeX = 1
             self.bulletsizeY = 1
         if self.imageType == 'warrior_other':
-            self.originShootDelay = random.randint(2, 4)
+            self.originShootDelay = random.randint(3, 7)
             self.shootSpeed = 40
             self.bulletsizeX = 2
             self.bulletsizeY = 2
@@ -350,7 +371,7 @@ class Bird(Monster):
         sizeX = 2
         sizeY = 2
         Monster.__init__(self, posX, posY, moveSpeed, sizeX, sizeY)
-
+        # image
         if Bird.image == None:
             Bird.image = load_image(os.path.join(os.getcwd(), 'resources', 'monster', 'bird.png'))
         # size of png

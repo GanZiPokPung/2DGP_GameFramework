@@ -13,6 +13,7 @@ ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
 class Bullet:
     image = None
     size = None
+    rectSize = None
     def __init__(self, posX, posY, angle, speed, imageType, rootType, bulletType, sizeX, sizeY):
         self.posX = posX
         self.posY = posY
@@ -34,9 +35,17 @@ class Bullet:
             self.initialize_size()
         self.pngSizeX = Bullet.size.get(self.type)[0]
         self.pngSizeY = Bullet.size.get(self.type)[1]
+
+        rectSizeX = Bullet.rectSize.get(self.type)[0]
+        rectSizeY = Bullet.rectSize.get(self.type)[1]
         #size
+        self.rectSizeX = rectSizeX * sizeX
+        self.rectSizeY = rectSizeY * sizeY
+
         self.sizeX = self.pngSizeX * sizeX
         self.sizeY = self.pngSizeY * sizeY
+
+
         # frame type
         self.frame = 0
         if self.bulletType == 'Anim':
@@ -104,6 +113,39 @@ class Bullet:
                         'Y':                    [270 // 3, 90, 3]
         }
 
+        Bullet.rectSize = {
+                        # player
+                        'BlueCircle':           [36, 36],
+                        'Eagle':                [75 // 2, 49 // 2],
+                        'ExplodeMiss':          [48, 22],
+                        'GreenWeak':            [36, 36],
+                        'GreenNormal':          [28, 28],
+                        'GreenStrong':          [32, 32],
+                        'PurpleWeak':           [26, 26],
+                        'PurpleNormal':         [26, 26],
+                        'PurpleStrong':         [32, 32],
+                        'PurpleMax':            [48, 48],
+                        'Rug':                  [24, 24],
+                        'SmallCircle':          [8, 8],
+                        'SmallMiss':            [16, 16],
+                        'Thunder':              [100, 200],
+                        # monster
+                        'Small_A':              [16, 16],
+                        'Small_B':              [12, 12],
+                        'Small_Anim':           [142 // 8, 10],
+                        'BlueCircle_M':         [92, 98],
+                        'BlueCircle_Anim':      [108 // 3, 38],
+                        'RedCircle':            [91, 92],
+                        'RedSun':               [91, 92],
+                        'Missile':              [24, 24],
+                        'YellowCircle_Anim':    [336 // 6, 61],
+                        'Y':                    [270 // 3, 90]
+        }
+
+    def get_rect(self):
+        return self.posX - self.rectSizeX, self.posY - self.rectSizeY, \
+               self.posX + self.rectSizeX, self.posY + self.rectSizeY
+
     def update(self):
 
 
@@ -139,6 +181,9 @@ class Bullet:
                                  self.pngSizeX, self.pngSizeY,
                                  self.posX, self.posY,
                                  self.sizeX, self.sizeY)
+
+    def draw_rect(self):
+        draw_rectangle(*self.get_rect())
 
     def modify_abilities(self):
         self.speedMeterPerMinute = (self.speed * 1000.0 / 60.0)

@@ -17,6 +17,8 @@ class Boss:
         #
         self.sizeX = sizeX
         self.sizeY = sizeY
+        self.rectSizeX = 0
+        self.rectSizeY = 0
         #
         self.frame = 0
         # shoot
@@ -29,6 +31,10 @@ class Boss:
         self.delayCheck = False
         self.delayTerm = 0
         self.delayTime = 0
+
+    def get_rect(self):
+        return self.posX - self.rectSizeX, self.posY - self.rectSizeY,\
+               self.posX + self.rectSizeX, self.posY + self.rectSizeY
 
     def update(self):
 
@@ -44,6 +50,9 @@ class Boss:
 
     def draw(self):
         pass
+
+    def draw_rect(self):
+        draw_rectangle(*self.get_rect())
 
     def update_anim(self):
         pass
@@ -72,6 +81,8 @@ class BossHead(Boss):
         self.pngSizeX = 259
         self.pngSizeY = 125
         # size
+        self.rectSizeX = (self.pngSizeX // 6) * self.sizeX
+        self.rectSizeY = (self.pngSizeY // 2) * self.sizeY
         self.sizeX = self.pngSizeX * self.sizeX
         self.sizeY = self.pngSizeY * self.sizeY
         self.bulletsizeX = 0
@@ -358,6 +369,8 @@ class BossHand(Boss):
         self.pngSizeX = 85
         self.pngSizeY = 49
         # size
+        self.rectSizeX = (self.pngSizeX // 2) * self.sizeX
+        self.rectSizeY = (self.pngSizeY // 2) * self.sizeY
         self.sizeX = self.pngSizeX * self.sizeX
         self.sizeY = self.pngSizeY * self.sizeY
         self.bulletsizeX = 0
@@ -529,7 +542,7 @@ class BossHand(Boss):
         if self.shootCount > self.shootMax:
             self.shootCout = 0
             self.attackInfoInit = False
-            
+
             return False
         else:
             return True

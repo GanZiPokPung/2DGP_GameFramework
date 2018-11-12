@@ -34,6 +34,9 @@ player = None
 # monsters = []
 monsterpattern = None
 
+# debug
+rectCheck = True
+
 def initialize():
     #map
     global totalmap
@@ -56,6 +59,7 @@ def initialize():
     game_world.add_object(player, PLAYER)
 
 def handle_events():
+    global rectCheck
     events = get_events()
     for event in events:
         if event.type == SDL_QUIT:
@@ -77,6 +81,11 @@ def handle_events():
             game_world.curtain_object(BOSS, 2).attackID = 3
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_5):
             game_world.curtain_object(BOSS, 2).attackID = 4
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_p):
+            if rectCheck == False:
+                rectCheck = True
+            else:
+                rectCheck = False
         #player
         player.handle_events(event)
 
@@ -103,6 +112,9 @@ def draw():
 
     for game_object in game_world.all_objects():
         game_object.draw()
+        # debug
+        if rectCheck == True:
+            game_object.draw_rect()
 
     update_canvas()
 
