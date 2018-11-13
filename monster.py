@@ -40,8 +40,7 @@ class Monster_Pattern:
                                                     len(warrior_pattern_left) + 1, 'Left', 'warrior_other'))
 
                 for monster in warrior_pattern_left :
-                    monster.modify_difficulty(Monster_Pattern.difficulty)
-                    yield monster
+                    game_world.add_object(monster, MONSTER)
             # 오른쪽위치에서 오른쪽 방향
             elif subselect == 1:
                 warrior_pattern_right = [Warrior(300, 800, i, 'Right', 'warrior')
@@ -50,8 +49,7 @@ class Monster_Pattern:
                                                      len(warrior_pattern_right) + 1, 'Right', 'warrior_other'))
 
                 for monster in warrior_pattern_right :
-                    monster.modify_difficulty(Monster_Pattern.difficulty)
-                    yield monster
+                    game_world.add_object(monster, MONSTER)
             # 중앙 방향
             elif subselect == 2:
                 warrior_pattern_center = [Warrior(300 + random.randint(-200, 200), 800, i, '', 'warrior')
@@ -60,8 +58,7 @@ class Monster_Pattern:
                                                       len(warrior_pattern_center) + 1, '', 'warrior_other'))
 
                 for monster in warrior_pattern_center :
-                    monster.modify_difficulty(Monster_Pattern.difficulty)
-                    yield monster
+                    game_world.add_object(monster, MONSTER)
             # 오른쪽위치에서 왼쪽 방향
             elif subselect == 3:
                 warrior_pattern_left_other = [Warrior(400, 800, i,'Left', 'warrior')
@@ -70,8 +67,7 @@ class Monster_Pattern:
                                                     len(warrior_pattern_left_other) + 1, 'Left', 'warrior_other'))
 
                 for monster in warrior_pattern_left_other :
-                    monster.modify_difficulty(Monster_Pattern.difficulty)
-                    yield monster
+                    game_world.add_object(monster, MONSTER)
             # 왼쪽위치에서 오른쪽 방향
             elif subselect == 4:
                 warrior_pattern_right_other = [Warrior(100, 800, i, 'Right', 'warrior')
@@ -80,8 +76,7 @@ class Monster_Pattern:
                                             len(warrior_pattern_right_other) + 1, 'Right', 'warrior_other'))
 
                 for monster in warrior_pattern_right_other :
-                    monster.modify_difficulty(Monster_Pattern.difficulty)
-                    yield monster
+                    game_world.add_object(monster, MONSTER)
             # 양쪽에서 바깥쪽 방향
             elif subselect == 5:
                 warrior_pattern_left = [Warrior(200, 800, i, 'Left', 'warrior')
@@ -99,8 +94,8 @@ class Monster_Pattern:
                 for monster in warrior_pattern_both_out:
                     monster[0].modify_difficulty(Monster_Pattern.difficulty)
                     monster[1].modify_difficulty(Monster_Pattern.difficulty)
-                    yield  monster[0]
-                    yield  monster[1]
+                    game_world.add_object(monster[0], MONSTER)
+                    game_world.add_object(monster[1], MONSTER)
             # 양쪽에서 안쪽 방향
             elif subselect == 6:
                 warrior_pattern_left_other = [Warrior(400, 800, i, 'Left', 'warrior')
@@ -119,8 +114,8 @@ class Monster_Pattern:
                 for monster in warrior_pattern_both_in:
                     monster[0].modify_difficulty(Monster_Pattern.difficulty)
                     monster[1].modify_difficulty(Monster_Pattern.difficulty)
-                    yield monster[0]
-                    yield monster[1]
+                    game_world.add_object(monster[0], MONSTER)
+                    game_world.add_object(monster[1], MONSTER)
             # 양쪽에서 왼쪽 방향
             elif subselect == 7:
                 warrior_pattern_left = [Warrior(200, 800, i, 'Left', 'warrior')
@@ -138,8 +133,8 @@ class Monster_Pattern:
                 for monster in warrior_pattern_both_left:
                     monster[0].modify_difficulty(Monster_Pattern.difficulty)
                     monster[1].modify_difficulty(Monster_Pattern.difficulty)
-                    yield  monster[0]
-                    yield  monster[1]
+                    game_world.add_object(monster[0], MONSTER)
+                    game_world.add_object(monster[1], MONSTER)
             # 양쪽에서 오른쪽 방향
             elif subselect == 8:
                 warrior_pattern_right = [Warrior(300, 800, i, 'Right', 'warrior')
@@ -158,8 +153,8 @@ class Monster_Pattern:
                 for monster in warrior_pattern_both_right:
                     monster[0].modify_difficulty(Monster_Pattern.difficulty)
                     monster[1].modify_difficulty(Monster_Pattern.difficulty)
-                    yield monster[0]
-                    yield monster[1]
+                    game_world.add_object(monster[0], MONSTER)
+                    game_world.add_object(monster[1], MONSTER)
         # warrior가 아닌 네임드급 몬스터들
         else:
             subselect = random.randint(0, 2)
@@ -169,17 +164,17 @@ class Monster_Pattern:
             if subselect == 0:
                 bird = Bird(300 + random.randint(-70, 70), 800)
                 bird.modify_difficulty(Monster_Pattern.difficulty)
-                yield bird
+                game_world.add_object(bird, MONSTER)
             # Dragon
             elif subselect == 1:
                 dragon = Dragon(200, 800)
                 dragon.modify_difficulty(Monster_Pattern.difficulty)
-                yield dragon
+                game_world.add_object(dragon, MONSTER)
             # Dragon_Strong
             elif subselect == 2:
                 dragon_strong = Dragon_Strong(50, 800)
                 dragon_strong.modify_difficulty(Monster_Pattern.difficulty)
-                yield dragon_strong
+                game_world.add_object(dragon_strong, MONSTER)
 
 ##########################################################################################
 
@@ -197,6 +192,7 @@ class Monster:
         self.shootTime = 0
         self.shootDelay = 0
         self.shootCheck = False
+        self.collideCheck = False
         self.time = 0
 
     def get_rect(self):
@@ -214,6 +210,10 @@ class Monster:
 
         self.update_AI()
         self.update_anim()
+
+        # 충돌하면 몬스터를 없앤다.
+        if self.collideCheck == True:
+            return True
 
         # 맵 밖을 나가면 몬스터를 없앤다.
         if (self.posX < 0 - self.sizeX) or (self.posX > static.canvas_width + self.sizeX):

@@ -8,6 +8,7 @@ from monster import *
 from boss import *
 
 import game_world
+import collision_manager
 
 # default
 name = "StageScene"
@@ -65,8 +66,7 @@ def handle_events():
         if event.type == SDL_QUIT:
             mainframe.quit()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_q):
-            for object in monsterpattern.get_monster():
-                game_world.add_object(object, MONSTER)
+            monsterpattern.get_monster()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_w):
             game_world.add_object(BossHead(), BOSS)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_e):
@@ -97,12 +97,17 @@ def update():
     for map in currentmaplist:
         map.update(currentmaplist)
 
+    # collider Check
+    collision_manager.collide_update()
+
     for game_object in game_world.all_objects():
         erase = game_object.update()
         if erase == True :
             game_world.remove_object(game_object)
 
-    delay(0.015)
+
+
+    #delay(0.015)
 
 def draw():
     clear_canvas()

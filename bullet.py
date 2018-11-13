@@ -53,6 +53,7 @@ class Bullet:
         else:
             self.maxFrame = 0
 
+        self.collideCheck = False
         self.modify_abilities()
 
     def initialize_image(self):
@@ -159,6 +160,10 @@ class Bullet:
         elif self.bulletType == 'Rotate':
             self.rotAngle += 20
 
+        # 충돌하면 총알을 없앤다.
+        if self.collideCheck == True:
+            return True
+
         # 맵 밖을 나가면 총알을 없앤다.
         if (self.posX < 0 - self.sizeX) or (self.posX > static.canvas_width + self.sizeX):
             return True
@@ -166,6 +171,8 @@ class Bullet:
             return True
         else:
             return False
+
+
 
     def draw(self):
 

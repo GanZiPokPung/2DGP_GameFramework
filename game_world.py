@@ -1,5 +1,5 @@
 
-objects = [[], [], [], [], []]
+objects = [[], [], [], [], [], []]
 
 # object layer 로 넣은 obj를 분류하여 그 리스트에 추가함
 def add_object(obj, layer):
@@ -25,7 +25,7 @@ def clear():
     objects.clear()
 
 def clear_layer(layer):
-    for obj in layer_objects(layer):
+    for obj in get_layer(layer):
         objects[layer].remove(obj)
         del obj
 
@@ -35,10 +35,8 @@ def all_objects():
         for obj in objects[i]:
             yield obj
 
-# 특정 레이어만 순회돌며 yield함
-def layer_objects(layer):
-    for obj in objects[layer]:
-        yield obj
+def get_layer(layer):
+    return objects[layer]
 
 # 특정 레이어의 오브젝트를 꺼내와서 yield함
 def curtain_object(layer, index):

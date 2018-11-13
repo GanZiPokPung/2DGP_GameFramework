@@ -31,6 +31,8 @@ class Player:
         self.pushLcheck = False
         self.pushRcheck = False
         self.pushAttcheck = False
+        # collider
+        self.collideCheck = False
         # frame
         self.frameID = 0
         self.frame = 0
@@ -189,9 +191,9 @@ class Player:
         # 공격(추후 상점 추가시 고칠 예정)
         if self.pushAttcheck == True :
             if self.BulletTime > self.BulletDelay:
-                game_world.add_object(Bullet(self.x, self.y, 90 - 15, 10, 'Eagle', 0, '',  2, 2), BULLET)
-                game_world.add_object(Bullet(self.x, self.y, 90, 10, 'Eagle', 0, '', 2, 2), BULLET)
-                game_world.add_object(Bullet(self.x, self.y, 90 + 15, 10, 'Eagle', 0, '',  2, 2), BULLET)
+                #game_world.add_object(Bullet(self.x, self.y, 90 - 15, 10, 'Eagle', 0, '',  2, 2), BULLET_PLAYER)
+                game_world.add_object(Bullet(self.x, self.y, 90, 60, 'Eagle', 0, '', 2, 2), BULLET_PLAYER)
+                #game_world.add_object(Bullet(self.x, self.y, 90 + 15, 10, 'Eagle', 0, '',  2, 2), BULLET_PLAYER)
                 self.BulletTime = 0
 
         return False
