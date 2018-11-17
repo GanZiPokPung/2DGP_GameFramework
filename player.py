@@ -192,9 +192,14 @@ class Player:
         if self.pushAttcheck == True :
             if self.BulletTime > self.BulletDelay:
                 #game_world.add_object(Bullet(self.x, self.y, 90 - 15, 10, 'Eagle', 0, '',  2, 2), BULLET_PLAYER)
-                game_world.add_object(Bullet(self.x, self.y, 90, 60, 'Eagle', 0, '', 2, 2), BULLET_PLAYER)
+                #game_world.add_object(Bullet(self.x, self.y, 90, 60, 'SmallMiss', 0, '', 5, 5), BULLET_PLAYER)
                 #game_world.add_object(Bullet(self.x, self.y, 90 + 15, 10, 'Eagle', 0, '',  2, 2), BULLET_PLAYER)
                 self.BulletTime = 0
+
+                # 필살기
+                # game_world.add_object(Bullet(100, 150, 90, 60, 'Thunder', 0, 'Anim_Stop', 6, 6), BULLET_PLAYER)
+                # game_world.add_object(Bullet(250, 150, 90, 60, 'Thunder', 0, 'Anim_Stop', 6, 6), BULLET_PLAYER)
+                # game_world.add_object(Bullet(400, 150, 90, 60, 'Thunder', 0, 'Anim_Stop', 6, 6), BULLET_PLAYER)
 
         return False
 

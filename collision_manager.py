@@ -26,8 +26,8 @@ def collide_update():
     # player, bullet
     monsterLayer = game_world.get_layer(MONSTER)
     bulletplayerLayer = game_world.get_layer(BULLET_PLAYER)
-    playerLayer = game_world.get_layer(MONSTER)
-    bulletLayer = game_world.get_layer(BULLET_PLAYER)
+    playerLayer = game_world.get_layer(PLAYER)
+    bulletLayer = game_world.get_layer(BULLET)
     collide_check(monsterLayer, bulletplayerLayer)
     collide_check(playerLayer, bulletLayer)
     # monster, bullet

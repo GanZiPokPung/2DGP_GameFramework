@@ -3,12 +3,15 @@ from static import *
 import math
 import static
 import mainframe
+import random
 import stage_scene
 import custom_math
 
 # Action Speed
 TIME_PER_ACTION = 0.2
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
+
+TIME_FOR_BOMB = 5
 
 class Bullet:
     image = None
@@ -50,8 +53,13 @@ class Bullet:
         self.frame = 0
         if self.bulletType == 'Anim':
             self.maxFrame = Bullet.size.get(self.type)[2]
+        elif self.bulletType == 'Anim_Stop':
+            self.maxFrame = Bullet.size.get(self.type)[2]
+            self.frame = random.randint(0, self.maxFrame)
         else:
             self.maxFrame = 0
+
+        self.time = 0
 
         self.collideCheck = False
         self.modify_abilities()
@@ -89,7 +97,7 @@ class Bullet:
                         # player
                         'BlueCircle':           [36, 36],
                         'Eagle':                [75, 49],
-                        'ExplodeMiss':          [48, 22],
+                        'ExplodeMiss':          [48 // 3, 22, 3],
                         'GreenWeak':            [36, 36],
                         'GreenNormal':          [28, 28],
                         'GreenStrong':          [32, 32],
@@ -100,7 +108,7 @@ class Bullet:
                         'Rug':                  [24, 24],
                         'SmallCircle':          [8, 8],
                         'SmallMiss':            [16, 16],
-                        'Thunder':              [100, 200],
+                        'Thunder':              [100 // 5, 200, 5],
                         # monster
                         'Small_A':              [16, 16],
                         'Small_B':              [12, 12],
@@ -116,20 +124,20 @@ class Bullet:
 
         Bullet.rectSize = {
                         # player
-                        'BlueCircle':           [36, 36],
+                        'BlueCircle':           [36 // 2, 36 //2],
                         'Eagle':                [75 // 2, 49 // 2],
-                        'ExplodeMiss':          [48, 22],
-                        'GreenWeak':            [36, 36],
-                        'GreenNormal':          [28, 28],
-                        'GreenStrong':          [32, 32],
-                        'PurpleWeak':           [26, 26],
-                        'PurpleNormal':         [26, 26],
-                        'PurpleStrong':         [32, 32],
-                        'PurpleMax':            [48, 48],
-                        'Rug':                  [24, 24],
-                        'SmallCircle':          [8, 8],
-                        'SmallMiss':            [16, 16],
-                        'Thunder':              [100, 200],
+                        'ExplodeMiss':          [(48 // 3)//6, 22 // 2],
+                        'GreenWeak':            [36 // 10, 36 // 2],
+                        'GreenNormal':          [28 // 6, 28 // 2],
+                        'GreenStrong':          [32 // 4, 32 // 2],
+                        'PurpleWeak':           [26 // 6, 26 // 2],
+                        'PurpleNormal':         [26 // 4, 26 // 2],
+                        'PurpleStrong':         [32 // 3, 32 // 2],
+                        'PurpleMax':            [48 // 4, 48 // 2],
+                        'Rug':                  [24 // 5, 24 // 3],
+                        'SmallCircle':          [8 // 2, 8 // 2],
+                        'SmallMiss':            [16 // 5, 16 // 3],
+                        'Thunder':              [(100 // 5) // 4, 200 // 2],
                         # monster
                         'Small_A':              [16, 16],
                         'Small_B':              [12, 12],
@@ -148,12 +156,15 @@ class Bullet:
                self.posX + self.rectSizeX, self.posY + self.rectSizeY
 
     def update(self):
+        if self.bulletType == 'Anim_Stop':
+            self.time += mainframe.frame_time
+            if self.time > TIME_FOR_BOMB:
+                return True
+        else:
+            self.posX += math.cos(math.radians(self.angle)) * self.speedPixelPerSecond * mainframe.frame_time
+            self.posY += math.sin(math.radians(self.angle)) * self.speedPixelPerSecond * mainframe.frame_time
 
-
-        self.posX += math.cos(math.radians(self.angle)) * self.speedPixelPerSecond * mainframe.frame_time
-        self.posY += math.sin(math.radians(self.angle)) * self.speedPixelPerSecond * mainframe.frame_time
-
-        if self.bulletType == 'Anim':
+        if self.bulletType == 'Anim' or self.bulletType == 'Anim_Stop':
             TimeToFrameQuantity = self.maxFrame * ACTION_PER_TIME * mainframe.frame_time
             self.frame = (self.frame + TimeToFrameQuantity) % self.maxFrame
 
