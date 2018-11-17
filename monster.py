@@ -24,10 +24,10 @@ class Monster_Pattern:
 
     def get_monster(self):
 
-        select = random.randint(1, 10)
+        # select = random.randint(1, 10)
 
         # debug
-        # select = random.randint(7, 7)
+        select = random.randint(8, 8)
 
         if select < 8:
             subselect = random.randint(0, 8)
@@ -158,9 +158,9 @@ class Monster_Pattern:
                     game_world.add_object(monster[1], MONSTER)
         # warrior가 아닌 네임드급 몬스터들
         else:
-            subselect = random.randint(0, 2)
+            # subselect = random.randint(0, 2)
             # debug
-            # subselect = random.randint(2, 2)
+            subselect = random.randint(2, 2)
             # Bird
             if subselect == 0:
                 bird = Bird(300 + random.randint(-70, 70), 800)
@@ -237,7 +237,7 @@ class Monster:
             return True
         # 체력이 다되면 몬스터를 없앤다.
         elif (self.hp <= 0):
-            game_world.add_object(Effect(self.posX, self.posY, 'random_effect', '', self.originSizeX * 3, self.originSizeY * 3),
+            game_world.add_object(Effect(self.posX, self.posY, 'random_effect', '', self.originSizeX, self.originSizeY),
                                   EFFECT)
             return True
         else:
@@ -264,6 +264,7 @@ class Monster:
 class Warrior(Monster):
     image = None
     size = None
+    rectsize = None
     def __init__(self, posX, posY, term, LRtype, imageType):
         # 초기 난이도 능력치
         moveSpeed = 30
@@ -403,6 +404,13 @@ class Bird(Monster):
         # size of png
         self.pngSizeX = 100
         self.pngSizeY = 100
+
+        rectSizeX = self.pngSizeX
+        rectSizeY = self.pngSizeY
+        # size
+        self.rectSizeX = (rectSizeX // 3) * self.sizeX
+        self.rectSizeY = (rectSizeY // 4) * self.sizeY
+
         # size
         self.sizeX = self.pngSizeX * self.sizeX
         self.sizeY = self.pngSizeY * self.sizeY
@@ -534,6 +542,13 @@ class Dragon(Monster):
         # size of png
         self.pngSizeX = 128
         self.pngSizeY = 128
+
+        rectSizeX = self.pngSizeX
+        rectSizeY = self.pngSizeY
+        # size
+        self.rectSizeX = (rectSizeX // 4) * self.sizeX
+        self.rectSizeY = (rectSizeY // 3) * self.sizeY
+
         # size
         self.sizeX = self.pngSizeX * self.sizeX
         self.sizeY = self.pngSizeY * self.sizeY
@@ -697,6 +712,13 @@ class Dragon_Strong(Monster):
         # size of png
         self.pngSizeX = 75
         self.pngSizeY = 70
+
+        rectSizeX = self.pngSizeX
+        rectSizeY = self.pngSizeY
+        # size
+        self.rectSizeX = (rectSizeX // 4) * self.sizeX
+        self.rectSizeY = (rectSizeY // 4) * self.sizeY
+
         # size
         self.sizeX = self.pngSizeX * self.sizeX
         self.sizeY = self.pngSizeY * self.sizeY
@@ -715,10 +737,10 @@ class Dragon_Strong(Monster):
         self.bulletAngle = 0
         self.bulletAngleSpeed = 50
         #
-        self.originShootDelay = 1
+        self.originShootDelay = 2
 
         # difficulty
-        self.shootSpeed = 60
+        self.shootSpeed = 45
 
         # abilities
         self.hp = 50

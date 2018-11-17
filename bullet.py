@@ -146,16 +146,16 @@ class Bullet:
                         'SmallMiss':            [16 // 5, 16 // 3],
                         'Thunder':              [(100 // 5) // 4, 200 // 2],
                         # monster
-                        'Small_A':              [16, 16],
-                        'Small_B':              [12, 12],
-                        'Small_Anim':           [142 // 8, 10],
-                        'BlueCircle_M':         [92, 98],
-                        'BlueCircle_Anim':      [108 // 3, 38],
-                        'RedCircle':            [91, 92],
-                        'RedSun':               [91, 92],
-                        'Missile':              [24, 24],
-                        'YellowCircle_Anim':    [336 // 6, 61],
-                        'Y':                    [270 // 3, 90]
+                        'Small_A':              [16 // 2, 16 // 2],
+                        'Small_B':              [12 // 2, 12 // 2],
+                        'Small_Anim':           [(142 // 8) // 2, 10 // 2],
+                        'BlueCircle_M':         [92 // 2, 98 // 2],
+                        'BlueCircle_Anim':      [(108 // 3) // 2, 38 // 2],
+                        'RedCircle':            [91 // 2, 92 // 2],
+                        'RedSun':               [91 // 2, 92 // 2],
+                        'Missile':              [24 // 2, 24 // 2],
+                        'YellowCircle_Anim':    [(336 // 6) // 3, 61 // 3],
+                        'Y':                    [(270 // 3) // 2, 90 // 2]
         }
 
     def get_rect(self):

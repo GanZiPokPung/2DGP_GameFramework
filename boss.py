@@ -1,12 +1,14 @@
 from pico2d import *
 from static import *
 from bullet import Bullet
+from effect import Effect
 import static
 import mainframe
 import custom_math
 import game_world
 import random
 import stage_scene
+
 
 
 class Boss:
@@ -17,6 +19,8 @@ class Boss:
         #
         self.sizeX = sizeX
         self.sizeY = sizeY
+        self.originSizeX = sizeX
+        self.originSizeY = sizeY
         self.rectSizeX = 0
         self.rectSizeY = 0
         #
@@ -31,12 +35,17 @@ class Boss:
         self.delayCheck = False
         self.delayTerm = 0
         self.delayTime = 0
+        self.hp = 0
+        self.attackDamage = 0
 
         # ability
 
     def get_rect(self):
         return self.posX - self.rectSizeX, self.posY - self.rectSizeY,\
                self.posX + self.rectSizeX, self.posY + self.rectSizeY
+
+    def collideActive(self, opponent):
+        self.hp -= opponent.attackDamage
 
     def update(self):
 
@@ -49,6 +58,11 @@ class Boss:
 
         self.update_AI()
         self.update_anim()
+
+        if (self.hp <= 0):
+            game_world.add_object(Effect(self.posX, self.posY, 'random_effect', '', self.originSizeX*2, self.originSizeY*2),
+                                  EFFECT)
+            return True
 
     def draw(self):
         pass
@@ -129,11 +143,19 @@ class BossHead(Boss):
         self.initializeHands()
         self.modify_abilities()
 
+        #
+        self.explodeTime = 0
+        self.explodeDelay = 0.25
+
+        #abilities
+        self.hp = 100
+        self.attackDamage = 10
+
     def initializeHands(self):
         self.BossHandLeft = BossHand('Left', self)
         self.BossHandRight = BossHand('Right', self)
         game_world.add_object(self.BossHandLeft, BOSS)
-        game_world.add_object( self.BossHandRight, BOSS)
+        game_world.add_object(self.BossHandRight, BOSS)
 
     def draw(self):
         BossHead.image.clip_draw(0, 0, self.pngSizeX, self.pngSizeY,
@@ -144,12 +166,15 @@ class BossHead(Boss):
         pass
 
     def update_AI(self):
+       if self.hp < 50:
+            self.almost_die()
         # move
        if self.firstMode == True:
             if self.moveT >= 100:
                 self.firstMode = False
                 self.moveMode = True
                 self.moveT = 0
+
             else:
                 self.moveT += self.speedT * mainframe.frame_time
                 self.posX, self.posY = custom_math.move_line(self.originPos,
@@ -220,12 +245,22 @@ class BossHead(Boss):
            #                                                          self.moveT)
 
 
+
     def modify_difficulty(self, difficulty):
         pass
 
     def modify_abilities(self):
         # delay
         self.shootDelay = self.originShootDelay / 5
+
+    def almost_die(self):
+        self.explodeTime += mainframe.frame_time
+        if self.explodeTime > self.explodeDelay:
+            game_world.add_object(Effect(random.randint(int(self.posX - self.sizeX // 2), int(self.posX + self.sizeX // 2)),
+                                         random.randint(int(self.posY - self.sizeY // 2), int(self.posY + self.sizeY // 2)),
+                                  'random_effect', '', self.originSizeX / 2, self.originSizeY / 2),
+                                  EFFECT)
+            self.explodeTime = 0
 
     def Pattern_Normal(self):
         if self.attackInfoInit == False:
@@ -235,6 +270,7 @@ class BossHead(Boss):
             self.bulletsizeY = 1
             self.shootMax = 30
             self.modify_abilities()
+            self.shootCheck = True
             self.attackInfoInit = True
 
         if self.shootTime > self.shootDelay:
@@ -242,13 +278,15 @@ class BossHead(Boss):
 
             game_world.add_object(Bullet(self.posX, self.posY - 50, self.shootAngle ,
                                     self.shootSpeed, 'Small_A', '', '',
-                                    self.bulletsizeX, self.bulletsizeY), BULLET)
+                                    self.bulletsizeX, self.bulletsizeY, self.attackDamage), BOSS_BULLET)
 
             self.shootTime = 0
             self.shootCount += 1
 
         if self.shootCount > self.shootMax:
-            self.shootCout = 0
+            self.shootCount = 0
+            self.shootTime = 0
+            self.shootCheck = False
             self.attackInfoInit = False
             return False
         else:
@@ -260,7 +298,7 @@ class BossHead(Boss):
             self.shootSpeed = 100
             self.bulletsizeX = 0.7
             self.bulletsizeY = 0.7
-
+            self.shootCheck = True
             self.LR_decision = random.randint(0, 1)
 
             if self.LR_decision == 0:
@@ -269,8 +307,8 @@ class BossHead(Boss):
                 self.shootAngle = 270 + 80
 
             self.time = 0
-            self.attackingTime = 5
-            self.delayTerm = 5
+            self.attackingTime = 0.75
+            self.delayTerm = 0.5
 
             self.delayCheck = False
 
@@ -295,19 +333,23 @@ class BossHead(Boss):
             if self.delayCheck == False:
                 game_world.add_object(Bullet(self.posX - 40, self.posY + 5, self.shootAngle,
                                              self.shootSpeed, 'Y', '', 'Anim',
-                                             self.bulletsizeX, self.bulletsizeY), BULLET)
+                                             self.bulletsizeX, self.bulletsizeY, self.attackDamage), BOSS_BULLET)
                 game_world.add_object(Bullet(self.posX + 40, self.posY + 5, self.shootAngle,
                                              self.shootSpeed, 'Y', '', 'Anim',
-                                             self.bulletsizeX, self.bulletsizeY), BULLET)
+                                             self.bulletsizeX, self.bulletsizeY, self.attackDamage), BOSS_BULLET)
 
             self.shootTime = 0
 
         if self.LR_decision == 0:
             if self.shootAngle > 270 + 80:
+                self.shootTime = 0
+                self.shootCheck = False
                 self.attackInfoInit = False
                 return False
         else:
             if self.shootAngle < 270 - 80:
+                self.shootTime = 0
+                self.shootCheck = False
                 self.attackInfoInit = False
                 return False
 
@@ -321,6 +363,7 @@ class BossHead(Boss):
             self.bulletsizeY = 1.5
             self.shootAngle = 0
             self.modify_abilities()
+            self.shootCheck = True
             self.attackInfoInit = True
 
         self.shootAngle += 0.4
@@ -328,27 +371,33 @@ class BossHead(Boss):
         if self.shootTime > self.shootDelay:
             game_world.add_object(Bullet(self.posX - 40, self.posY, 180 + self.shootAngle,
                                          self.shootSpeed, 'BlueCircle_Anim', '', 'Anim',
-                                         self.bulletsizeX, self.bulletsizeY), BULLET)
+                                         self.bulletsizeX, self.bulletsizeY, self.attackDamage), BOSS_BULLET)
             game_world.add_object(Bullet(self.posX + 40, self.posY, 360 - self.shootAngle,
                                          self.shootSpeed, 'BlueCircle_Anim', '', 'Anim',
-                                         self.bulletsizeX, self.bulletsizeY), BULLET)
+                                         self.bulletsizeX, self.bulletsizeY, self.attackDamage), BOSS_BULLET)
 
             self.shootTime = 0
 
 
         if self.shootAngle > 85:
+            self.shootTime = 0
+            self.shootCheck = False
             self.attackInfoInit = False
             return False
 
         return True
 
     def Pattern_Hand_One(self):
-        self.BossHandLeft.attackID = 0
-        self.BossHandRight.attackID = 0
+        if  self.BossHandLeft != None:
+            self.BossHandLeft.attackID = 0
+        if self.BossHandRight != None:
+            self.BossHandRight.attackID = 0
 
     def Pattern_Hand_Two(self):
-        self.BossHandLeft.moveMode = False
-        self.BossHandRight.moveMode = False
+        if self.BossHandLeft != None:
+            self.BossHandLeft.moveMode = False
+        if self.BossHandRight != None:
+            self.BossHandRight.moveMode = False
 
 class BossHand(Boss):
     image = None
@@ -411,6 +460,10 @@ class BossHand(Boss):
         self.player = None
         if len(game_world.get_layer(PLAYER)) > 0:
             self.player = game_world.curtain_object(PLAYER, 0)
+
+        # abilities
+        self.hp = 100
+        self.attackDamage = 10
 
         self.modify_difficulty(123)
         self.modify_abilities()
@@ -482,7 +535,7 @@ class BossHand(Boss):
 
     def Pattern_Normal(self):
         if self.attackInfoInit == False:
-            self.originShootDelay = random.randint(8, 10)
+            self.originShootDelay = random.randint(2, 3)
             self.shootSpeed = 80
             self.bulletsizeX = 2
             self.bulletsizeY = 2
@@ -490,16 +543,16 @@ class BossHand(Boss):
 
             self.time = 0
             self.tmpCount = 0
-            self.delayTerm = 0.5
+            self.delayTerm = 0.05
 
             self.delayCheck = False
-
+            self.shootCheck = True
             self.modify_abilities()
             self.attackInfoInit = True
 
-        if self.shootTime > self.shootDelay:
+        if self.shootTime > self.originShootDelay:
             if self.delayCheck == False:
-                if self.player  != None:
+                if self.player != None:
                     self.shootAngle = custom_math.angle_between([self.posX, self.posY],
                                                                 [self.player.x, self.player.y])
                 self.delayCheck = True
@@ -507,7 +560,7 @@ class BossHand(Boss):
                 if self.delayTime > self.delayTerm:
                     game_world.add_object(Bullet(self.posX, self.posY - 10, self.shootAngle,
                                                 self.shootSpeed, 'Small_A', '', '',
-                                                self.bulletsizeX, self.bulletsizeY), BOSSBULLET)
+                                                self.bulletsizeX, self.bulletsizeY, self.attackDamage), BOSS_BULLET)
                     self.shootCount += 1
                     self.tmpCount += 1
                     self.delayTime = 0
@@ -522,6 +575,8 @@ class BossHand(Boss):
 
         if self.shootCount > self.shootMax:
             self.shootCount = 0
+            self.shootTime = 0
+            self.shootCheck = False
             self.attackInfoInit = False
             return False
         else:
@@ -529,28 +584,31 @@ class BossHand(Boss):
 
     def Pattern_Special_One(self):
         if self.attackInfoInit == False:
-            self.originShootDelay = 0.75
+            self.originShootDelay = 0.15
             self.shootSpeed = 50
             self.bulletsizeX = 2
             self.bulletsizeY = 2
             self.shootMax = 100
             self.modify_abilities()
+            self.shootCheck = True
             self.attackInfoInit = True
 
-        if self.shootTime > self.shootDelay:
+        if self.shootTime > self.originShootDelay:
             self.shootAngle = random.randint(270 - 60, 270 + 60)
 
             tmpbullet = Bullet(self.posX, self.posY - 50, self.shootAngle ,
                                     self.shootSpeed, 'Missile', '', 'RotateOnce',
-                                    self.bulletsizeX, self.bulletsizeY)
+                                    self.bulletsizeX, self.bulletsizeY, self.attackDamage)
             tmpbullet.rotAngle = self.shootAngle - 270
-            game_world.add_object(tmpbullet, BOSSBULLET)
+            game_world.add_object(tmpbullet, BOSS_BULLET)
 
             self.shootTime = 0
             self.shootCount += 1
 
         if self.shootCount > self.shootMax:
-            self.shootCout = 0
+            self.shootCount = 0
+            self.shootTime = 0
+            self.shootCheck = False
             self.attackInfoInit = False
 
             return False

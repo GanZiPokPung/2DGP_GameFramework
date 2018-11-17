@@ -76,7 +76,7 @@ class Effect:
             #'Effect01':              [300 // 12, 22, 12],
             'Effect02':              [1462 // 15, 98, 15],
             'Effect03':              [1930 // 15, 104, 15],
-            'Effect04':              [975 // 15, 65, 15],
+            'Effect04':              [4420 // 26, 170, 26],
             'HitEffect01':           [390 // 13, 30, 13],
             'HitEffect02':           [120 // 3, 40, 3],
             'BombEffect':            [2300 // 23, 200, 23],
@@ -90,12 +90,12 @@ class Effect:
 
     def initialize_others(self):
         Effect.others = {
-            #'Effect01':              [0.5, 4],
+            # 'Effect01':              [0.5, 4],
             'Effect02':              [0.5, 1],
             'Effect03':              [0.5, 1],
-            'Effect04':              [0.5, 2],
-            'HitEffect01':           [0.3, 1],
-            'HitEffect02':           [0.15, 1],
+            'Effect04':              [0.6, 0.5],
+            'HitEffect01':           [0.3, 1.5],
+            'HitEffect02':           [0.15, 1.5],
             'BombEffect':            [0.5,  1],
         }
 
