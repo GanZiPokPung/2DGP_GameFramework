@@ -48,6 +48,11 @@ class Player:
         if Player.image == None:
             Player.image = load_image(os.path.join(os.getcwd(), 'resources', 'player', 'player.png'))
 
+        # player abilities
+        self.hp = 100
+        self.bomb = 3
+        self.attackDamage = 5
+        self.attackID = 0
         # modify
         self.Modify_Abilities()
 
@@ -192,7 +197,7 @@ class Player:
         if self.pushAttcheck == True :
             if self.BulletTime > self.BulletDelay:
                 #game_world.add_object(Bullet(self.x, self.y, 90 - 15, 10, 'Eagle', 0, '',  2, 2), BULLET_PLAYER)
-                #game_world.add_object(Bullet(self.x, self.y, 90, 60, 'SmallMiss', 0, '', 5, 5), BULLET_PLAYER)
+                game_world.add_object(Bullet(self.x, self.y, 90, 60, 'SmallMiss', 0, '', 2, 2), BULLET_PLAYER)
                 #game_world.add_object(Bullet(self.x, self.y, 90 + 15, 10, 'Eagle', 0, '',  2, 2), BULLET_PLAYER)
                 self.BulletTime = 0
 

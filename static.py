@@ -4,11 +4,12 @@ canvas_height = 700
 
 # game world
 MONSTER = 0
-BOSSBULLET = 1
-BOSS = 2
+BOSS = 1
+EFFECT = 2
 PLAYER = 3
-BULLET_PLAYER = 4
-BULLET = 5
+BOSS_BULLET = 4
+BULLET_PLAYER = 5
+BULLET = 6
 
 # speed meter
 PIXEL_PER_METER = (10.0 / 0.3) # 10 pixel 30 cm

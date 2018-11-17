@@ -405,8 +405,15 @@ class BossHand(Boss):
         self.startPos   = []
         self.currentPos = []
 
+        # 부모
+        self.player = None
+        if len(game_world.get_layer(PLAYER)) > 0:
+            self.player = game_world.curtain_object(PLAYER, 0)
+
         self.modify_difficulty(123)
         self.modify_abilities()
+
+
 
     def draw(self):
         self.image.clip_draw(0, 0, self.pngSizeX, self.pngSizeY,
@@ -490,8 +497,9 @@ class BossHand(Boss):
 
         if self.shootTime > self.shootDelay:
             if self.delayCheck == False:
-                self.shootAngle = custom_math.angle_between([self.posX, self.posY],
-                                                            [stage_scene.player.x, stage_scene.player.y])
+                if self.player  != None:
+                    self.shootAngle = custom_math.angle_between([self.posX, self.posY],
+                                                                [self.player.x, self.player.y])
                 self.delayCheck = True
             else:
                 if self.delayTime > self.delayTerm:

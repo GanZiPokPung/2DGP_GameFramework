@@ -1,11 +1,13 @@
 from pico2d import *
 from static import *
+from effect import Effect
 import math
 import static
 import mainframe
 import random
 import stage_scene
 import custom_math
+import game_world
 
 # Action Speed
 TIME_PER_ACTION = 0.2
@@ -42,11 +44,14 @@ class Bullet:
         rectSizeX = Bullet.rectSize.get(self.type)[0]
         rectSizeY = Bullet.rectSize.get(self.type)[1]
         #size
-        self.rectSizeX = rectSizeX * sizeX
-        self.rectSizeY = rectSizeY * sizeY
+        self.originSizeX = sizeX
+        self.originSizeY = sizeY
 
-        self.sizeX = self.pngSizeX * sizeX
-        self.sizeY = self.pngSizeY * sizeY
+        self.rectSizeX = rectSizeX * self.originSizeX
+        self.rectSizeY = rectSizeY * self.originSizeY
+
+        self.sizeX = self.pngSizeX * self.originSizeX
+        self.sizeY = self.pngSizeY * self.originSizeY
 
 
         # frame type
@@ -173,6 +178,7 @@ class Bullet:
 
         # 충돌하면 총알을 없앤다.
         if self.collideCheck == True:
+            game_world.add_object(Effect(self.posX, self.posY, '', 'HitEffect01', self.originSizeX, self.originSizeY), EFFECT)
             return True
 
         # 맵 밖을 나가면 총알을 없앤다.
@@ -186,7 +192,6 @@ class Bullet:
 
 
     def draw(self):
-
         if self.bulletType == 'Rotate' or self.bulletType == 'RotateOnce':
             self.image.clip_composite_draw(int(self.frame) * self.pngSizeX, 0,
                                            self.pngSizeX, self.pngSizeY,

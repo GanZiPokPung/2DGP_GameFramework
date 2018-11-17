@@ -3,6 +3,7 @@ from static import *
 import game_world
 import stage_scene
 from bullet import Bullet
+from effect import Effect
 import custom_math
 import static
 import mainframe
@@ -186,6 +187,8 @@ class Monster:
         self.moveSpeed = moveSpeed
         self.sizeX = sizeX
         self.sizeY = sizeY
+        self.originSizeX = sizeX
+        self.originSizeY = sizeY
         self.rectSizeX = 0
         self.rectSizeY = 0
         self.frame = 0
@@ -193,7 +196,13 @@ class Monster:
         self.shootDelay = 0
         self.shootCheck = False
         self.collideCheck = False
+        self.hp = 0
         self.time = 0
+        # 부모
+        self.player = None
+        if len(game_world.get_layer(PLAYER)) > 0:
+            self.player = game_world.curtain_object(PLAYER, 0)
+            self.playerAttackDamage = self.player.attackDamage
 
     def get_rect(self):
         return self.posX - self.rectSizeX, self.posY - self.rectSizeY,\
@@ -213,12 +222,18 @@ class Monster:
 
         # 충돌하면 몬스터를 없앤다.
         if self.collideCheck == True:
-            return True
+            self.hp -= self.playerAttackDamage
+            self.collideCheck = False
 
         # 맵 밖을 나가면 몬스터를 없앤다.
         if (self.posX < 0 - self.sizeX) or (self.posX > static.canvas_width + self.sizeX):
             return True
         elif (self.posY < 0 - self.sizeY):
+            return True
+        # 체력이 다되면 몬스터를 없앤다.
+        elif (self.hp <= 0):
+            game_world.add_object(Effect(self.posX, self.posY, 'random_effect', '', self.originSizeX * 3, self.originSizeY * 3),
+                                  EFFECT)
             return True
         else:
             return False
@@ -272,15 +287,15 @@ class Warrior(Monster):
         self.sizeX = self.pngSizeX * self.sizeX
         self.sizeY = self.pngSizeY * self.sizeY
 
-
         # 아래를 바라보는게 기본
         self.angle = 270
         # 타입에 따라 다른 행동을 하도록 초기화
         self.initialize_type()
         # 한꺼번에 나오지 않게 해준다. 줄지어 나올수 있도록 도와주는 변수
         self.term = term / 3
-        # 부모
-        self.player = game_world.curtain_object(PLAYER, 0)
+
+        # abilities
+        self.hp = 10
         # modify
         self.modify_abilities()
 
@@ -296,7 +311,6 @@ class Warrior(Monster):
         Warrior.rectSize = {'warrior': [100, 100],
                         'warrior_other': [147, 142]
                         }
-
 
     # 타입별 어떤 행동을 할지 결정
     def initialize_type(self):
@@ -332,13 +346,17 @@ class Warrior(Monster):
         if self.time < self.term:
             return 1
 
+        self.angle += self.anglespeed
+        self.posX += math.cos(math.radians(self.angle)) * self.moveSpeedPixelPerSecond * mainframe.frame_time
+        self.posY += math.sin(math.radians(self.angle)) * self.moveSpeedPixelPerSecond * mainframe.frame_time
+
+        if self.player == None:
+            return 1
+
         if self.player.y > self.posY:
             self.shootCheck = False
         else:
             self.shootCheck = True
-        self.angle += self.anglespeed
-        self.posX += math.cos(math.radians(self.angle)) * self.moveSpeedPixelPerSecond * mainframe.frame_time
-        self.posY += math.sin(math.radians(self.angle)) * self.moveSpeedPixelPerSecond * mainframe.frame_time
 
         if self.shootTime > self.shootDelay:
             angle = custom_math.angle_between([self.posX, self.posY], [stage_scene.player.x, stage_scene.player.y])
@@ -354,6 +372,7 @@ class Warrior(Monster):
         self.originShootDelay /= (1 + difficulty / 10)
         self.shootSpeed *= (1 + difficulty / 10)
         self.moveSpeed  *= (1 + difficulty / 10)
+        self.hp *= (1 + difficulty / 10)
         self.Modify_Abilities()
 
     def modify_abilities(self):
