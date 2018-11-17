@@ -19,7 +19,7 @@ class Bullet:
     image = None
     size = None
     rectSize = None
-    def __init__(self, posX, posY, angle, speed, imageType, rootType, bulletType, sizeX, sizeY):
+    def __init__(self, posX, posY, angle, speed, imageType, rootType, bulletType, sizeX, sizeY, damage):
         self.posX = posX
         self.posY = posY
         self.angle = angle
@@ -65,6 +65,8 @@ class Bullet:
             self.maxFrame = 0
 
         self.time = 0
+
+        self.attackDamage = damage
 
         self.collideCheck = False
         self.modify_abilities()
@@ -159,6 +161,9 @@ class Bullet:
     def get_rect(self):
         return self.posX - self.rectSizeX, self.posY - self.rectSizeY, \
                self.posX + self.rectSizeX, self.posY + self.rectSizeY
+
+    def collideActive(self, opponent):
+        self.collideCheck = True
 
     def update(self):
         if self.bulletType == 'Anim_Stop':

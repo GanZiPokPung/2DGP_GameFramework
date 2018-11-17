@@ -19,8 +19,8 @@ def collide_check(groupA, groupB):
     for objA in groupA:
         for objB in groupB:
             if collide(objA, objB) == True:
-                objA.collideCheck = True
-                objB.collideCheck = True
+                objA.collideActive(objB)
+                objB.collideActive(objA)
 
 def collide_update():
     # player, bullet

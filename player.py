@@ -162,6 +162,9 @@ class Player:
         self.moveSpeedMterPerSecond = (self.moveSpeedMeterPerMinute / 60.0)
         self.moveSpeedPixelPerSecond = (self.moveSpeedMterPerSecond * PIXEL_PER_METER)
 
+    def collideActive(self, opponent):
+        self.hp -= opponent.attackDamage
+
     def update(self):
         #player_time
         self.BulletTime += mainframe.frame_time
@@ -197,7 +200,7 @@ class Player:
         if self.pushAttcheck == True :
             if self.BulletTime > self.BulletDelay:
                 #game_world.add_object(Bullet(self.x, self.y, 90 - 15, 10, 'Eagle', 0, '',  2, 2), BULLET_PLAYER)
-                game_world.add_object(Bullet(self.x, self.y, 90, 60, 'SmallMiss', 0, '', 2, 2), BULLET_PLAYER)
+                game_world.add_object(Bullet(self.x, self.y, 90, 150, 'BlueCircle', 0, '', 2, 2, self.attackDamage), BULLET_PLAYER)
                 #game_world.add_object(Bullet(self.x, self.y, 90 + 15, 10, 'Eagle', 0, '',  2, 2), BULLET_PLAYER)
                 self.BulletTime = 0
 

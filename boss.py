@@ -32,6 +32,8 @@ class Boss:
         self.delayTerm = 0
         self.delayTime = 0
 
+        # ability
+
     def get_rect(self):
         return self.posX - self.rectSizeX, self.posY - self.rectSizeY,\
                self.posX + self.rectSizeX, self.posY + self.rectSizeY
