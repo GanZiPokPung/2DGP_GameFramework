@@ -38,6 +38,7 @@ monsterpattern = None
 # debug
 rectCheck = True
 
+
 def initialize():
     #map
     global totalmap
