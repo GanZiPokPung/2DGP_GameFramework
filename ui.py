@@ -23,3 +23,17 @@ class UI:
 
     def draw(self):
         pass
+
+class Button(UI):
+    pass
+
+class Bar(UI):
+    pass
+
+#
+class Number(UI):
+    pass
+#
+
+class Score(UI):
+    pass
