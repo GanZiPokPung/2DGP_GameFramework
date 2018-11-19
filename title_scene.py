@@ -46,5 +46,3 @@ def exit():
     global image
     global mouse
     del(image)
-    mouse.free()
-    del(mouse)
