@@ -50,6 +50,13 @@ def change_state(scene):
     stack.append(scene)
     scene.initialize()
 
+def push_state(scene):
+    global stack
+    if(len(stack) > 0):
+        stack[-1].pause()
+    stack.append(scene)
+    scene.initialize()
+
 def pop_state():
     global stack
     if(isLenEmpty(stack) == False):
@@ -79,7 +86,7 @@ def run(start_scene):
         stack[-1].update()
         stack[-1].draw()
         frame_time = time.time() - current_time
-        frame_rate = 1.0 / frame_time
+        #frame_rate = 1.0 / frame_time
         current_time += frame_time
 
     while(isLenEmpty(stack) == False):

@@ -1,4 +1,5 @@
 import mainframe
+import shop_state
 from pico2d import *
 from static import *
 
@@ -80,6 +81,8 @@ def handle_events():
             game_world.add_object(BossHead(), BOSS)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_e):
             game_world.clear_layer(MONSTER)
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_l):
+            mainframe.push_state(shop_state)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_1):
             game_world.curtain_object(BOSS, 2).attackID = 0
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_2):

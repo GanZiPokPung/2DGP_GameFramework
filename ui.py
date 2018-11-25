@@ -40,6 +40,7 @@ class Button(UI):
     image = None
     size = None
     def __init__(self, x, y, sizeX, sizeY, ID):
+        UI.__init__(self)
         self.posX, self.posY = x, y
         if Button.image == None:
             self.initialize_image()
@@ -107,3 +108,35 @@ class Number(UI):
 
 class Score(UI):
     pass
+
+class Others(UI):
+    image = None
+    size = None
+    def __init__(self, x, y, sizeX, sizeY, ID, opacify):
+        UI.__init__(self)
+        self.posX, self.posY = x, y
+        if Others.image == None:
+            self.initialize_image()
+        if Others.size == None:
+            self.initialize_size()
+        self.uiID = 'others'
+        self.othersID = ID
+        self.image = Others.image.get(self.othersID)
+        self.originSizeX = sizeX
+        self.originSizeY = sizeY
+        self.pngSizeX = Others.size.get(self.othersID)[0]
+        self.pngSizeY = Others.size.get(self.othersID)[1]
+        self.sizeX = self.pngSizeX * self.originSizeX
+        self.sizeY = self.pngSizeY * self.originSizeY
+        self.opacify = opacify
+        self.image.opacify(self.opacify)
+
+    def initialize_image(self):
+        Others.image = {
+            'shop_back': load_image(os.path.join(os.getcwd(), 'resources', 'ui', 'Others', 'shop_background.png'))
+        }
+
+    def initialize_size(self):
+        Others.size = {
+            'shop_back': [500, 700]
+        }

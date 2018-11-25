@@ -10,7 +10,7 @@ PLAYER = 3
 BOSS_BULLET = 4
 BULLET_PLAYER = 5
 BULLET = 6
-UI = 7
+UITYPE = 7
 MOUSE = 8
 
 # speed meter
