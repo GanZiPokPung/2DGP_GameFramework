@@ -22,6 +22,16 @@ def collide_check(groupA, groupB):
                 objA.collideActive(objB)
                 objB.collideActive(objA)
 
+def collide_check_other(groupA, groupB):
+    for objA in groupA:
+        for objB in groupB:
+            if collide(objA, objB) == True:
+                objA.collideActive(objB)
+                objB.collideActive(objA)
+            else:
+                objA.collideInactive(objB)
+                objB.collideInactive(objA)
+
 def collide_update():
     # player, bullet
     monsterLayer = game_world.get_layer(MONSTER)
@@ -30,10 +40,14 @@ def collide_update():
     bulletLayer = game_world.get_layer(BULLET)
     bossLayer = game_world.get_layer(BOSS)
     bulletbossLayer = game_world.get_layer(BOSS_BULLET)
+    uiLayer = game_world.get_layer(UI)
+    mouseLayer = game_world.get_layer(MOUSE)
+
     collide_check(monsterLayer, bulletplayerLayer)
     collide_check(playerLayer, bulletLayer)
     collide_check(bossLayer, bulletplayerLayer)
     collide_check(playerLayer, bulletbossLayer)
+    collide_check_other(uiLayer, mouseLayer)
     # monster, bullet
 
 

@@ -6,7 +6,7 @@ class Mouse:
     images = None
     frames = None
     def __init__(self):
-        self.x, self.y = 0, 0
+        self.posX, self.posY = 0, 0
         if Mouse.images == None:
             self.initialize_images()
         if Mouse.frames == None:
@@ -16,6 +16,9 @@ class Mouse:
 
         self.sizeX = self.pngSizeX * sizeX
         self.sizeY = self.pngSizeY * sizeY
+
+        self.rectSizeX = self.sizeX / 2
+        self.rectSizeY = self.sizeY / 2
 
         self.collideCheck = False
         self.mouseID = 'normal'
@@ -27,6 +30,9 @@ class Mouse:
         self.actionPerTime = 1.0 / self.timePerAction
 
         self.time = 0
+        self.hideTime = 2.0
+
+        self.drawCheck = True
 
     def initialize_images(self):
         Mouse.images = {
@@ -52,8 +58,23 @@ class Mouse:
         self.actionPerTime = 1.0 / self.timePerAction
         self.frame = 0
 
+    def get_rect(self):
+        return self.posX - self.rectSizeX, self.posY - self.rectSizeY, \
+               self.posX + self.rectSizeX, self.posY + self.rectSizeY
+
+    def collideActive(self, opponent):
+        pass
+
+    def collideInactive(self, opponent):
+        pass
+
     def update(self):
-        # self.time += mainframe.frame_time
+        self.time += mainframe.frame_time
+
+        if self.time > self.hideTime:
+            self.drawCheck = False
+        else:
+            self.drawCheck = True
 
         if self.mouseID == 'click' :
             if int(self.frame) >= self.frameMax - 1:
@@ -63,21 +84,30 @@ class Mouse:
             self.frame = (self.frame + TimeToFrameQuantity) % self.frameMax
 
 
-    def handle_event(self, event):
+    def handle_events(self, event):
         if event.type == SDL_MOUSEMOTION:
-            self.x, self.y = event.x,  static.canvas_height - 1 - event.y
+            self.time = 0
+            self.posX, self.posY = event.x,  static.canvas_height - 1 - event.y
         elif event.type == SDL_MOUSEBUTTONDOWN :
             if event.button == SDL_BUTTON_LEFT:
+                self.time = 0
                 self.change_ID('click')
             if event.button == SDL_BUTTON_RIGHT:
+                self.time = 0
                 self.change_ID('gate')
         elif event.type == SDL_MOUSEBUTTONUP:
             if event.button == SDL_BUTTON_LEFT:
+                self.time = 0
                 self.frame = 1
         #elif event.type == SDL_MOUSEBUTTONDOWN
 
     def draw(self):
-        Mouse.images[self.mouseID][int(self.frame)].draw(self.x, self.y, self.sizeX, self.sizeY)
+        if self.drawCheck == True:
+            Mouse.images[self.mouseID][int(self.frame)].draw(self.posX, self.posY, self.sizeX, self.sizeY)
+
+    def draw_rect(self):
+        if self.drawCheck == True:
+            draw_rectangle(*self.get_rect())
 
     def free(self):
         for k in Mouse.images.keys():

@@ -16,6 +16,9 @@ image = None
 stage_time = 0.0
 stage = 0
 
+# mouse
+mouse = None
+
 # map
 totalmap = None
 currentmap = 2
@@ -40,6 +43,7 @@ rectCheck = True
 
 
 def initialize():
+    global mouse
     #map
     global totalmap
     global map1
@@ -47,6 +51,9 @@ def initialize():
     #player
     global player
     global monsterpattern
+
+    # mouse
+    mouse = game_world.curtain_object(MOUSE, 0)
     # map
     # stage 별로 리스트에 보관
     map1 = [Map(1, 0, 2000, mapSpeed)]
@@ -62,6 +69,7 @@ def initialize():
 
 def handle_events():
     global rectCheck
+    global mouse
     events = get_events()
     for event in events:
         if event.type == SDL_QUIT:
@@ -89,6 +97,8 @@ def handle_events():
                 rectCheck = False
         #player
         player.handle_events(event)
+        #mouse
+        mouse.handle_events(event)
 
 def update():
     # map
@@ -105,8 +115,6 @@ def update():
         erase = game_object.update()
         if erase == True :
             game_world.remove_object(game_object)
-
-
 
     #delay(0.015)
 
