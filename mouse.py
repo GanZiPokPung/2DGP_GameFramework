@@ -104,6 +104,7 @@ class Mouse:
                 self.frame = 1
                 if self.ui != None:
                     self.ui.unclick()
+                    self.ui = None
             if event.button == SDL_BUTTON_RIGHT:
                 self.change_ID('normal')
         #elif event.type == SDL_MOUSEBUTTONDOWN
