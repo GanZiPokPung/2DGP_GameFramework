@@ -33,6 +33,7 @@ class Mouse:
         self.hideTime = 2.0
 
         self.drawCheck = True
+        self.ui = None
 
     def initialize_images(self):
         Mouse.images = {
@@ -63,7 +64,8 @@ class Mouse:
                self.posX + self.rectSizeX, self.posY + self.rectSizeY
 
     def collideActive(self, opponent):
-        pass
+        if opponent.uiID == 'button':
+            self.ui = opponent
 
     def collideInactive(self, opponent):
         pass
@@ -89,16 +91,21 @@ class Mouse:
             self.time = 0
             self.posX, self.posY = event.x,  static.canvas_height - 1 - event.y
         elif event.type == SDL_MOUSEBUTTONDOWN :
+            self.time = 0
             if event.button == SDL_BUTTON_LEFT:
-                self.time = 0
                 self.change_ID('click')
+                if self.ui != None:
+                    self.ui.click()
             if event.button == SDL_BUTTON_RIGHT:
-                self.time = 0
                 self.change_ID('gate')
         elif event.type == SDL_MOUSEBUTTONUP:
+            self.time = 0
             if event.button == SDL_BUTTON_LEFT:
-                self.time = 0
                 self.frame = 1
+                if self.ui != None:
+                    self.ui.unclick()
+            if event.button == SDL_BUTTON_RIGHT:
+                self.change_ID('normal')
         #elif event.type == SDL_MOUSEBUTTONDOWN
 
     def draw(self):

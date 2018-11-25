@@ -17,7 +17,7 @@ def initialize():
     image = load_image(os.path.join(os.getcwd(), 'resources', 'scene', 'title2.png'))
     mouse = Mouse()
     game_world.add_object(mouse, MOUSE)
-    game_world.add_object(Button(250, 200, 1.5, 1.5, 'start'), UI)
+    game_world.add_object(Button(250, 250, 0.4, 0.38, 'start'), UI)
     hide_cursor()
 
 def handle_events():
