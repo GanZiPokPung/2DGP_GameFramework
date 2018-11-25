@@ -17,8 +17,8 @@ class Mouse:
         self.sizeX = self.pngSizeX * sizeX
         self.sizeY = self.pngSizeY * sizeY
 
-        self.rectSizeX = self.sizeX / 2
-        self.rectSizeY = self.sizeY / 2
+        self.rectSizeX = self.sizeX / 4
+        self.rectSizeY = self.sizeY / 4
 
         self.collideCheck = False
         self.mouseID = 'normal'
@@ -60,8 +60,8 @@ class Mouse:
         self.frame = 0
 
     def get_rect(self):
-        return self.posX - self.rectSizeX, self.posY - self.rectSizeY, \
-               self.posX + self.rectSizeX, self.posY + self.rectSizeY
+        return (self.posX - self.pngSizeX / 2) - self.rectSizeX, (self.posY + self.pngSizeY / 2) - self.rectSizeY, \
+               (self.posX - self.pngSizeX / 2) + self.rectSizeX, (self.posY + self.pngSizeY / 2) + self.rectSizeY
 
     def collideActive(self, opponent):
         if opponent.uiID == 'button':

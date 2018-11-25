@@ -18,6 +18,7 @@ def initialize():
     mouse = Mouse()
     game_world.add_object(mouse, MOUSE)
     game_world.add_object(Button(250, 250, 0.4, 0.38, 'start'), UI)
+    game_world.add_object(Button(250, 180, 0.4, 0.38, 'quit'), UI)
     hide_cursor()
 
 def handle_events():

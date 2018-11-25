@@ -94,6 +94,8 @@ class Button(UI):
         self.clickCheck = False
         if self.buttonID == 'start':
             mainframe.change_state(stage_scene)
+        elif self.buttonID == 'quit':
+            mainframe.quit()
 
 class Bar(UI):
     pass
