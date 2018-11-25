@@ -25,9 +25,7 @@ def clear():
     objects.clear()
 
 def clear_layer(layer):
-    for obj in get_layer(layer):
-        objects[layer].remove(obj)
-        del obj
+    objects[layer].clear()
 
 # 모든 오브젝트들을 순회돌며 yield함
 def all_objects():
