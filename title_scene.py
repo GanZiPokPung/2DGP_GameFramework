@@ -7,6 +7,7 @@ import game_world
 import collision_manager
 from ui import Button
 from ui import Number
+from ui import Numbers
 
 name = "TitleScene"
 image = None
@@ -19,7 +20,6 @@ def initialize():
     game_world.add_object(mouse, MOUSE)
     game_world.add_object(Button(250, 250, 0.4, 0.38, 'start'), UITYPE)
     game_world.add_object(Button(250, 180, 0.4, 0.38, 'quit'), UITYPE)
-    game_world.add_object(Number(200, 400, 1, 1, 0), UITYPE)
     hide_cursor()
 
 def handle_events():

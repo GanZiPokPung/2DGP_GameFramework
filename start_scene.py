@@ -31,7 +31,7 @@ def update():
 def draw():
     global image
     clear_canvas()
-    image.draw(static.canvas_width / 2, static.canvas_height / 2)
+    image.draw(static.canvas_width / 2 + 15, static.canvas_height / 2)
     update_canvas()
 
 def pause():

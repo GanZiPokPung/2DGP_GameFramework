@@ -18,9 +18,13 @@ def initialize():
     game_world.add_object(Others(250, 650, 1, 1, 'shop_logo', 1.0), UITYPE)
     # money cap
     game_world.add_object(Others(400, 570, 1.3, 1.3, 'money_capacity', 1.0), UITYPE)
+
     # default button
-    game_world.add_object(Button(200, 400, 1, 1, 'default'), UITYPE)
-    game_world.add_object(Number(200, 400, 1, 1, 10), UITYPE)
+    attUpgradeButton = Button(200, 390, 1, 1, 'default')
+    attUpgradeButton.set_numbers(attUpgradeButton.posX + 30, attUpgradeButton.posY - 20, 2, 2, 17, 1)
+    attUpgradeButton.set_additionalimage(attUpgradeButton.posX, attUpgradeButton.posY + 10, 1, 1, '1', 1)
+    game_world.add_object(attUpgradeButton, UITYPE)
+
     mouse = game_world.curtain_object(MOUSE, 0)
 
 def handle_events():
@@ -36,6 +40,7 @@ def handle_events():
                 mainframe.pop_state()
 
         mouse.handle_events(event)
+
 def update():
     collision_manager.collide_update()
 

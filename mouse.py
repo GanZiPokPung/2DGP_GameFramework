@@ -35,6 +35,8 @@ class Mouse:
         self.drawCheck = True
         self.ui = None
 
+        self.font = load_font('ENCR10B.TTF', 16)
+
     def initialize_images(self):
         Mouse.images = {
             'normal' : [load_image(os.path.join(os.getcwd(), 'resources', 'ui', 'Mouse', 'Normal',
@@ -112,6 +114,8 @@ class Mouse:
     def draw(self):
         if self.drawCheck == True:
             Mouse.images[self.mouseID][int(self.frame)].draw(self.posX, self.posY, self.sizeX, self.sizeY)
+            self.font.draw(self.posX, self.posY - (self.sizeY / 2),
+                           '(%5d, %5d)' % (self.posX, self.posY), (255, 0, 0))
 
     def draw_rect(self):
         if self.drawCheck == True:
