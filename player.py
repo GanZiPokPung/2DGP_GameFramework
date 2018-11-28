@@ -16,6 +16,7 @@ FRAMES_PER_ACTION = 7
 
 class Player:
     image = None
+    data = None
     def __init__(self):
         # position
         self.x = 250
@@ -47,14 +48,39 @@ class Player:
         # image
         if Player.image == None:
             Player.image = load_image(os.path.join(os.getcwd(), 'resources', 'player', 'player.png'))
-
+        if Player.data == None:
+            self.initializeData()
         # player abilities
         self.hp = 100
         self.bomb = 3
         self.attackDamage = 5
-        self.attackID = 0
+        self.parsingID = '1'
+
         # modify
+        self.parsingDataSet(self.parsingID)
         self.Modify_Abilities()
+
+    def initializeData(self):
+        Player.data = {
+            'posion': [],
+            'megica': [],
+            # bullet
+            # 불렛 갯수 사이각 각도, 속도, 이미지 타입, 불릿 타입, 사이즈
+            # 나중에 데미지도 (맨 뒤에)
+            '1': [1, 70, 'SmallCircle', '', 3, 3],
+            '2': [1, 70, 'SmallMiss', '', 3, 3],
+            '3': [1, 70, 'Rug', '', 2.5, 2.5],
+            '4': [1, 70, 'GreenWeak', '', 2, 2],
+            '5': [1, 70, 'PurpleWeak', '', 2, 2],
+            '6': [1, 70, 'GreenNormal', '', 2, 2],
+            '7': [1, 70, 'PurpleNormal', '', 2, 2],
+            '8': [1, 70, 'GreenStrong', '', 2, 2],
+            '9': [1, 70, 'PurpleStrong', '', 2, 2],
+            '10': [1, 70, 'PurpleMax', '', 2, 2],
+            '11': [1, 70, 'ExplodeMiss', 'Anim', 3, 3],
+            '12': [1, 70, 'BlueCircle', '', 1.5, 1.5],
+            '13': [1, 70, 'Eagle', '', 1.5, 1.5]
+        }
 
     def get_rect(self):
         return self.x - 10, self.y - 20, self.x + 10, self.y + 20
@@ -156,6 +182,16 @@ class Player:
         if key_state == SDLK_s:
             self.pushAttcheck = False
 
+    def parsingDataSet(self, parsingID):
+        # 불렛 갯수 /사이각 각도/, 속도, 이미지 타입, 불릿 타입, 사이즈
+        self.parsingID = parsingID
+        self.bulletCount = Player.data.get(parsingID)[0]
+        self.bulletSpeed = Player.data.get(parsingID)[1]
+        self.bulletImage = Player.data.get(parsingID)[2]
+        self.bulletType = Player.data.get(parsingID)[3]
+        self.bulletSizeX = Player.data.get(parsingID)[4]
+        self.bulletSizeY = Player.data.get(parsingID)[5]
+
     def Modify_Abilities(self):
         # speed
         self.moveSpeedMeterPerMinute = (self.moveSpeed * 1000.0 / 60.0)
@@ -199,9 +235,21 @@ class Player:
         # 공격(추후 상점 추가시 고칠 예정)
         if self.pushAttcheck == True :
             if self.BulletTime > self.BulletDelay:
-                #game_world.add_object(Bullet(self.x, self.y, 90 - 15, 10, 'Eagle', 0, '',  2, 2), BULLET_PLAYER)
-                game_world.add_object(Bullet(self.x, self.y, 90, 150, 'BlueCircle', 0, '', 2, 2, self.attackDamage), BULLET_PLAYER)
-                #game_world.add_object(Bullet(self.x, self.y, 90 + 15, 10, 'Eagle', 0, '',  2, 2), BULLET_PLAYER)
+
+                angleTerm = 0
+                angle = 90
+                for bullet in range(0, self.bulletCount):
+                    game_world.add_object(Bullet(self.x, self.y, angle + angleTerm, self.bulletSpeed, self.bulletImage, 0, self.bulletType
+                                                 , self.bulletSizeX, self.bulletSizeY, self.attackDamage), BULLET_PLAYER)
+                    if angleTerm == 0:
+                        angleTerm += 10
+                    elif angleTerm > 0:
+                        angleTerm *= -1
+                    elif angleTerm < 0:
+                        angleTerm *= -1
+                        angleTerm += 10
+
+
                 self.BulletTime = 0
 
                 # 필살기

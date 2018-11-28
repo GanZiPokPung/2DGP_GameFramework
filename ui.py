@@ -2,6 +2,9 @@ from pico2d import *
 import mainframe
 import title_scene
 import stage_scene
+import game_world
+import player
+from static import *
 
 class UI:
     def __init__(self):
@@ -42,9 +45,6 @@ class UI:
     def collideInactive(self, opponent):
         pass
 
-    def click(self):
-        pass
-
     def update(self):
         pass
 
@@ -63,7 +63,7 @@ class UI:
 class Button(UI):
     image = None
     size = None
-    def __init__(self, x, y, sizeX, sizeY, ID):
+    def __init__(self, x, y, sizeX, sizeY, imageID, processID):
         UI.__init__(self)
         self.posX, self.posY = x, y
         if Button.image == None:
@@ -71,12 +71,13 @@ class Button(UI):
         if Button.size == None:
             self.initialize_size()
         self.uiID = 'button'
-        self.buttonID = ID
-        self.image = Button.image.get(self.buttonID)
+        self.buttonImageID = imageID
+        self.buttonProcessID = processID
+        self.image = Button.image.get(self.buttonImageID)
         self.originSizeX = sizeX
         self.originSizeY = sizeY
-        self.pngSizeX = Button.size.get(self.buttonID)[0]
-        self.pngSizeY = Button.size.get(self.buttonID)[1]
+        self.pngSizeX = Button.size.get(self.buttonImageID)[0]
+        self.pngSizeY = Button.size.get(self.buttonImageID)[1]
         self.sizeX = self.pngSizeX * self.originSizeX
         self.sizeY = self.pngSizeY * self.originSizeY
 
@@ -89,14 +90,16 @@ class Button(UI):
         Button.image = {
             'start': load_image(os.path.join(os.getcwd(), 'resources', 'ui', 'button', 'start.png')),
             'quit': load_image(os.path.join(os.getcwd(), 'resources', 'ui', 'button', 'quit.png')),
-            'default': load_image(os.path.join(os.getcwd(), 'resources', 'ui', 'button', 'default.png'))
+            'default': load_image(os.path.join(os.getcwd(), 'resources', 'ui', 'button', 'default.png')),
+            'restart' : load_image(os.path.join(os.getcwd(), 'resources', 'ui', 'button', 'restart.png'))
         }
 
     def initialize_size(self):
         Button.size = {
             'start': [497, 134],
             'quit': [497, 134],
-            'default':  [99, 99]
+            'default':  [99, 99],
+            'restart': [301, 99]
         }
 
     def collideActive(self, opponent):
@@ -136,14 +139,22 @@ class Button(UI):
 
     def unclick(self):
         self.clickCheck = False
-        if self.buttonID == 'start':
+        if self.buttonProcessID == 'start':
             mainframe.change_state(stage_scene)
-        elif self.buttonID == 'quit':
+        elif self.buttonProcessID == 'quit':
             mainframe.quit()
-        elif self.buttonID == 'default':
-            self.set_numbers(0, 0, 0, 0, 0,self.numbers.num + 1)
-            self.additionalImage.setOtherImageToIndex(self.additionalImage.attIndex + 1)
-
+        elif self.buttonProcessID == 'attUpgrade':
+            if self.numbers.num < 13:
+                self.set_numbers(0, 0, 0, 0, 0, self.numbers.num + 1)
+            self.additionalImage.setOtherImageToIndex(int(self.additionalImage.othersID) + 1)
+            # 정보 파싱
+            game_world.curtain_object(PLAYER, 0).parsingDataSet(self.additionalImage.othersID)
+        elif self.buttonProcessID == 'lifeUpgrade':
+            pass
+        elif self.buttonProcessID == 'magica':
+            pass
+        elif self.buttonProcessID == 'restart':
+            mainframe.pop_state()
 
 class Bar(UI):
     pass
@@ -254,7 +265,6 @@ class Others(UI):
         self.sizeY = self.pngSizeY * self.originSizeY
         self.opacify = opacify
         self.image.opacify(self.opacify)
-        self.attIndex = 1
 
     def setOtherImageID(self, ID):
         self.othersID = ID
@@ -269,7 +279,6 @@ class Others(UI):
             return
 
         self.othersID = str(idx)
-        self.attIndex = idx
         self.image = Others.image.get(self.othersID)
         self.pngSizeX = Others.size.get(self.othersID)[0]
         self.pngSizeY = Others.size.get(self.othersID)[1]
@@ -281,21 +290,23 @@ class Others(UI):
             'shop_back': load_image(os.path.join(os.getcwd(), 'resources', 'ui', 'Others', 'shop_background.png')),
             'shop_logo': load_image(os.path.join(os.getcwd(), 'resources', 'ui', 'Others', 'shop.png')),
             'money_capacity': load_image(os.path.join(os.getcwd(), 'resources', 'ui', 'Others', 'money.png')),
+            'posion': load_image(os.path.join(os.getcwd(), 'resources', 'ui', 'item', 'posion.png')),
+            'megica': load_image(os.path.join(os.getcwd(), 'resources', 'ui', 'item', 'book.png')),
 
             # bullet
-            '1': load_image(os.path.join(os.getcwd(), 'resources', 'bullet', 'player', 'BlueCircle.png')),
-            '2': load_image(os.path.join(os.getcwd(), 'resources', 'bullet', 'player', 'Eagle.png')),
-            '3': load_image(os.path.join(os.getcwd(), 'resources', 'bullet', 'player', 'ExplodeMiss.png')),
+            '1':  load_image(os.path.join(os.getcwd(), 'resources', 'bullet', 'player', 'SmallCircle.png')),
+            '2':  load_image(os.path.join(os.getcwd(), 'resources', 'bullet', 'player', 'SmallMiss.png')),
+            '3': load_image(os.path.join(os.getcwd(), 'resources', 'bullet', 'player', 'Rug.png')),
             '4': load_image(os.path.join(os.getcwd(), 'resources', 'bullet', 'player', 'GreenWeak.png')),
-            '5': load_image(os.path.join(os.getcwd(), 'resources', 'bullet', 'player', 'GreenNormal.png')),
-            '6': load_image(os.path.join(os.getcwd(), 'resources', 'bullet', 'player', 'GreenStrong.png')),
-            '7': load_image(os.path.join(os.getcwd(), 'resources', 'bullet', 'player', 'PurpleWeak.png')),
-            '8': load_image(os.path.join(os.getcwd(), 'resources', 'bullet', 'player', 'PurpleNormal.png')),
+            '5': load_image(os.path.join(os.getcwd(), 'resources', 'bullet', 'player', 'PurpleWeak.png')),
+            '6': load_image(os.path.join(os.getcwd(), 'resources', 'bullet', 'player', 'GreenNormal.png')),
+            '7': load_image(os.path.join(os.getcwd(), 'resources', 'bullet', 'player', 'PurpleNormal.png')),
+            '8': load_image(os.path.join(os.getcwd(), 'resources', 'bullet', 'player', 'GreenStrong.png')),
             '9': load_image(os.path.join(os.getcwd(), 'resources', 'bullet', 'player', 'PurpleStrong.png')),
             '10': load_image(os.path.join(os.getcwd(), 'resources', 'bullet', 'player', 'PurpleMax.png')),
-            '11': load_image(os.path.join(os.getcwd(), 'resources', 'bullet', 'player', 'Rug.png')),
-            '12': load_image(os.path.join(os.getcwd(), 'resources', 'bullet', 'player', 'SmallCircle.png')),
-            '13': load_image(os.path.join(os.getcwd(), 'resources', 'bullet', 'player', 'SmallMiss.png'))
+            '11': load_image(os.path.join(os.getcwd(), 'resources', 'bullet', 'player', 'ExplodeMiss.png')),
+            '12': load_image(os.path.join(os.getcwd(), 'resources', 'bullet', 'player', 'BlueCircle.png')),
+            '13': load_image(os.path.join(os.getcwd(), 'resources', 'bullet', 'player', 'Eagle.png'))
         }
 
     def initialize_size(self):
@@ -303,19 +314,22 @@ class Others(UI):
             'shop_back': [500, 700],
             'shop_logo': [253, 58],
             'money_capacity': [138, 33],
+            'posion': [61, 81],
+            'megica': [101, 108],
 
             # bullet
-           '1': [36, 36],
-           '2': [75, 49],
-           '3': [48 // 3, 22],
-           '4': [36, 36],
-           '5': [28, 28],
-           '6': [32, 32],
-           '7': [26, 26],
-           '8': [26, 26],
-           '9': [32, 32],
-           '10': [48, 48],
-           '11':[24, 24],
-           '12': [8, 8],
-           '13': [16, 16],
+            # 사이즈 조정 필요
+            '1': [8, 8],
+            '2': [16, 16],
+            '3': [24, 24],
+            '4': [36, 36],
+            '5': [26, 26],
+            '6': [28, 28],
+            '7': [26, 26],
+            '8': [32, 32],
+            '9': [32, 32],
+            '10': [48, 48],
+            '11': [48 // 3, 22],
+            '12': [36, 36],
+            '13': [75, 49]
         }

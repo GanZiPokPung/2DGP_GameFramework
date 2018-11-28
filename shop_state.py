@@ -4,6 +4,7 @@ from pico2d import *
 from static import *
 
 import game_world
+import player
 import collision_manager
 
 from ui import *
@@ -19,11 +20,29 @@ def initialize():
     # money cap
     game_world.add_object(Others(400, 570, 1.3, 1.3, 'money_capacity', 1.0), UITYPE)
 
-    # default button
-    attUpgradeButton = Button(200, 390, 1, 1, 'default')
-    attUpgradeButton.set_numbers(attUpgradeButton.posX + 30, attUpgradeButton.posY - 20, 2, 2, 17, 1)
-    attUpgradeButton.set_additionalimage(attUpgradeButton.posX, attUpgradeButton.posY + 10, 1, 1, '1', 1)
+    # attUpgrade button
+    # 가격 추가 필요
+    playerAttID = game_world.curtain_object(PLAYER, 0).parsingID
+    attUpgradeButton = Button(150, 440, 1, 1, 'default', 'attUpgrade')
+    attUpgradeButton.set_numbers(attUpgradeButton.posX + 30, attUpgradeButton.posY - 25, 2, 2, 17, int(playerAttID))
+    attUpgradeButton.set_additionalimage(attUpgradeButton.posX, attUpgradeButton.posY + 10, 1, 1, playerAttID, 1)
     game_world.add_object(attUpgradeButton, UITYPE)
+
+    # lifeUpgrade button
+    # 가격 추가 필요
+    lifeUpgradeButton = Button(350, 440, 1, 1, 'default', 'lifeUpgrade')
+    lifeUpgradeButton.set_additionalimage(lifeUpgradeButton.posX, lifeUpgradeButton.posY, 1, 1, 'posion', 1)
+    game_world.add_object(lifeUpgradeButton, UITYPE)
+
+    # magicaUpgrade button
+    magicaUpgradeButton = Button(250, 280, 1, 1, 'default', 'magicaUpgrade')
+    magicaUpgradeButton.set_additionalimage(magicaUpgradeButton.posX, magicaUpgradeButton.posY, 1, 1, 'megica', 1)
+    game_world.add_object(magicaUpgradeButton, UITYPE)
+
+    # restart button
+    game_world.add_object(Button(250, 100, 0.8, 0.8, 'restart', 'restart'), UITYPE)
+
+
 
     mouse = game_world.curtain_object(MOUSE, 0)
 
