@@ -155,10 +155,6 @@ class Button(UI):
             pass
         elif self.buttonProcessID == 'restart':
             mainframe.pop_state()
-
-class Bar(UI):
-    pass
-
 #
 class Numbers(UI):
     def __init__(self, x, y, sizeX, sizeY, between, num):
@@ -172,6 +168,7 @@ class Numbers(UI):
         self.between = between
         self.num = -num
         self.setNumbers(num)
+        self.uiID = 'numbers'
 
     def setNumbers(self, num):
         if self.num == num:
@@ -219,6 +216,7 @@ class Number(UI):
         self.pngSizeY = 14
         self.sizeX = self.pngSizeX * self.originSizeX
         self.sizeY = self.pngSizeY * self.originSizeY
+        self.uiID = 'number'
 
         self.frame = idx;
 
@@ -240,6 +238,81 @@ class Number(UI):
     def draw(self):
         Number.image.clip_draw(self.frame * self.pngSizeX, 0, self.pngSizeX, self.pngSizeY, self.posX, self.posY,
                                 self.sizeX, self.sizeY)
+
+class HPBar(UI):
+    def __init__(self, x, y, hp):
+        UI.__init__(self)
+        self.posX, self.posY = x, y
+        self.hp = hp
+        self.uiID = 'hpbar'
+        self.divideNum = 50
+        self.hearts = []
+        self.setHPImage(hp)
+
+    def setHPImage(self, hp):
+        self.hearts.clear()
+
+        if hp <= 0:
+            self.hp = 0
+            return
+
+        self.hp = hp
+        fullHeart = int(hp // self.divideNum)
+        lastHeart = int(hp % self.divideNum)
+
+        far = 0
+        if fullHeart != 0:
+            for cnt in range(0, fullHeart):
+                self.hearts.append(Heart(self.posX - (50 * far), self.posY, self.divideNum, self.divideNum))
+                far += 1
+        if lastHeart != 0:
+            self.hearts.append(Heart(self.posX - (50 * far), self.posY, lastHeart, self.divideNum))
+
+    def update(self):
+        for heart in self.hearts:
+            heart.update(mainframe.frame_time)
+
+    def draw(self):
+        for heart in self.hearts:
+            heart.draw()
+
+class Heart(UI):
+    image = None
+    def __init__(self, x, y, hp, divide):
+        UI.__init__(self)
+        self.posX, self.posY = x, y
+        self.hp = hp
+        self.originSizeX = 0.25 * (self.hp * (1 / divide))
+        self.originSizeY = 0.25 * (self.hp * (1 / divide))
+        self.moveSizeX = self.originSizeX
+        self.moveSizeY = self.originSizeY
+        self.moveID = 'big'
+        self.pngSizeX = 170
+        self.pngSizeY = 150
+        self.sizeX = self.pngSizeX * self.originSizeX
+        self.sizeY = self.pngSizeY * self.originSizeY
+        self.uiID = 'heart'
+        self.hpDifferSpeed = 0.5
+        if Heart.image == None:
+            Heart.image = load_image(os.path.join(os.getcwd(), 'resources', 'ui', 'Ingame', 'heart.png'))
+        self.image = Heart.image
+
+    def update(self, time):
+        if self.moveID == 'big':
+            self.moveSizeX += time * self.hpDifferSpeed
+            self.moveSizeY += time * self.hpDifferSpeed
+            if self.moveSizeX > self.originSizeX * 1.1:
+                self.moveID = 'small'
+                self.hpDifferSpeed /= 3
+        elif self.moveID == 'small':
+            self.moveSizeX -= time * self.hpDifferSpeed
+            self.moveSizeY -= time * self.hpDifferSpeed
+            if self.moveSizeX < self.originSizeX * 0.9:
+                self.moveID = 'big'
+                self.hpDifferSpeed *= 3
+
+        self.sizeX = self.pngSizeX * self.moveSizeX
+        self.sizeY = self.pngSizeY * self.moveSizeY
 
 class Score(UI):
     pass
@@ -277,8 +350,6 @@ class Others(UI):
     def setOtherImageToIndex(self, idx):
         if idx > 13:
             return
-
-
         self.othersID = str(idx)
         self.image = Others.image.get(self.othersID)
         self.pngSizeX = Others.size.get(self.othersID)[0]

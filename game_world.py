@@ -1,5 +1,5 @@
 
-objects = [[], [], [], [], [], [], [], [], []]
+objects = [[], [], [], [], [], [], [], [], [], []]
 
 # object layer 로 넣은 obj를 분류하여 그 리스트에 추가함
 def add_object(obj, layer):

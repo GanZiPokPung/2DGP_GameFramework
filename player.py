@@ -4,6 +4,7 @@ from static import *
 import stage_scene
 import mainframe
 from bullet import Bullet
+from ui import HPBar
 import game_world
 
 # Action Speed
@@ -51,13 +52,28 @@ class Player:
         if Player.data == None:
             self.initializeData()
         # player abilities
-        self.hp = 100
+        self.hp = 150
         self.bomb = 3
         self.parsingID = '1'
 
         # modify
+        self.hpBar = None
+        self.initPlayerUI(self.hp)
         self.parsingDataSet(self.parsingID)
         self.Modify_Abilities()
+
+    def initPlayerUI(self, hp):
+        uiCheck = 0
+        uiLayer = game_world.get_layer(UIINGAME)
+
+        for ui in uiLayer:
+            if ui.uiID == 'hpbar':
+                self.hpBar = ui
+                uiCheck = 1
+
+        if uiCheck == 0:
+            self.hpBar = HPBar(470, 30, self.hp)
+            game_world.add_object(self.hpBar, UIINGAME)
 
     def initializeData(self):
         Player.data = {
@@ -200,6 +216,7 @@ class Player:
 
     def collideActive(self, opponent):
         self.hp -= opponent.attackDamage
+        self.hpBar.setHPImage(self.hp)
 
     def update(self):
         #player_time
@@ -264,6 +281,7 @@ class Player:
 
     def draw(self):
         Player.image.clip_draw(int(self.frame) * 70, self.frameID * 70, 70, 70, self.x, self.y)
+
 
         # DEBUG
         # print(str(self.pushLcheck) + " " + str(self.pushRcheck))

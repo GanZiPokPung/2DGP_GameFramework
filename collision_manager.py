@@ -40,7 +40,7 @@ def collide_update():
     bulletLayer = game_world.get_layer(BULLET)
     bossLayer = game_world.get_layer(BOSS)
     bulletbossLayer = game_world.get_layer(BOSS_BULLET)
-    uiLayer = game_world.get_layer(UITYPE)
+    uiLayer = game_world.get_layer(UIDEFAULT)
     mouseLayer = game_world.get_layer(MOUSE)
 
     collide_check(monsterLayer, bulletplayerLayer)

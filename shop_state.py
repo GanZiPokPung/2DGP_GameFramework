@@ -14,11 +14,11 @@ mouse = None
 def initialize():
     global mouse
     # background
-    game_world.add_object(Others(250, 350, 1, 1, 'shop_back', 0.7), UITYPE)
+    game_world.add_object(Others(250, 350, 1, 1, 'shop_back', 0.7), UIDEFAULT)
     # shop logo
-    game_world.add_object(Others(250, 650, 1, 1, 'shop_logo', 1.0), UITYPE)
+    game_world.add_object(Others(250, 650, 1, 1, 'shop_logo', 1.0), UIDEFAULT)
     # money cap
-    game_world.add_object(Others(400, 570, 1.3, 1.3, 'money_capacity', 1.0), UITYPE)
+    game_world.add_object(Others(400, 570, 1.3, 1.3, 'money_capacity', 1.0), UIDEFAULT)
 
     # attUpgrade button
     # 가격 추가 필요
@@ -27,23 +27,21 @@ def initialize():
     attUpgradeButton.set_numbers(attUpgradeButton.posX + 30, attUpgradeButton.posY - 25, 2, 2, 17, int(playerAttID))
     attUpgradeButton.set_additionalimage(attUpgradeButton.posX, attUpgradeButton.posY + 10, 1, 1, playerAttID, 1)
     attUpgradeButton.additionalImage.setOtherImageToIndex(int(playerAttID))
-    game_world.add_object(attUpgradeButton, UITYPE)
+    game_world.add_object(attUpgradeButton, UIDEFAULT)
 
     # lifeUpgrade button
     # 가격 추가 필요
     lifeUpgradeButton = Button(350, 440, 1, 1, 'default', 'lifeUpgrade')
     lifeUpgradeButton.set_additionalimage(lifeUpgradeButton.posX, lifeUpgradeButton.posY, 1, 1, 'posion', 1)
-    game_world.add_object(lifeUpgradeButton, UITYPE)
+    game_world.add_object(lifeUpgradeButton, UIDEFAULT)
 
     # magicaUpgrade button
     magicaUpgradeButton = Button(250, 280, 1, 1, 'default', 'magicaUpgrade')
     magicaUpgradeButton.set_additionalimage(magicaUpgradeButton.posX, magicaUpgradeButton.posY, 1, 1, 'megica', 1)
-    game_world.add_object(magicaUpgradeButton, UITYPE)
+    game_world.add_object(magicaUpgradeButton, UIDEFAULT)
 
     # restart button
-    game_world.add_object(Button(250, 100, 0.8, 0.8, 'restart', 'restart'), UITYPE)
-
-
+    game_world.add_object(Button(250, 100, 0.8, 0.8, 'restart', 'restart'), UIDEFAULT)
 
     mouse = game_world.curtain_object(MOUSE, 0)
 
@@ -64,7 +62,11 @@ def handle_events():
 def update():
     collision_manager.collide_update()
 
-    for ui in game_world.get_layer(UITYPE):
+    # ui만 업데이트
+    for ui in game_world.get_layer(UIDEFAULT):
+        ui.update()
+
+    for ui in game_world.get_layer(UIINGAME):
         ui.update()
 
     mouse.update()
@@ -89,4 +91,4 @@ def resume():
     pass
 
 def exit():
-    game_world.clear_layer(UITYPE)
+    game_world.clear_layer(UIDEFAULT)

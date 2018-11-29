@@ -744,7 +744,7 @@ class Dragon_Strong(Monster):
 
         # abilities
         self.hp = 50
-        self.attackDamage = 10
+        self.attackDamage = 1
 
         self.modify_abilities()
 
