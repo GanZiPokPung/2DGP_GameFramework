@@ -53,7 +53,6 @@ class Player:
         # player abilities
         self.hp = 100
         self.bomb = 3
-        self.attackDamage = 5
         self.parsingID = '1'
 
         # modify
@@ -67,19 +66,19 @@ class Player:
             # bullet
             # 불렛 갯수 사이각 각도, 속도, 이미지 타입, 불릿 타입, 사이즈
             # 나중에 데미지도 (맨 뒤에)
-            '1': [1, 70, 'SmallCircle', '', 3, 3],
-            '2': [1, 70, 'SmallMiss', '', 3, 3],
-            '3': [1, 70, 'Rug', '', 2.5, 2.5],
-            '4': [1, 70, 'GreenWeak', '', 2, 2],
-            '5': [1, 70, 'PurpleWeak', '', 2, 2],
-            '6': [1, 70, 'GreenNormal', '', 2, 2],
-            '7': [1, 70, 'PurpleNormal', '', 2, 2],
-            '8': [1, 70, 'GreenStrong', '', 2, 2],
-            '9': [1, 70, 'PurpleStrong', '', 2, 2],
-            '10': [1, 70, 'PurpleMax', '', 2, 2],
-            '11': [1, 70, 'ExplodeMiss', 'Anim', 3, 3],
-            '12': [1, 70, 'BlueCircle', '', 1.5, 1.5],
-            '13': [1, 70, 'Eagle', '', 1.5, 1.5]
+            '1': [1, 70, 'SmallCircle', 'RotateOnce', 4, 4, 1],
+            '2': [3, 90, 'SmallMiss', 'RotateOnce', 2.7, 2.7, 1],
+            '3': [3, 130, 'Rug', 'RotateOnce', 2, 2, 2],
+            '4': [3, 70, 'GreenWeak', 'RotateOnce', 2, 2, 3],
+            '5': [3, 70, 'PurpleWeak', 'RotateOnce', 2.5, 2.5, 3],
+            '6': [5, 80, 'GreenNormal', 'RotateOnce', 2, 2, 4],
+            '7': [5, 80, 'PurpleNormal', 'RotateOnce', 1.75, 1.75, 4],
+            '8': [3, 100, 'GreenStrong', 'RotateOnce', 2, 2, 5],
+            '9': [3, 100, 'PurpleStrong', 'RotateOnce', 1.75, 1.75, 5],
+            '10': [1, 150, 'PurpleMax', 'RotateOnce', 3, 3, 6],
+            '11': [3, 90, 'ExplodeMiss', 'Anim', 4, 4, 8],
+            '12': [5, 100, 'BlueCircle', '', 1.25, 1.25, 6],
+            '13': [1, 175, 'Eagle', 'RotateOnce', 3, 3, 15]
         }
 
     def get_rect(self):
@@ -191,6 +190,7 @@ class Player:
         self.bulletType = Player.data.get(parsingID)[3]
         self.bulletSizeX = Player.data.get(parsingID)[4]
         self.bulletSizeY = Player.data.get(parsingID)[5]
+        self.attackDamage = Player.data.get(parsingID)[6]
 
     def Modify_Abilities(self):
         # speed
@@ -238,9 +238,12 @@ class Player:
 
                 angleTerm = 0
                 angle = 90
-                for bullet in range(0, self.bulletCount):
-                    game_world.add_object(Bullet(self.x, self.y, angle + angleTerm, self.bulletSpeed, self.bulletImage, 0, self.bulletType
-                                                 , self.bulletSizeX, self.bulletSizeY, self.attackDamage), BULLET_PLAYER)
+                for cnt in range(0, self.bulletCount):
+                    bullet = Bullet(self.x + 5, self.y + 20, angle + angleTerm, self.bulletSpeed, self.bulletImage, 0, self.bulletType
+                           , self.bulletSizeX, self.bulletSizeY, self.attackDamage)
+                    bullet.set_rotation(angle)
+                    game_world.add_object(bullet, BULLET_PLAYER)
+
                     if angleTerm == 0:
                         angleTerm += 10
                     elif angleTerm > 0:
@@ -252,10 +255,10 @@ class Player:
 
                 self.BulletTime = 0
 
-                # 필살기
-                # game_world.add_object(Bullet(100, 150, 90, 60, 'Thunder', 0, 'Anim_Stop', 6, 6), BULLET_PLAYER)
-                # game_world.add_object(Bullet(250, 150, 90, 60, 'Thunder', 0, 'Anim_Stop', 6, 6), BULLET_PLAYER)
-                # game_world.add_object(Bullet(400, 150, 90, 60, 'Thunder', 0, 'Anim_Stop', 6, 6), BULLET_PLAYER)
+                # # 필살기
+                # game_world.add_object(Bullet(100, 150, 90, 60, 'Thunder', 0, 'Anim_Stop', 6, 6, self.attackDamage * 2), BULLET_PLAYER)
+                # game_world.add_object(Bullet(250, 150, 90, 60, 'Thunder', 0, 'Anim_Stop', 6, 6, self.attackDamage * 2), BULLET_PLAYER)
+                # game_world.add_object(Bullet(400, 150, 90, 60, 'Thunder', 0, 'Anim_Stop', 6, 6, self.attackDamage * 2), BULLET_PLAYER)
 
         return False
 

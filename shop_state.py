@@ -26,6 +26,7 @@ def initialize():
     attUpgradeButton = Button(150, 440, 1, 1, 'default', 'attUpgrade')
     attUpgradeButton.set_numbers(attUpgradeButton.posX + 30, attUpgradeButton.posY - 25, 2, 2, 17, int(playerAttID))
     attUpgradeButton.set_additionalimage(attUpgradeButton.posX, attUpgradeButton.posY + 10, 1, 1, playerAttID, 1)
+    attUpgradeButton.additionalImage.setOtherImageToIndex(int(playerAttID))
     game_world.add_object(attUpgradeButton, UITYPE)
 
     # lifeUpgrade button

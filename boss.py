@@ -596,10 +596,10 @@ class BossHand(Boss):
         if self.shootTime > self.originShootDelay:
             self.shootAngle = random.randint(270 - 60, 270 + 60)
 
-            tmpbullet = Bullet(self.posX, self.posY - 50, self.shootAngle ,
+            tmpbullet = Bullet(self.posX, self.posY - 50, self.shootAngle,
                                     self.shootSpeed, 'Missile', '', 'RotateOnce',
                                     self.bulletsizeX, self.bulletsizeY, self.attackDamage)
-            tmpbullet.rotAngle = self.shootAngle - 270
+            tmpbullet.set_rotation(270)
             game_world.add_object(tmpbullet, BOSS_BULLET)
 
             self.shootTime = 0

@@ -23,7 +23,6 @@ class Bullet:
         self.posX = posX
         self.posY = posY
         self.angle = angle
-        self.rotAngle = 0
         self.speed = speed
         # image
         self.type = imageType
@@ -31,6 +30,7 @@ class Bullet:
         self.rootType = rootType
         # 총알 타입 회전(보는 각도, 지속), 스프라이트, 등등
         self.bulletType = bulletType
+
         # image
         if Bullet.image == None:
             self.initialize_image()
@@ -63,6 +63,9 @@ class Bullet:
             self.frame = random.randint(0, self.maxFrame)
         else:
             self.maxFrame = 0
+
+
+        self.rotAngle = 0
 
         self.time = 0
 
@@ -158,7 +161,11 @@ class Bullet:
                         'Y':                    [(270 // 3) // 2, 90 // 2]
         }
 
+    def set_rotation(self, degree):
+        self.rotAngle = self.angle - degree
+
     def get_rect(self):
+        # 기울기에 따른 렉트 회전(해결 X, 다른 충돌처리 함수가 필요)
         return self.posX - self.rectSizeX, self.posY - self.rectSizeY, \
                self.posX + self.rectSizeX, self.posY + self.rectSizeY
 

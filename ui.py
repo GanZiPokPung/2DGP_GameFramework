@@ -278,10 +278,13 @@ class Others(UI):
         if idx > 13:
             return
 
+
         self.othersID = str(idx)
         self.image = Others.image.get(self.othersID)
         self.pngSizeX = Others.size.get(self.othersID)[0]
         self.pngSizeY = Others.size.get(self.othersID)[1]
+        self.originSizeX = Others.size.get(self.othersID)[2]
+        self.originSizeY = Others.size.get(self.othersID)[3]
         self.sizeX = self.pngSizeX * self.originSizeX
         self.sizeY = self.pngSizeY * self.originSizeY
 
@@ -319,17 +322,17 @@ class Others(UI):
 
             # bullet
             # 사이즈 조정 필요
-            '1': [8, 8],
-            '2': [16, 16],
-            '3': [24, 24],
-            '4': [36, 36],
-            '5': [26, 26],
-            '6': [28, 28],
-            '7': [26, 26],
-            '8': [32, 32],
-            '9': [32, 32],
-            '10': [48, 48],
-            '11': [48 // 3, 22],
-            '12': [36, 36],
-            '13': [75, 49]
+            '1': [8, 8, 4, 4],
+            '2': [16, 16, 2.7, 2.7],
+            '3': [24, 24, 1.5, 1.5],
+            '4': [36, 36, 1.5, 1.5],
+            '5': [26, 26, 2.5, 2.5],
+            '6': [28, 28, 2, 2],
+            '7': [26, 26, 1.75, 1.75],
+            '8': [32, 32, 2, 2],
+            '9': [32, 32, 1.75, 1.75],
+            '10': [48, 48, 1, 1],
+            '11': [48 // 3, 22, 2, 2],
+            '12': [36, 36, 1, 1],
+            '13': [75, 49, 1, 1]
         }
