@@ -123,6 +123,7 @@ class BossHead(Boss):
         self.attackInfoInit = False
         # for attack type
         self.attackID = 99
+        self.attackOtherID = 99
         # for attack term
         self.attackingTime = 0
         self.attackDelay = 0
@@ -141,6 +142,7 @@ class BossHead(Boss):
         self.shootterm = False
         self.shootAngle = 0
         self.LR_decision = 0
+        self.handOnceCheck = False
 
         #hand
         self.initializeHands()
@@ -193,16 +195,12 @@ class BossHead(Boss):
                         self.moveLocation += 1
                 else:
                     self.moveT_Curv += self.curvSpeedT * mainframe.frame_time
-                    if self.moveLocation == 4:
-                        dstLocation = 0
-                    else:
-                        dstLocation = self.moveLocation + 1
                     self.posX, self.posY = custom_math.move_curve(self.movePattern[self.moveLocation - 3],
                                                                   self.movePattern[self.moveLocation - 2],
                                                                   self.movePattern[self.moveLocation - 1],
                                                                   self.movePattern[self.moveLocation],
                                                                   self.moveT_Curv)
-
+           # head
            if self.attackID == 0:
                check = self.Pattern_Normal()
                if check == False:
@@ -215,14 +213,24 @@ class BossHead(Boss):
                 check = self.Pattern_Lazer_Two()
                 if check == False:
                     self.attackID = 99
-           elif self.attackID == 3:
+
+           # hand
+           if self.attackOtherID == 1:
+                check = self.Pattern_Hand_Normal()
+                if check == False:
+                    self.attackOtherID = 99
+           elif self.attackOtherID == 2:
                 check = self.Pattern_Hand_One()
                 if check == False:
-                    self.attackID = 99
-           elif self.attackID == 4:
-                check = self.Pattern_Hand_Two()
+                    self.attackOtherID = 99
+           elif self.attackOtherID == 3:
+               check = self.Pattern_Hand_Two()
+               if check == False:
+                   self.attackOtherID = 99
+           elif self.attackOtherID == 4:
+                check = self.Pattern_Hand_Three()
                 if check == False:
-                    self.attackID = 99
+                    self.attackOtherID = 99
 
                         # normal attack
                     # self.Pattern_Normal()
@@ -246,8 +254,6 @@ class BossHead(Boss):
            #             self.posX, self.posY = custom_math.move_line(self.currentPos,
            #                                                          self.startPos,
            #                                                          self.moveT)
-
-
 
     def modify_difficulty(self, difficulty):
         self.difficulty
@@ -390,17 +396,136 @@ class BossHead(Boss):
 
         return True
 
+    def Pattern_Hand_Normal(self):
+        if self.handOnceCheck == False:
+            if  self.BossHandLeft != None:
+                self.BossHandLeft.attackID = 0
+            if self.BossHandRight != None:
+                self.BossHandRight.attackID = 0
+
+            self.handOnceCheck = True
+
+            # 끝나는 체크
+        if self.BossHandLeft == None:
+            doCheckR = self.BossHandRight.attackID
+            if doCheckR == 99:
+                self.handOnceCheck = False
+                return False
+        elif self.BossHandRight == None:
+            doCheckL = self.BossHandLeft.attackID
+            if doCheckL == 99:
+                self.handOnceCheck = False
+                return False
+        else:
+            doCheckL = self.BossHandLeft.attackID
+            doCheckR = self.BossHandRight.attackID
+            if doCheckL == 99 and doCheckR == 99:
+                self.handOnceCheck = False
+                return False
+
+        return True
+
     def Pattern_Hand_One(self):
-        if  self.BossHandLeft != None:
-            self.BossHandLeft.attackID = 0
-        if self.BossHandRight != None:
-            self.BossHandRight.attackID = 0
+
+        if self.handOnceCheck == False:
+            if self.BossHandLeft != None:
+                self.BossHandLeft.moveMode = False
+                self.BossHandLeft.attackID = 1
+            if self.BossHandRight != None:
+                self.BossHandRight.moveMode = False
+                self.BossHandRight.attackID = 1
+
+            self.handOnceCheck = True
+
+        # 끝나는 체크
+        if self.BossHandLeft == None:
+            doCheckR = self.BossHandRight.attackID
+            if doCheckR == 99:
+                self.handOnceCheck = False
+                return False
+        elif self.BossHandRight == None:
+            doCheckL = self.BossHandLeft.attackID
+            if doCheckL == 99:
+                self.handOnceCheck = False
+                return False
+        else:
+            doCheckL = self.BossHandLeft.attackID
+            doCheckR = self.BossHandRight.attackID
+            if doCheckL == 99 and doCheckR == 99:
+                self.handOnceCheck = False
+                return False
+
+        return True
 
     def Pattern_Hand_Two(self):
-        if self.BossHandLeft != None:
-            self.BossHandLeft.moveMode = False
-        if self.BossHandRight != None:
-            self.BossHandRight.moveMode = False
+
+        if self.handOnceCheck == False:
+            LRCheck = random.randint(0, 1)
+
+            if LRCheck == 0:
+                if self.BossHandLeft != None:
+                    self.BossHandLeft.moveMode = False
+                    self.BossHandLeft.attackID = 2
+            else:
+                if self.BossHandRight != None:
+                    self.BossHandRight.moveMode = False
+                    self.BossHandRight.attackID = 2
+
+            self.handOnceCheck = True
+
+        # 끝나는 체크
+        if self.BossHandLeft == None:
+            doCheckR = self.BossHandRight.attackID
+            if doCheckR == 99:
+                self.handOnceCheck = False
+                return False
+        elif self.BossHandRight == None:
+            doCheckL = self.BossHandLeft.attackID
+            if doCheckL == 99:
+                self.handOnceCheck = False
+                return False
+        else:
+            doCheckL = self.BossHandLeft.attackID
+            doCheckR = self.BossHandRight.attackID
+            if doCheckL == 99 and doCheckR == 99:
+                self.handOnceCheck = False
+                return False
+
+        return True
+
+    def Pattern_Hand_Three(self):
+        if self.handOnceCheck == False:
+            LRCheck = random.randint(0, 1)
+
+            if LRCheck == 0:
+                if self.BossHandLeft != None:
+                    self.BossHandLeft.specialMoveMode = True
+            else:
+                if self.BossHandRight != None:
+                    self.BossHandRight.specialMoveMode = True
+
+            self.handOnceCheck = True
+
+        #끝나는 체크
+        if self.BossHandLeft == None:
+            checkR = self.BossHandRight.specialMoveMode
+            if checkR == False:
+                self.handOnceCheck = False
+                return False
+        elif self.BossHandRight == None:
+            checkL = self.BossHandLeft.specialMoveMode
+            if checkL == False:
+                self.handOnceCheck = False
+                return False
+        else:
+            checkL = self.BossHandLeft.specialMoveMode
+            checkR = self.BossHandRight.specialMoveMode
+            if checkL == False and checkR == False:
+                self.handOnceCheck = False
+                return False
+
+        return True
+
 
 class BossHand(Boss):
     image = None
@@ -435,12 +560,16 @@ class BossHand(Boss):
         # for AI check
         self.moveMode = True
         self.attackMode = False
+        self.specialMoveMode = False
+        self.specialAttMode = False
         self.attackInfoInit = False
         self.attackID = 99
         # for AI move
         self.moveLocation = 0
         self.moveT = 0
         self.speedT = 50
+        self.moveT_Curv = 0
+        self.curvSpeedT = 200
         # for AI shoot
         self.originShootDelay = 0
         self.shootDelay = 0
@@ -458,6 +587,8 @@ class BossHand(Boss):
         self.originPosY = []
         self.startPos   = []
         self.currentPos = []
+        self.curvPos = []
+        self.initialize_course()
 
         # 부모
         self.player = None
@@ -471,7 +602,11 @@ class BossHand(Boss):
         self.modify_difficulty(123)
         self.modify_abilities()
 
-
+    def initialize_course(self):
+        if self.type == 'Left':
+            self.curvPos = [[470, 200], self.currentPos, self.currentPos, self.currentPos, [0 + 20, 360]]
+        elif self.type == 'Right':
+            self.curvPos = [[30, 200], self.currentPos, self.currentPos, self.currentPos, [500 - 20, 360]]
 
     def draw(self):
         self.image.clip_draw(0, 0, self.pngSizeX, self.pngSizeY,
@@ -482,8 +617,37 @@ class BossHand(Boss):
         pass
 
     def update_AI(self):
+        if self.specialMoveMode == True:
+            self.initialize_course()
+            if self.moveT_Curv >= 100:
+                self.moveT_Curv = 0
+                if self.moveLocation == 3:
+                    self.moveLocation = 0
+                    self.specialMoveMode = False
+                    self.shootCount = 0
+                    self.shootTime = 0
+                    self.shootCheck = False
+                    self.attackInfoInit = False
+                else:
+                    self.moveLocation += 1
+            else:
+                self.moveT_Curv += self.curvSpeedT * mainframe.frame_time
+                if self.moveLocation == 0:
+                    self.curvSpeedT = 50
+                elif self.moveLocation == 1:
+                    self.curvSpeedT = 200
+                    self.Pattern_Normal_For_Special()
+
+                self.posX, self.posY = custom_math.move_curve(self.curvPos[self.moveLocation - 3],
+                                                              self.curvPos[self.moveLocation - 2],
+                                                              self.curvPos[self.moveLocation - 1],
+                                                              self.curvPos[self.moveLocation],
+                                                              self.moveT_Curv)
+            return
+
         if self.moveMode == True :
             if self.attackMode == False:
+                # 보스를 따라 움직일때
                 if self.type == 'Left':
                     self.originPosX = self.headinfo.posX - 160
                     self.originPosY = self.headinfo.posY - 100
@@ -504,6 +668,7 @@ class BossHand(Boss):
                     if check == False:
                         self.attackID = 99
 
+            # 팔 접기
             else:
                 if self.moveT >= 100:
                     self.attackMode = False
@@ -515,6 +680,7 @@ class BossHand(Boss):
                                                                  self.startPos,
                                                                  self.moveT)
         else:
+            # 팔 뻗기
             if self.attackMode == False:
                 if self.moveT >= 100:
                     self.attackMode = True
@@ -525,10 +691,19 @@ class BossHand(Boss):
                     self.posX, self.posY = custom_math.move_line(self.currentPos,
                                                                  [self.startPos[0], self.startPos[1] - 90],
                                                                  self.moveT)
+            # 공격
             else:
-                check = self.Pattern_Special_One()
-                if check == False:
-                    self.attackMode = False
+                if self.attackID == 1:
+                    check = self.Pattern_Special_One()
+                    if check == False:
+                        self.moveMode = True
+                        self.attackID = 99
+                elif self.attackID == 2:
+                    check = self.Pattern_Special_Two()
+                    if check == False:
+                        self.moveMode = True
+                        self.attackID = 99
+
 
     def modify_difficulty(self, difficulty):
         self.difficulty
@@ -536,24 +711,46 @@ class BossHand(Boss):
     def modify_abilities(self):
         self.shootDelay = self.originShootDelay / 5
 
+    def Pattern_Normal_For_Special(self):
+        if self.attackInfoInit == False:
+            self.originShootDelay = 0.3
+            self.shootSpeed = 20
+            self.bulletsizeX = 2
+            self.bulletsizeY = 2
+            self.time = 0
+            self.delayCheck = False
+            self.shootCheck = True
+            self.modify_abilities()
+            self.attackInfoInit = True
+
+        if self.shootTime > self.shootDelay:
+            game_world.add_object(Bullet(self.posX, self.posY - 10, 270,
+                                                self.shootSpeed, 'Y', '', 'Anim',
+                                                self.bulletsizeX, self.bulletsizeY, self.attackDamage), BOSS_BULLET)
+
+            self.shootTime = 0
+
+        return True
+
     def Pattern_Normal(self):
         if self.attackInfoInit == False:
             self.originShootDelay = random.randint(2, 3)
-            self.shootSpeed = 80
+            self.shootSpeed = 55
             self.bulletsizeX = 2
             self.bulletsizeY = 2
             self.shootMax = 30
 
             self.time = 0
             self.tmpCount = 0
-            self.delayTerm = 0.05
+            self.delayTerm = 0.15
 
             self.delayCheck = False
             self.shootCheck = True
             self.modify_abilities()
+            self.shootTime = self.shootDelay
             self.attackInfoInit = True
 
-        if self.shootTime > self.originShootDelay:
+        if self.shootTime > self.shootDelay:
             if self.delayCheck == False:
                 if self.player != None:
                     self.shootAngle = custom_math.angle_between([self.posX, self.posY],
@@ -574,7 +771,7 @@ class BossHand(Boss):
 
             if self.delayCheck == False:
                 self.shootTime = 0
-                self.shootDelay = random.randint(8, 10)
+                self.shootDelay = random.randint(5, 7)
 
         if self.shootCount > self.shootMax:
             self.shootCount = 0
@@ -582,22 +779,22 @@ class BossHand(Boss):
             self.shootCheck = False
             self.attackInfoInit = False
             return False
-        else:
-            return True
+
+        return True
 
     def Pattern_Special_One(self):
         if self.attackInfoInit == False:
             self.originShootDelay = 0.15
-            self.shootSpeed = 50
+            self.shootSpeed = 80
             self.bulletsizeX = 2
             self.bulletsizeY = 2
-            self.shootMax = 100
+            self.shootMax = 70
             self.modify_abilities()
             self.shootCheck = True
             self.attackInfoInit = True
 
         if self.shootTime > self.originShootDelay:
-            self.shootAngle = random.randint(270 - 60, 270 + 60)
+            self.shootAngle = random.randint(270 - 40, 270 + 40)
 
             tmpbullet = Bullet(self.posX, self.posY - 50, self.shootAngle,
                                     self.shootSpeed, 'Missile', '', 'RotateOnce',
@@ -615,5 +812,47 @@ class BossHand(Boss):
             self.attackInfoInit = False
 
             return False
-        else:
-            return True
+
+        return True
+
+    def Pattern_Special_Two(self):
+        # 손에서 나가게 할 예정
+        if self.attackInfoInit == False:
+            self.originShootDelay = 0.2
+            self.shootSpeed = 40
+            self.bulletsizeX = 1
+            self.bulletsizeY = 1
+            self.shootAngle = 0
+            self.shootMax = 100
+            self.modify_abilities()
+            self.shootCheck = True
+            self.attackInfoInit = True
+
+        self.shootAngle += 5.0
+
+        if self.shootTime > self.shootDelay:
+            game_world.add_object(Bullet(self.posX, self.posY - 50, self.shootAngle,
+                                         self.shootSpeed, 'Small_A', '', '',
+                                         self.bulletsizeX, self.bulletsizeY, self.attackDamage), BOSS_BULLET)
+            game_world.add_object(Bullet(self.posX, self.posY - 50, self.shootAngle + 90,
+                                         self.shootSpeed, 'Small_A', '', '',
+                                         self.bulletsizeX, self.bulletsizeY, self.attackDamage), BOSS_BULLET)
+            game_world.add_object(Bullet(self.posX, self.posY - 50, self.shootAngle + 180,
+                                         self.shootSpeed, 'Small_A', '', '',
+                                         self.bulletsizeX, self.bulletsizeY, self.attackDamage), BOSS_BULLET)
+            game_world.add_object(Bullet(self.posX, self.posY - 50, self.shootAngle + 270,
+                                         self.shootSpeed, 'Small_A', '', '',
+                                         self.bulletsizeX, self.bulletsizeY, self.attackDamage), BOSS_BULLET)
+
+            self.shootCount += 1
+            self.shootTime = 0
+
+
+        if self.shootCount > self.shootMax:
+            self.shootCount = 0
+            self.shootTime = 0
+            self.shootCheck = False
+            self.attackInfoInit = False
+            return False
+
+        return True

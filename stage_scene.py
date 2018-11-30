@@ -47,7 +47,7 @@ bossCheck = False
 #stage
 stage = 1
 stageCount = 0
-stageCountMax = 10
+stageCountMax = 5
 
 # debug
 rectCheck = True
@@ -100,18 +100,15 @@ def handle_events():
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_e):
             game_world.clear_layer(MONSTER)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_m):
-            # money
-            game_world.add_object(Coin(250, 350, 1.5, 1.5, 1000), COIN)
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_l):
-            mainframe.push_state(shop_state)
+            pass
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_1):
-            game_world.curtain_object(BOSS, 2).attackID = 0
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_2):
             game_world.curtain_object(BOSS, 2).attackID = 1
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_3):
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_2):
             game_world.curtain_object(BOSS, 2).attackID = 2
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_3):
+            game_world.curtain_object(BOSS, 2).attackOtherID = 3
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_4):
-            game_world.curtain_object(BOSS, 2).attackID = 3
+            game_world.curtain_object(BOSS, 2).attackOtherID = 4
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_5):
             game_world.curtain_object(BOSS, 2).attackID = 4
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_p):
@@ -126,8 +123,10 @@ def handle_events():
 
 def updateStage():
     global stage
+    global stage_time
     global stageCount
     global stageCountMax
+    global monsterSpawnCheck
     global bossCheck
     # stage
     if stageCount > stageCountMax:
@@ -146,14 +145,19 @@ def updateStage():
             # 보스 등장
             game_world.add_object(BossHead(), BOSS)
             bossCheck = True
-        else:
+
+        elif bossCheck == True:
             # if 보스를 잡으면
             # 코인이 쏟아지며
             # 코인이 없어지면
             bossLayer = game_world.get_layer(BOSS)
             if len(bossLayer) == 0:
                 # 상점 등장
-                mainframe.push_state(shop_state)
+                stage_time += mainframe.frame_time
+                if stage_time > 2.5:
+                    bossCheck = False
+                    mainframe.push_state(shop_state)
+                    stage_time = 0.0
 
 def update():
     # map
@@ -211,6 +215,12 @@ def resume():
     Monster_Pattern.difficulty += 1
     for map in totalmap.get(2):
         map.speed += 50
+
+    # 플레이어 버그
+    player.dirX = 0
+    player.dirY = 0
+    player.velocityX = 0
+    player.velocityY = 0
 
 def exit():
     game_world.clear()

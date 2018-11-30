@@ -47,7 +47,7 @@ class Player:
         self.BulletTime = 0
         self.BulletDelay = 0.15
         # speed
-        self.moveSpeed = 20
+        self.moveSpeed = 30
         # image
         if Player.image == None:
             Player.image = load_image(os.path.join(os.getcwd(), 'resources', 'player', 'player.png'))
@@ -56,7 +56,7 @@ class Player:
         # player abilities
         self.hp = 150
         self.score = 0
-        self.money = 10000
+        self.money = 0
         self.attackDamage = 10
         self.bomb = 3
         self.parsingID = '1'
@@ -105,9 +105,9 @@ class Player:
             # bullet
             # 불렛 갯수 사이각 각도, 속도, 이미지 타입, 불릿 타입, 사이즈
             # 나중에 데미지도 (맨 뒤에)
-            '1': [1, 110, 'SmallCircle', 'RotateOnce', 4, 4, 2],
-            '2': [3, 100, 'SmallMiss', 'RotateOnce', 2.7, 2.7, 1],
-            '3': [3, 130, 'Rug', 'RotateOnce', 2, 2, 3],
+            '1': [3, 110, 'SmallCircle', 'RotateOnce', 2, 2, 1],
+            '2': [3, 100, 'SmallMiss', 'RotateOnce', 2.7, 2.7, 2],
+            '3': [3, 130, 'Rug', 'Rotate', 2, 2, 3],
             '4': [3, 90, 'GreenWeak', 'RotateOnce', 2, 2, 4],
             '5': [3, 90, 'PurpleWeak', 'RotateOnce', 2.5, 2.5, 4],
             '6': [5, 80, 'GreenNormal', 'RotateOnce', 2, 2, 5],

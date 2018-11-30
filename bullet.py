@@ -157,7 +157,7 @@ class Bullet:
                         'RedSun':               [91 // 2, 92 // 2],
                         'Missile':              [24 // 2, 24 // 2],
                         'YellowCircle_Anim':    [(336 // 6) // 3, 61 // 3],
-                        'Y':                    [(270 // 3) // 2, 90 // 2]
+                        'Y':                    [(270 // 3) // 4, 90 // 4]
         }
 
     def set_rotation(self, degree):
