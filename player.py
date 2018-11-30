@@ -4,9 +4,7 @@ from static import *
 import stage_scene
 import mainframe
 from bullet import Bullet
-from ui import HPBar
-from ui import Score
-from ui import Money
+from ui import *
 import game_world
 
 # Action Speed
@@ -35,6 +33,7 @@ class Player:
         self.pushLcheck = False
         self.pushRcheck = False
         self.pushAttcheck = False
+        self.pushBombcheck = False
         # collider
         self.collideCheck = False
         # frame
@@ -46,6 +45,10 @@ class Player:
         # time
         self.BulletTime = 0
         self.BulletDelay = 0.15
+        self.BombTime = 0
+        self.BombDelay = 5
+        self.TickTime = 0
+        self.TickDelay = 0.4
         # speed
         self.moveSpeed = 30
         # image
@@ -58,13 +61,16 @@ class Player:
         self.score = 0
         self.money = 0
         self.attackDamage = 10
-        self.bomb = 3
+        self.bomb = None
+        self.bombCount = 3
+        self.bombDamage = 2
         self.parsingID = '1'
 
         # modify
         self.hpBar = None
         self.scoreBar = None
         self.moneyBar = None
+        self.bombBar = None
         self.initPlayerUI()
         self.parsingAttData(self.parsingID)
         self.Modify_Abilities()
@@ -73,6 +79,7 @@ class Player:
         uiHpCheck = 0
         uiScoreCheck = 0
         uiMoneyCheck = 0
+        uiBombCheck = 0
         uiLayer = game_world.get_layer(UIINGAME)
 
         for ui in uiLayer:
@@ -85,10 +92,17 @@ class Player:
             elif ui.uiID == 'money':
                 self.moneyBar = ui
                 uiMoneyCheck = 1
+            elif ui.uiID == 'bomb':
+                self.bombBar = ui
+                uiBombCheck = 1
 
         if uiHpCheck == 0:
             self.hpBar = HPBar(470, 30, self.hp)
             game_world.add_object(self.hpBar, UIINGAME)
+
+        if uiBombCheck == 0:
+            self.bombBar = BombBar(470, 80, self.bombCount)
+            game_world.add_object(self.bombBar, UIINGAME)
 
         if uiScoreCheck == 0:
             self.scoreBar = Score(120, 680, self.score)
@@ -215,6 +229,16 @@ class Player:
     def Attack_State_DownKey(self, key_state):
         if key_state == SDLK_s:
             self.pushAttcheck = True
+        elif key_state == SDLK_a:
+            # 필살기
+            if self.pushBombcheck == False:
+                game_world.add_object(Bullet(100, 150, 90, 60, 'Thunder', 0, 'Anim_Stop', 6, 6, self.attackDamage * 2), BULLET_PLAYER)
+                game_world.add_object(Bullet(250, 150, 90, 60, 'Thunder', 0, 'Anim_Stop', 6, 6, self.attackDamage * 2), BULLET_PLAYER)
+                game_world.add_object(Bullet(400, 150, 90, 60, 'Thunder', 0, 'Anim_Stop', 6, 6, self.attackDamage * 2), BULLET_PLAYER)
+                self.bombCount -= 1
+                self.bombBar.setBombImage(self.bombCount)
+                self.pushBombcheck = True
+
     # Att UpKey
     def Attack_State_UpKey(self, key_state):
         if key_state == SDLK_s:
@@ -241,6 +265,15 @@ class Player:
 
         self.hp += healAmount
         self.hpBar.setHPImage(self.hp)
+
+        return True
+
+    def parsingBombBar(self, bombAmount):
+        if self.bombCount + bombAmount > 10:
+            return False
+
+        self.bombCount += bombAmount
+        self.bombBar.setBombImage(self.bombCount)
 
         return True
 
@@ -298,7 +331,7 @@ class Player:
         # boy.x = clamp(25, boy.x, 1600 - 25)
 
 
-        # 공격(추후 상점 추가시 고칠 예정)
+        # 공격
         if self.pushAttcheck == True :
             if self.BulletTime > self.BulletDelay:
 
@@ -321,10 +354,30 @@ class Player:
 
                 self.BulletTime = 0
 
-                # # 필살기
-                # game_world.add_object(Bullet(100, 150, 90, 60, 'Thunder', 0, 'Anim_Stop', 6, 6, self.attackDamage * 2), BULLET_PLAYER)
-                # game_world.add_object(Bullet(250, 150, 90, 60, 'Thunder', 0, 'Anim_Stop', 6, 6, self.attackDamage * 2), BULLET_PLAYER)
-                # game_world.add_object(Bullet(400, 150, 90, 60, 'Thunder', 0, 'Anim_Stop', 6, 6, self.attackDamage * 2), BULLET_PLAYER)
+        # 폭탄
+        if self.pushBombcheck == True:
+            self.BombTime += mainframe.frame_time
+            self.TickTime += mainframe.frame_time
+            # 지속 시간동안
+            # 모든 몬스터 보스 총알을 무효화시키며
+            # 지속적인 피해를 입힘
+            game_world.clear_layer(BULLET)
+            game_world.clear_layer(BOSS_BULLET)
+
+            if self.TickTime > self.TickDelay:
+                monsterLayer = game_world.get_layer(MONSTER)
+                for monster in monsterLayer:
+                    monster.hp -= self.bombDamage
+                bossLayer = game_world.get_layer(BOSS)
+                for boss in bossLayer:
+                    boss.hp -= self.bombDamage
+                self.TickTime = 0
+
+            if self.BombTime > self.BombDelay:
+                self.BombTime = 0
+                self.TickTime = 0
+                self.pushBombcheck = False
+
 
         return False
 

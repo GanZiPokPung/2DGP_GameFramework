@@ -39,7 +39,7 @@ player = None
 # monsterpatterns = []
 # monsters = []
 monsterpattern = None
-monsterSpawnCheck = False
+monsterSpawnCheck = True
 
 # boss
 bossCheck = False
@@ -90,11 +90,6 @@ def handle_events():
             Monster_Pattern.difficulty += 1
             for map in totalmap.get(2):
                 map.speed += 50
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_a):
-            monsterSpawnCheck = True
-            Monster_Pattern.difficulty -= 1
-            for map in totalmap.get(2):
-                map.speed -= 50
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_w):
             game_world.add_object(BossHead(), BOSS)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_e):
@@ -143,21 +138,25 @@ def updateStage():
 
         if len(monsterLayer) == 0 and bossCheck == False:
             # 보스 등장
-            game_world.add_object(BossHead(), BOSS)
+            boss = BossHead()
+            boss.modify_difficulty(Monster_Pattern.difficulty + 1)
+            game_world.add_object(boss, BOSS)
             bossCheck = True
 
         elif bossCheck == True:
             # if 보스를 잡으면
-            # 코인이 쏟아지며
-            # 코인이 없어지면
             bossLayer = game_world.get_layer(BOSS)
             if len(bossLayer) == 0:
+                # 코인이 쏟아지며
+                # 코인이 없어지면
+                coinLayer = game_world.get_layer(COIN)
                 # 상점 등장
-                stage_time += mainframe.frame_time
-                if stage_time > 2.5:
-                    bossCheck = False
-                    mainframe.push_state(shop_state)
-                    stage_time = 0.0
+                if len(coinLayer) == 0:
+                    stage_time += mainframe.frame_time
+                    if stage_time > 1.5:
+                        bossCheck = False
+                        mainframe.push_state(shop_state)
+                        stage_time = 0.0
 
 def update():
     # map

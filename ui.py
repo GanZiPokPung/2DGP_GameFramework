@@ -158,10 +158,13 @@ class Button(UI):
             heartCheck = game_world.curtain_object(PLAYER, 0).parsingHPBar(50)
             if heartCheck == False:
                 game_world.curtain_object(PLAYER, 0).parsingMoneyBar(500)
-        elif self.buttonProcessID == 'magica':
+        elif self.buttonProcessID == 'magicaUpgrade':
             moneyCheck = game_world.curtain_object(PLAYER, 0).parsingMoneyBar(-1000)
             if moneyCheck == False:
                 return
+            bombCheck = game_world.curtain_object(PLAYER, 0).parsingBombBar(1)
+            if bombCheck == False:
+                game_world.curtain_object(PLAYER, 0).parsingMoneyBar(-1000)
         elif self.buttonProcessID == 'restart':
             mainframe.pop_state()
 #
@@ -250,6 +253,43 @@ class Number(UI):
     def draw(self):
         Number.image.clip_draw(self.frame * self.pngSizeX, 0, self.pngSizeX, self.pngSizeY, self.posX, self.posY,
                                 self.sizeX, self.sizeY)
+
+class BombBar(UI):
+    def __init__(self, x, y, bombCount):
+        UI.__init__(self)
+        self.posX, self.posY = x, y
+        self.bombCount = bombCount
+        self.uiID = 'bombbar'
+        self.bombs = []
+        self.setBombImage(bombCount)
+
+    def setBombImage(self, bombCount):
+        self.bombs.clear()
+
+        for cnt in range(0, bombCount):
+            self.bombs.append(Bomb(self.posX - (50 * cnt), self.posY))
+
+    def draw(self):
+        for bomb in self.bombs:
+            bomb.draw()
+
+class Bomb(UI):
+    image = None
+    def __init__(self, x, y):
+        UI.__init__(self)
+        self.posX, self.posY = x, y
+        self.originSizeX = 0.015
+        self.originSizeY = 0.015
+        self.moveSizeX = self.originSizeX
+        self.moveSizeY = self.originSizeY
+        self.pngSizeX = 2400
+        self.pngSizeY = 2400
+        self.sizeX = self.pngSizeX * self.originSizeX
+        self.sizeY = self.pngSizeY * self.originSizeY
+        self.uiID = 'bomb'
+        if Bomb.image == None:
+            Bomb.image = load_image(os.path.join(os.getcwd(), 'resources', 'ui', 'Ingame', 'thunder.png'))
+        self.image = Bomb.image
 
 class HPBar(UI):
     def __init__(self, x, y, hp):

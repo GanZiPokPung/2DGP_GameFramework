@@ -169,7 +169,9 @@ class Bullet:
                self.posX + self.rectSizeX, self.posY + self.rectSizeY
 
     def collideActive(self, opponent):
-        self.collideCheck = True
+        if self.bulletType != 'Anim_Stop':
+            self.collideCheck = True
+
 
     def update(self):
         if self.bulletType == 'Anim_Stop':

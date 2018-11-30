@@ -2,6 +2,7 @@ from pico2d import *
 from static import *
 from bullet import Bullet
 from effect import Effect
+from coin import Coin
 import static
 import mainframe
 import custom_math
@@ -39,6 +40,8 @@ class Boss:
         self.attackDamage = 0
         self.difficulty = 1
 
+        self.deadCheck = False
+
         # ability
 
     def get_rect(self):
@@ -58,14 +61,24 @@ class Boss:
         if self.delayCheck == True:
             self.delayTime += mainframe.frame_time
 
-        self.update_AI()
-        self.update_anim()
+        if self.deadCheck == False:
+            self.update_AI()
+            self.update_anim()
 
         if (self.hp <= 0):
-            game_world.add_object(Effect(self.posX, self.posY, 'random_effect', '', self.originSizeX*2, self.originSizeY*2),
-                                  EFFECT)
-            game_world.curtain_object(PLAYER, 0).parsingScoreBar(random.randint(1000, 5000) * self.difficulty)
-            return True
+            self.deadCheck = True
+            check = self.deadProcess()
+            if check == True:
+                game_world.add_object(
+                    Effect(self.posX, self.posY, 'random_effect', '', self.originSizeX * 3, self.originSizeY * 3),
+                    EFFECT)
+                game_world.curtain_object(PLAYER, 0).parsingScoreBar(random.randint(1000, 5000) * self.difficulty)
+                return True
+            else:
+                return False
+
+    def deadProcess(self):
+        return True
 
     def draw(self):
         pass
@@ -153,8 +166,20 @@ class BossHead(Boss):
         self.explodeDelay = 0.25
 
         #abilities
-        self.hp = 100
+        self.hp = 200
         self.attackDamage = 10
+
+
+        self.patternDelay = 7
+        self.patternHandDelay = 10
+
+        self.patternTime = self.patternDelay - 3
+        self.patternHandTime = 0
+
+        # coin
+        self.coinTime = 0
+        self.coinDelay = 0.15
+        self.coinCount = 0
 
     def initializeHands(self):
         self.BossHandLeft = BossHand('Left', self)
@@ -171,8 +196,8 @@ class BossHead(Boss):
         pass
 
     def update_AI(self):
-       if self.hp < 50:
-            self.almost_die()
+       if self.hp < (self.hp * 0.3):
+            self.almost_die(1)
         # move
        if self.firstMode == True:
             if self.moveT >= 100:
@@ -187,6 +212,7 @@ class BossHead(Boss):
                                                              self.moveT)
        else:
            if self.moveMode == True:
+
                 if self.moveT_Curv >= 100:
                     self.moveT_Curv = 0
                     if self.moveLocation == 4:
@@ -200,16 +226,18 @@ class BossHead(Boss):
                                                                   self.movePattern[self.moveLocation - 1],
                                                                   self.movePattern[self.moveLocation],
                                                                   self.moveT_Curv)
+
+           self.pattern_check()
            # head
-           if self.attackID == 0:
+           if self.attackID == 1:
                check = self.Pattern_Normal()
                if check == False:
                    self.attackID = 99
-           elif self.attackID == 1:
+           elif self.attackID == 2:
                check = self.Pattern_Lazer_One()
                if check == False:
                    self.attackID = 99
-           elif self.attackID == 2:
+           elif self.attackID == 3:
                 check = self.Pattern_Lazer_Two()
                 if check == False:
                     self.attackID = 99
@@ -255,19 +283,63 @@ class BossHead(Boss):
            #                                                          self.startPos,
            #                                                          self.moveT)
 
+    def pattern_check(self):
+        self.patternTime += mainframe.frame_time
+        self.patternHandTime += mainframe.frame_time
+
+        if self.patternTime > self.patternDelay:
+            check = random.randint(0, 10)
+            if check < 7:
+                self.attackID = 1
+            else:
+                self.attackID = random.randint(2, 3)
+            self.patternTime = 0
+
+        if self.patternHandTime > self.patternHandDelay:
+            self.attackOtherID = random.randint(1, 4)
+            self.patternHandTime = 0
+
     def modify_difficulty(self, difficulty):
-        self.difficulty
+        self.hp *= (1 + difficulty / 4)
+        self.attackDamage *= (1 + difficulty / 4)
+        self.patternHandDelay /= (1 + difficulty / 5)
+        self.patternDelay /= (1 + difficulty / 5)
+        self.difficulty = difficulty
+        self.BossHandLeft.modify_difficulty(self.difficulty)
+        self.BossHandRight.modify_difficulty(self.difficulty)
 
     def modify_abilities(self):
         # delay
         self.shootDelay = self.originShootDelay / 5
 
-    def almost_die(self):
+    def deadProcess(self):
+        self.coinTime += mainframe.frame_time
+
+        if self.BossHandLeft != None:
+            self.BossHandLeft.hp = 0
+        if self.BossHandRight != None:
+            self.BossHandRight.hp = 0
+
+        self.almost_die(3)
+
+        if self.coinTime > self.coinDelay:
+            game_world.add_object(Coin(random.randint(int(self.posX - self.sizeX // 2), int(self.posX + self.sizeX // 2)),
+                                        random.randint(int(self.posY - self.sizeY // 3), int(self.posY + self.sizeY // 3)),
+                                        1.5, 1.5, random.randint(3, 5) * self.difficulty * 100), COIN)
+            self.coinTime = 0
+            self.coinCount += 1
+
+        if self.coinCount > 50:
+            return True
+        else:
+            return False
+
+    def almost_die(self, size):
         self.explodeTime += mainframe.frame_time
         if self.explodeTime > self.explodeDelay:
             game_world.add_object(Effect(random.randint(int(self.posX - self.sizeX // 2), int(self.posX + self.sizeX // 2)),
-                                         random.randint(int(self.posY - self.sizeY // 2), int(self.posY + self.sizeY // 2)),
-                                  'random_effect', '', self.originSizeX / 2, self.originSizeY / 2),
+                                         random.randint(int(self.posY - self.sizeY // 3), int(self.posY + self.sizeY // 3)),
+                                  'random_effect', '', (self.originSizeX / 2) * size, (self.originSizeY / 2) * size),
                                   EFFECT)
             self.explodeTime = 0
 
@@ -599,7 +671,6 @@ class BossHand(Boss):
         self.hp = 100
         self.attackDamage = 10
 
-        self.modify_difficulty(123)
         self.modify_abilities()
 
     def initialize_course(self):
@@ -704,9 +775,10 @@ class BossHand(Boss):
                         self.moveMode = True
                         self.attackID = 99
 
-
     def modify_difficulty(self, difficulty):
-        self.difficulty
+        self.hp *= (1 + difficulty / 4)
+        self.attackDamage *= (1 + difficulty / 4)
+        self.difficulty = difficulty
 
     def modify_abilities(self):
         self.shootDelay = self.originShootDelay / 5
@@ -828,7 +900,10 @@ class BossHand(Boss):
             self.shootCheck = True
             self.attackInfoInit = True
 
-        self.shootAngle += 5.0
+        if self.type == 'Left':
+            self.shootAngle += 300 * mainframe.frame_time
+        else:
+            self.shootAngle -= 300 * mainframe.frame_time
 
         if self.shootTime > self.shootDelay:
             game_world.add_object(Bullet(self.posX, self.posY - 50, self.shootAngle,
