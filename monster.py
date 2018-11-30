@@ -22,7 +22,7 @@ class Monster_Pattern:
 
     def __init__(self):
         if Monster_Pattern.difficulty == None:
-            Monster_Pattern.difficulty = 0
+            Monster_Pattern.difficulty = 1
         self.spawnTime = 0
         self.spawnDelay = 7
 

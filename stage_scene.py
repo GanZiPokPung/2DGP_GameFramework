@@ -11,6 +11,7 @@ from coin import Coin
 
 import game_world
 import collision_manager
+import result_scene
 
 # default
 name = "StageScene"
@@ -51,7 +52,8 @@ stageCountMax = 5
 
 # debug
 rectCheck = True
-
+score = 0
+money = 0
 
 def initialize():
     global mouse
@@ -95,7 +97,7 @@ def handle_events():
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_e):
             game_world.clear_layer(MONSTER)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_m):
-            pass
+            player.hp = 0
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_1):
             game_world.curtain_object(BOSS, 2).attackID = 1
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_2):
@@ -139,7 +141,7 @@ def updateStage():
         if len(monsterLayer) == 0 and bossCheck == False:
             # 보스 등장
             boss = BossHead()
-            boss.modify_difficulty(Monster_Pattern.difficulty + 1)
+            boss.modify_difficulty(Monster_Pattern.difficulty)
             game_world.add_object(boss, BOSS)
             bossCheck = True
 
@@ -174,6 +176,9 @@ def update():
 
     # collider Check
     collision_manager.collide_update()
+
+    if len(game_world.get_layer(PLAYER)) == 0:
+        mainframe.change_state(result_scene)
 
     for game_object in game_world.all_objects():
         erase = game_object.update()
@@ -222,4 +227,6 @@ def resume():
     player.velocityY = 0
 
 def exit():
+    result_scene.score = score
+    result_scene.money = money
     game_world.clear()

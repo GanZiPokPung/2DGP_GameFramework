@@ -4,6 +4,7 @@ from static import *
 import stage_scene
 import mainframe
 from bullet import Bullet
+from effect import Effect
 from ui import *
 import game_world
 
@@ -109,7 +110,7 @@ class Player:
             game_world.add_object(self.scoreBar, UIINGAME)
 
         if uiMoneyCheck == 0:
-            self.moneyBar = Money(480, 680, self.money)
+            self.moneyBar = Money(480, 680, 1, 100, 2, 17, self.money)
             game_world.add_object(self.moneyBar, UIINGAME)
 
     def initializeData(self):
@@ -297,10 +298,21 @@ class Player:
         self.moveSpeedPixelPerSecond = (self.moveSpeedMterPerSecond * PIXEL_PER_METER)
 
     def collideActive(self, opponent):
-        self.hp -= opponent.attackDamage
-        self.hpBar.setHPImage(self.hp)
+        if self.hp - opponent.attackDamage <= 0:
+            self.hp = 0
+        else:
+            self.hp -= opponent.attackDamage
+            self.hpBar.setHPImage(self.hp)
 
     def update(self):
+        # dead
+        if (self.hp <= 0):
+            game_world.add_object(Effect(self.x, self.y, 'random_effect', '', 70 * 3, 70 * 3),
+                                  EFFECT)
+            stage_scene.score = self.score
+            stage_scene.money = self.money
+            return True
+
         #player_time
         self.BulletTime += mainframe.frame_time
 

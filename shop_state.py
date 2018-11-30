@@ -38,7 +38,7 @@ def initialize():
     game_world.add_object(Numbers(275, 210, 1.5, 1.5, 17, 1000), UIDEFAULT)
 
     # restart button
-    game_world.add_object(Button(250, 140, 0.8, 0.8, 'restart', 'restart'), UIDEFAULT)
+    game_world.add_object(Button(250, 140, 0.8, 0.8, 'restart', 'resume'), UIDEFAULT)
 
     mouse = game_world.curtain_object(MOUSE, 0)
 
@@ -51,8 +51,6 @@ def handle_events():
         else:
             if (event.type, event.key) == (SDL_KEYDOWN, SDLK_ESCAPE):
                 mainframe.quit()
-            elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_l):
-                mainframe.pop_state()
 
         mouse.handle_events(event)
 

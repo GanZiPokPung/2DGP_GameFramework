@@ -1,5 +1,6 @@
 from pico2d import *
 import mainframe
+import title_scene
 import stage_scene
 import game_world
 from static import *
@@ -89,7 +90,8 @@ class Button(UI):
             'start': load_image(os.path.join(os.getcwd(), 'resources', 'ui', 'button', 'start.png')),
             'quit': load_image(os.path.join(os.getcwd(), 'resources', 'ui', 'button', 'quit.png')),
             'default': load_image(os.path.join(os.getcwd(), 'resources', 'ui', 'button', 'default.png')),
-            'restart' : load_image(os.path.join(os.getcwd(), 'resources', 'ui', 'button', 'restart.png'))
+            'restart': load_image(os.path.join(os.getcwd(), 'resources', 'ui', 'button', 'restart.png')),
+            'confirm': load_image(os.path.join(os.getcwd(), 'resources', 'ui', 'button', 'confirm.png'))
         }
 
     def initialize_size(self):
@@ -97,7 +99,8 @@ class Button(UI):
             'start': [497, 134],
             'quit': [497, 134],
             'default':  [99, 99],
-            'restart': [301, 99]
+            'restart': [301, 99],
+            'confirm': [273, 82]
         }
 
     def collideActive(self, opponent):
@@ -165,8 +168,10 @@ class Button(UI):
             bombCheck = game_world.curtain_object(PLAYER, 0).parsingBombBar(1)
             if bombCheck == False:
                 game_world.curtain_object(PLAYER, 0).parsingMoneyBar(-1000)
-        elif self.buttonProcessID == 'restart':
+        elif self.buttonProcessID == 'resume':
             mainframe.pop_state()
+        elif self.buttonProcessID == 'confirm':
+            mainframe.change_state(title_scene)
 #
 class Numbers(UI):
     def __init__(self, x, y, sizeX, sizeY, between, num):
@@ -386,20 +391,21 @@ class Score(UI):
 
 class Money(UI):
     image = None
-    def __init__(self, x, y, money):
+    def __init__(self, x, y, sizeImg, imgFar, sizeNum, between, money):
         UI.__init__(self)
         self.posX, self.posY = x, y
         self.money = money
         self.uiID = 'money'
-        self.numbers = Numbers(self.posX, self.posY, 2, 2, 17, self.money)
+        self.numbers = Numbers(self.posX, self.posY, sizeNum, sizeNum, between, self.money)
         if Money.image == None:
             Money.image =  load_image(os.path.join(os.getcwd(), 'resources', 'ui', 'Ingame', 'money.png'))
-        self.originSizeX = 0.05
-        self.originSizeY = 0.05
+        self.originSizeX = 0.05 * sizeImg
+        self.originSizeY = 0.05 * sizeImg
         self.pngSizeX = 600
         self.pngSizeY = 600
         self.sizeX = self.pngSizeX * self.originSizeX
         self.sizeY = self.pngSizeY * self.originSizeY
+        self.far = imgFar
 
     def setMoney(self, money):
         if money > 99999999:
@@ -408,7 +414,7 @@ class Money(UI):
         self.numbers.setNumbers(self.money)
 
     def draw(self):
-        Money.image.clip_draw(0, 0, self.pngSizeX, self.pngSizeY, self.posX - 100, self.posY, self.sizeX, self.sizeY)
+        Money.image.clip_draw(0, 0, self.pngSizeX, self.pngSizeY, self.posX - self.far, self.posY, self.sizeX, self.sizeY)
         self.numbers.draw()
 
 class Others(UI):
