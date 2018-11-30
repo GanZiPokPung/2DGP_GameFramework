@@ -1,6 +1,8 @@
 from pico2d import *
+import mainframe
 
 class Map :
+    image = None
     def __init__(self, name, subname, posy, mapSpeed):
         self.name = name
         self.subname = subname
@@ -12,13 +14,14 @@ class Map :
         self.y = posy
         self.pushcheck = False
         self.endCheck = False
-        self.image = load_image(os.path.join(os.getcwd(), 'resources', 'map', 'Stage' + str(name) + '_' + str(subname) + '.png'))
+        if Map.image == None:
+            Map.image = load_image(os.path.join(os.getcwd(), 'resources', 'map', 'Stage2_0.png'))
         #
         self.speed = mapSpeed
 
     def update(self, mapList):
         # 스피드에 따라 맵 이동
-        self.y = self.y - (self.speed / 100)
+        self.y -= (self.speed) * mainframe.frame_time
         # 맵 이동 구간 체크
         # self.height / 2 = 2000
         # self.width + 2000 => 4000 + 2000 = 6000
@@ -28,9 +31,11 @@ class Map :
             self.pushcheck = True
         else:
         # 캔버스에 벗어난 맵은 리스트에서 제거한다.
-            if self.y < -2500:
-                mapList.pop(0)
+            if self.y < -3000:
+                return True
+
+        return False
 
     def draw(self):
-        self.image.draw(self.x, self.y)
+        Map.image.draw(self.x, self.y)
         #print(self.y)

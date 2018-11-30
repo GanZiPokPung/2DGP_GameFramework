@@ -37,6 +37,7 @@ class Boss:
         self.delayTime = 0
         self.hp = 0
         self.attackDamage = 0
+        self.difficulty = 1
 
         # ability
 
@@ -46,6 +47,7 @@ class Boss:
 
     def collideActive(self, opponent):
         self.hp -= opponent.attackDamage
+        game_world.curtain_object(PLAYER, 0).parsingScoreBar(opponent.attackDamage * random.randint(2, 5))
 
     def update(self):
 
@@ -62,6 +64,7 @@ class Boss:
         if (self.hp <= 0):
             game_world.add_object(Effect(self.posX, self.posY, 'random_effect', '', self.originSizeX*2, self.originSizeY*2),
                                   EFFECT)
+            game_world.curtain_object(PLAYER, 0).parsingScoreBar(random.randint(1000, 5000) * self.difficulty)
             return True
 
     def draw(self):
@@ -247,7 +250,7 @@ class BossHead(Boss):
 
 
     def modify_difficulty(self, difficulty):
-        pass
+        self.difficulty
 
     def modify_abilities(self):
         # delay
@@ -528,7 +531,7 @@ class BossHand(Boss):
                     self.attackMode = False
 
     def modify_difficulty(self, difficulty):
-        pass
+        self.difficulty
 
     def modify_abilities(self):
         self.shootDelay = self.originShootDelay / 5

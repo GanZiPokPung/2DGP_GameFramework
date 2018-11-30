@@ -64,7 +64,6 @@ class Bullet:
         else:
             self.maxFrame = 0
 
-
         self.rotAngle = 0
 
         self.time = 0
@@ -190,7 +189,8 @@ class Bullet:
 
         # 충돌하면 총알을 없앤다.
         if self.collideCheck == True:
-            game_world.add_object(Effect(self.posX, self.posY, '', 'HitEffect01', self.originSizeX, self.originSizeY), EFFECT)
+            game_world.add_object(Effect(self.posX, self.posY, '', 'HitEffect01',
+                                         self.originSizeX * 0.8, self.originSizeY * 0.8), EFFECT)
             return True
 
         # 맵 밖을 나가면 총알을 없앤다.

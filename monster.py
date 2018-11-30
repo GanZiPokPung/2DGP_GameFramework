@@ -4,9 +4,11 @@ import game_world
 import stage_scene
 from bullet import Bullet
 from effect import Effect
+from coin import Coin
 import custom_math
 import static
 import mainframe
+
 import player
 
 import random
@@ -21,13 +23,25 @@ class Monster_Pattern:
     def __init__(self):
         if Monster_Pattern.difficulty == None:
             Monster_Pattern.difficulty = 0
+        self.spawnTime = 0
+        self.spawnDelay = 7
+
+    def update(self):
+        self.spawnTime += mainframe.frame_time
+
+        if self.spawnTime > (self.spawnDelay / (1 + Monster_Pattern.difficulty / 3)):
+            self.get_monster()
+            self.spawnTime = 0
+            return True
+
+        return False
 
     def get_monster(self):
 
-        # select = random.randint(1, 10)
+        select = random.randint(1, 10)
 
         # debug
-        select = random.randint(8, 8)
+        # select = random.randint(7, 7)
 
         if select < 8:
             subselect = random.randint(0, 8)
@@ -158,9 +172,9 @@ class Monster_Pattern:
                     game_world.add_object(monster[1], MONSTER)
         # warrior가 아닌 네임드급 몬스터들
         else:
-            # subselect = random.randint(0, 2)
+            subselect = random.randint(0, 2)
             # debug
-            subselect = random.randint(2, 2)
+            # subselect = random.randint(2, 2)
             # Bird
             if subselect == 0:
                 bird = Bird(300 + random.randint(-70, 70), 800)
@@ -199,6 +213,7 @@ class Monster:
         self.hp = 0
         self.attackDamage = 0
         self.time = 0
+        self.difficulty = 1
 
         # 부모
         self.player = None
@@ -215,6 +230,7 @@ class Monster:
 
     def collideActive(self, opponent):
         self.hp -= opponent.attackDamage
+        game_world.curtain_object(PLAYER, 0).parsingScoreBar(opponent.attackDamage * random.randint(2, 5))
 
     def update(self):
         self.time += mainframe.frame_time
@@ -239,6 +255,8 @@ class Monster:
         elif (self.hp <= 0):
             game_world.add_object(Effect(self.posX, self.posY, 'random_effect', '', self.originSizeX, self.originSizeY),
                                   EFFECT)
+            game_world.curtain_object(PLAYER, 0).parsingScoreBar(random.randint(100, 500) * self.difficulty)
+            game_world.add_object(Coin(self.posX, self.posY, 1.5, 1.5, random.randint(1, 3) * self.difficulty * 100), COIN)
             return True
         else:
             return False
@@ -301,7 +319,7 @@ class Warrior(Monster):
         self.term = term / 3
 
         # abilities
-        self.hp = 10
+        self.hp = 5
         self.attackDamage = 2
         # modify
         self.modify_abilities()
@@ -343,8 +361,12 @@ class Warrior(Monster):
 
     # 바꿔야함, 각도를 따라 이미지가 회전하도록
     def draw(self):
-        self.image.clip_draw(0, 0, self.pngSizeX, self.pngSizeY, self.posX, self.posY, self.sizeX, self.sizeY)
-
+        #self.image.clip_draw(0, 0, self.pngSizeX, self.pngSizeY, self.posX, self.posY, self.sizeX, self.sizeY)
+        self.image.clip_composite_draw(0, 0,
+                                       self.pngSizeX, self.pngSizeY,
+                                       math.radians(self.angle - 270), '',
+                                       self.posX, self.posY,
+                                       self.sizeX, self.sizeY)
     def update_anim(self):
         pass
 
@@ -381,6 +403,7 @@ class Warrior(Monster):
         self.moveSpeed  *= (1 + difficulty / 10)
         self.hp *= (1 + difficulty / 10)
         self.attackDamage *= (1 + difficulty / 10)
+        self.difficulty = difficulty
         self.Modify_Abilities()
 
     def modify_abilities(self):
@@ -438,8 +461,8 @@ class Bird(Monster):
         self.shootSpeed = 40
 
         # abilities
-        self.hp = 20
-        self.attackDamage = 4
+        self.hp = 75
+        self.attackDamage = 5
 
         self.modify_abilities()
 
@@ -520,6 +543,7 @@ class Bird(Monster):
         self.speedT     += difficulty // 2
         self.hp *= (1 + difficulty / 10)
         self.attackDamage *= (1 + difficulty / 10)
+        self.difficulty = difficulty
         self.modify_abilities()
 
     def modify_abilities(self):
@@ -574,7 +598,7 @@ class Dragon(Monster):
         self.shootterm = False
 
         # abilities
-        self.hp = 30
+        self.hp = 100
         self.attackDamage = 6
 
         self.modify_abilities()
@@ -689,6 +713,7 @@ class Dragon(Monster):
         self.speedT     += difficulty // 2
         self.hp *= (1 + difficulty / 10)
         self.attackDamage *= (1 + difficulty / 10)
+        self.difficulty = difficulty
         self.modify_abilities()
 
     def modify_abilities(self):
@@ -743,8 +768,8 @@ class Dragon_Strong(Monster):
         self.shootSpeed = 45
 
         # abilities
-        self.hp = 50
-        self.attackDamage = 1
+        self.hp = 125
+        self.attackDamage = 10
 
         self.modify_abilities()
 
@@ -803,6 +828,7 @@ class Dragon_Strong(Monster):
         self.anglespeed *= (1 + difficulty / 10)
         self.hp *= (1 + difficulty / 10)
         self.attackDamage *= (1 + difficulty / 10)
+        self.difficulty = difficulty
         self.modify_abilities()
 
     def modify_abilities(self):

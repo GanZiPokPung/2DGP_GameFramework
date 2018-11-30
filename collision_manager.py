@@ -39,14 +39,22 @@ def collide_update():
     playerLayer = game_world.get_layer(PLAYER)
     bulletLayer = game_world.get_layer(BULLET)
     bossLayer = game_world.get_layer(BOSS)
+    coinLayer = game_world.get_layer(COIN)
     bulletbossLayer = game_world.get_layer(BOSS_BULLET)
     uiLayer = game_world.get_layer(UIDEFAULT)
     mouseLayer = game_world.get_layer(MOUSE)
 
+    # 몬스터, 플레이어탄환
     collide_check(monsterLayer, bulletplayerLayer)
+    # 플레이어, 몬스터탄환
     collide_check(playerLayer, bulletLayer)
+    # 플레이어, 코인
+    collide_check(playerLayer, coinLayer)
+    # 보스, 플레이어탄환
     collide_check(bossLayer, bulletplayerLayer)
+    # 플레이어, 보스탄환
     collide_check(playerLayer, bulletbossLayer)
+    # ui, 마우스
     collide_check_other(uiLayer, mouseLayer)
     # monster, bullet
 

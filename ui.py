@@ -1,9 +1,7 @@
 from pico2d import *
 import mainframe
-import title_scene
 import stage_scene
 import game_world
-import player
 from static import *
 
 class UI:
@@ -52,7 +50,7 @@ class UI:
         self.image.clip_draw(0, 0, self.pngSizeX, self.pngSizeY, self.posX, self.posY, self.sizeX, self.sizeY)
 
         if self.numbers != None:
-            self.numbers.drawNumbers()
+            self.numbers.draw()
 
         if self.additionalImage != None:
             self.additionalImage.draw()
@@ -144,15 +142,26 @@ class Button(UI):
         elif self.buttonProcessID == 'quit':
             mainframe.quit()
         elif self.buttonProcessID == 'attUpgrade':
+            moneyCheck = game_world.curtain_object(PLAYER, 0).parsingMoneyBar(-1500)
+            if moneyCheck == False:
+                return
             if self.numbers.num < 13:
                 self.set_numbers(0, 0, 0, 0, 0, self.numbers.num + 1)
             self.additionalImage.setOtherImageToIndex(int(self.additionalImage.othersID) + 1)
-            # 정보 파싱
-            game_world.curtain_object(PLAYER, 0).parsingDataSet(self.additionalImage.othersID)
+            attCheck =  game_world.curtain_object(PLAYER, 0).parsingAttData(self.additionalImage.othersID)
+            if attCheck == False:
+                game_world.curtain_object(PLAYER, 0).parsingMoneyBar(1500)
         elif self.buttonProcessID == 'lifeUpgrade':
-            pass
+            moneyCheck = game_world.curtain_object(PLAYER, 0).parsingMoneyBar(-500)
+            if moneyCheck == False:
+                 return
+            heartCheck = game_world.curtain_object(PLAYER, 0).parsingHPBar(50)
+            if heartCheck == False:
+                game_world.curtain_object(PLAYER, 0).parsingMoneyBar(500)
         elif self.buttonProcessID == 'magica':
-            pass
+            moneyCheck = game_world.curtain_object(PLAYER, 0).parsingMoneyBar(-1000)
+            if moneyCheck == False:
+                return
         elif self.buttonProcessID == 'restart':
             mainframe.pop_state()
 #
@@ -166,16 +175,19 @@ class Numbers(UI):
         self.sizeX = sizeX
         self.sizeY = sizeY
         self.between = between
-        self.num = -num
+        self.num = 0
         self.setNumbers(num)
         self.uiID = 'numbers'
 
     def setNumbers(self, num):
-        if self.num == num:
-            return -1
         self.num = num
         self.numberList.clear()
         self.numberValueList.clear()
+
+        if self.num == 0:
+            self.numberList.append(Number(self.x, self.y, self.sizeX, self.sizeY, 0))
+            return 0
+
         numStr = str(self.num)
         lengthCheck = 10
 
@@ -198,7 +210,7 @@ class Numbers(UI):
         for n in self.numberList:
             n.setOriginSize()
 
-    def drawNumbers(self):
+    def draw(self):
         for n in self.numberList:
             n.draw()
 
@@ -315,7 +327,49 @@ class Heart(UI):
         self.sizeY = self.pngSizeY * self.moveSizeY
 
 class Score(UI):
-    pass
+    image = None
+    def __init__(self, x, y, score):
+        UI.__init__(self)
+        self.posX, self.posY = x, y
+        self.score = score
+        self.uiID = 'score'
+        self.numbers = Numbers(self.posX, self.posY, 2, 2, 17, self.score)
+
+    def setScore(self, score):
+        if score > 99999999:
+            return
+        self.score = score
+        self.numbers.setNumbers(self.score)
+
+    def draw(self):
+        self.numbers.draw()
+
+class Money(UI):
+    image = None
+    def __init__(self, x, y, money):
+        UI.__init__(self)
+        self.posX, self.posY = x, y
+        self.money = money
+        self.uiID = 'money'
+        self.numbers = Numbers(self.posX, self.posY, 2, 2, 17, self.money)
+        if Money.image == None:
+            Money.image =  load_image(os.path.join(os.getcwd(), 'resources', 'ui', 'Ingame', 'money.png'))
+        self.originSizeX = 0.05
+        self.originSizeY = 0.05
+        self.pngSizeX = 600
+        self.pngSizeY = 600
+        self.sizeX = self.pngSizeX * self.originSizeX
+        self.sizeY = self.pngSizeY * self.originSizeY
+
+    def setMoney(self, money):
+        if money > 99999999:
+            return
+        self.money = money
+        self.numbers.setNumbers(self.money)
+
+    def draw(self):
+        Money.image.clip_draw(0, 0, self.pngSizeX, self.pngSizeY, self.posX - 100, self.posY, self.sizeX, self.sizeY)
+        self.numbers.draw()
 
 class Others(UI):
     image = None
@@ -365,7 +419,7 @@ class Others(UI):
             'shop_logo': load_image(os.path.join(os.getcwd(), 'resources', 'ui', 'Others', 'shop.png')),
             'money_capacity': load_image(os.path.join(os.getcwd(), 'resources', 'ui', 'Others', 'money.png')),
             'posion': load_image(os.path.join(os.getcwd(), 'resources', 'ui', 'item', 'posion.png')),
-            'megica': load_image(os.path.join(os.getcwd(), 'resources', 'ui', 'item', 'book.png')),
+            'magica': load_image(os.path.join(os.getcwd(), 'resources', 'ui', 'item', 'book.png')),
 
             # bullet
             '1':  load_image(os.path.join(os.getcwd(), 'resources', 'bullet', 'player', 'SmallCircle.png')),
@@ -389,7 +443,7 @@ class Others(UI):
             'shop_logo': [253, 58],
             'money_capacity': [138, 33],
             'posion': [61, 81],
-            'megica': [101, 108],
+            'magica': [101, 108],
 
             # bullet
             # 사이즈 조정 필요

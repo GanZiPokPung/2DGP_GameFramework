@@ -5,6 +5,8 @@ import stage_scene
 import mainframe
 from bullet import Bullet
 from ui import HPBar
+from ui import Score
+from ui import Money
 import game_world
 
 # Action Speed
@@ -53,27 +55,48 @@ class Player:
             self.initializeData()
         # player abilities
         self.hp = 150
+        self.score = 0
+        self.money = 10000
+        self.attackDamage = 10
         self.bomb = 3
         self.parsingID = '1'
 
         # modify
         self.hpBar = None
-        self.initPlayerUI(self.hp)
-        self.parsingDataSet(self.parsingID)
+        self.scoreBar = None
+        self.moneyBar = None
+        self.initPlayerUI()
+        self.parsingAttData(self.parsingID)
         self.Modify_Abilities()
 
-    def initPlayerUI(self, hp):
-        uiCheck = 0
+    def initPlayerUI(self):
+        uiHpCheck = 0
+        uiScoreCheck = 0
+        uiMoneyCheck = 0
         uiLayer = game_world.get_layer(UIINGAME)
 
         for ui in uiLayer:
             if ui.uiID == 'hpbar':
                 self.hpBar = ui
-                uiCheck = 1
+                uiHpCheck = 1
+            elif ui.uiID == 'score':
+                self.scoreBar = ui
+                uiScoreCheck = 1
+            elif ui.uiID == 'money':
+                self.moneyBar = ui
+                uiMoneyCheck = 1
 
-        if uiCheck == 0:
+        if uiHpCheck == 0:
             self.hpBar = HPBar(470, 30, self.hp)
             game_world.add_object(self.hpBar, UIINGAME)
+
+        if uiScoreCheck == 0:
+            self.scoreBar = Score(120, 680, self.score)
+            game_world.add_object(self.scoreBar, UIINGAME)
+
+        if uiMoneyCheck == 0:
+            self.moneyBar = Money(480, 680, self.money)
+            game_world.add_object(self.moneyBar, UIINGAME)
 
     def initializeData(self):
         Player.data = {
@@ -82,18 +105,18 @@ class Player:
             # bullet
             # 불렛 갯수 사이각 각도, 속도, 이미지 타입, 불릿 타입, 사이즈
             # 나중에 데미지도 (맨 뒤에)
-            '1': [1, 70, 'SmallCircle', 'RotateOnce', 4, 4, 1],
-            '2': [3, 90, 'SmallMiss', 'RotateOnce', 2.7, 2.7, 1],
-            '3': [3, 130, 'Rug', 'RotateOnce', 2, 2, 2],
-            '4': [3, 70, 'GreenWeak', 'RotateOnce', 2, 2, 3],
-            '5': [3, 70, 'PurpleWeak', 'RotateOnce', 2.5, 2.5, 3],
-            '6': [5, 80, 'GreenNormal', 'RotateOnce', 2, 2, 4],
-            '7': [5, 80, 'PurpleNormal', 'RotateOnce', 1.75, 1.75, 4],
-            '8': [3, 100, 'GreenStrong', 'RotateOnce', 2, 2, 5],
-            '9': [3, 100, 'PurpleStrong', 'RotateOnce', 1.75, 1.75, 5],
-            '10': [1, 150, 'PurpleMax', 'RotateOnce', 3, 3, 6],
+            '1': [1, 110, 'SmallCircle', 'RotateOnce', 4, 4, 2],
+            '2': [3, 100, 'SmallMiss', 'RotateOnce', 2.7, 2.7, 1],
+            '3': [3, 130, 'Rug', 'RotateOnce', 2, 2, 3],
+            '4': [3, 90, 'GreenWeak', 'RotateOnce', 2, 2, 4],
+            '5': [3, 90, 'PurpleWeak', 'RotateOnce', 2.5, 2.5, 4],
+            '6': [5, 80, 'GreenNormal', 'RotateOnce', 2, 2, 5],
+            '7': [5, 80, 'PurpleNormal', 'RotateOnce', 1.75, 1.75, 5],
+            '8': [3, 100, 'GreenStrong', 'RotateOnce', 2, 2, 6],
+            '9': [3, 100, 'PurpleStrong', 'RotateOnce', 1.75, 1.75, 6],
+            '10': [1, 150, 'PurpleMax', 'RotateOnce', 3, 3, 7],
             '11': [3, 90, 'ExplodeMiss', 'Anim', 4, 4, 8],
-            '12': [5, 100, 'BlueCircle', '', 1.25, 1.25, 6],
+            '12': [5, 100, 'BlueCircle', '', 1.25, 1.25, 7],
             '13': [1, 175, 'Eagle', 'RotateOnce', 3, 3, 15]
         }
 
@@ -197,8 +220,11 @@ class Player:
         if key_state == SDLK_s:
             self.pushAttcheck = False
 
-    def parsingDataSet(self, parsingID):
+    def parsingAttData(self, parsingID):
         # 불렛 갯수 /사이각 각도/, 속도, 이미지 타입, 불릿 타입, 사이즈
+        if int(parsingID) >= 13 and self.parsingID == parsingID:
+            return False
+
         self.parsingID = parsingID
         self.bulletCount = Player.data.get(parsingID)[0]
         self.bulletSpeed = Player.data.get(parsingID)[1]
@@ -207,6 +233,29 @@ class Player:
         self.bulletSizeX = Player.data.get(parsingID)[4]
         self.bulletSizeY = Player.data.get(parsingID)[5]
         self.attackDamage = Player.data.get(parsingID)[6]
+        return True
+
+    def parsingHPBar(self, healAmount):
+        if (self.hp + healAmount) >= 500:
+            return False
+
+        self.hp += healAmount
+        self.hpBar.setHPImage(self.hp)
+
+        return True
+
+    def parsingScoreBar(self, scoreAmount):
+         self.score += scoreAmount
+         self.scoreBar.setScore(self.score)
+
+    def parsingMoneyBar(self, moneyAmount):
+        if (self.money + moneyAmount) < 0:
+            return False
+
+        self.money += moneyAmount
+        self.moneyBar.setMoney(self.money)
+
+        return True
 
     def Modify_Abilities(self):
         # speed

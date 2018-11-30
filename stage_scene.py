@@ -7,6 +7,7 @@ from map import Map
 from player import Player
 from monster import *
 from boss import *
+from coin import Coin
 
 import game_world
 import collision_manager
@@ -38,6 +39,15 @@ player = None
 # monsterpatterns = []
 # monsters = []
 monsterpattern = None
+monsterSpawnCheck = False
+
+# boss
+bossCheck = False
+
+#stage
+stage = 1
+stageCount = 0
+stageCountMax = 10
 
 # debug
 rectCheck = True
@@ -65,22 +75,33 @@ def initialize():
     player = Player()
     # monster
     monsterpattern = Monster_Pattern()
-
     game_world.add_object(player, PLAYER)
 
 def handle_events():
     global rectCheck
     global mouse
+    global monsterSpawnCheck
     events = get_events()
     for event in events:
         if event.type == SDL_QUIT:
             mainframe.quit()
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_q):
-            monsterpattern.get_monster()
+            monsterSpawnCheck = True
+            Monster_Pattern.difficulty += 1
+            for map in totalmap.get(2):
+                map.speed += 50
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_a):
+            monsterSpawnCheck = True
+            Monster_Pattern.difficulty -= 1
+            for map in totalmap.get(2):
+                map.speed -= 50
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_w):
             game_world.add_object(BossHead(), BOSS)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_e):
             game_world.clear_layer(MONSTER)
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_m):
+            # money
+            game_world.add_object(Coin(250, 350, 1.5, 1.5, 1000), COIN)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_l):
             mainframe.push_state(shop_state)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_1):
@@ -103,13 +124,50 @@ def handle_events():
         #mouse
         mouse.handle_events(event)
 
+def updateStage():
+    global stage
+    global stageCount
+    global stageCountMax
+    global bossCheck
+    # stage
+    if stageCount > stageCountMax:
+        monsterSpawnCheck = False
+
+    # monster spawn
+    if monsterSpawnCheck == True:
+        spawnCheck = monsterpattern.update()
+        if spawnCheck == True:
+            stageCount += 1
+    else:
+        # 몬스터를 모두 잡았으면?
+        monsterLayer = game_world.get_layer(MONSTER)
+
+        if len(monsterLayer) == 0 and bossCheck == False:
+            # 보스 등장
+            game_world.add_object(BossHead(), BOSS)
+            bossCheck = True
+        else:
+            # if 보스를 잡으면
+            # 코인이 쏟아지며
+            # 코인이 없어지면
+            bossLayer = game_world.get_layer(BOSS)
+            if len(bossLayer) == 0:
+                # 상점 등장
+                mainframe.push_state(shop_state)
+
 def update():
     # map
     # 현재 스테이지 리스트를 딕셔너리에서 가져옴
+
     currentmaplist = totalmap.get(currentmap)
     # list loop
     for map in currentmaplist:
-        map.update(currentmaplist)
+        erase = map.update(currentmaplist)
+        if erase == True :
+            currentmaplist.remove(map)
+
+    # stage
+    updateStage()
 
     # collider Check
     collision_manager.collide_update()
@@ -139,7 +197,20 @@ def pause():
     pass
 
 def resume():
-    pass
+    # restart 후
+    # 몬스터 난이도 증가, 맵 이동속도 증가
+    global stage
+    global stageCount
+    global stageCountMax
+    global monsterSpawnCheck
+
+    monsterSpawnCheck = True
+    stage += 1
+    stageCount = 0
+    stageCountMax += 5
+    Monster_Pattern.difficulty += 1
+    for map in totalmap.get(2):
+        map.speed += 50
 
 def exit():
     game_world.clear()
