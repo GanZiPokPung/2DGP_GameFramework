@@ -8,13 +8,16 @@ ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
 
 class Coin:
     image = None
+    sound = None
     def __init__(self, x, y, sizeX, sizeY, coinAmount):
         self.posX, self.posY = x, y
         self.speed = 40
 
         if Coin.image == None:
             Coin.image = load_image(os.path.join(os.getcwd(), 'resources', 'ui', 'Ingame', 'coin.png'))
-
+        if Coin.sound == None:
+            Coin.sound = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'effect', 'coin.wav'))
+            Coin.sound.set_volume(25)
         # size
         self.pngSizeX = 24
         self.pngSizeY = 23
@@ -43,6 +46,7 @@ class Coin:
 
         self.modify_abilities()
 
+
     def get_rect(self):
         return self.posX - self.rectSizeX, self.posY - self.rectSizeY, \
                self.posX + self.rectSizeX, self.posY + self.rectSizeY
@@ -50,6 +54,7 @@ class Coin:
     def collideActive(self, opponent):
         self.collideCheck = True
         opponent.parsingMoneyBar(self.coinAmount)
+        Coin.sound.play()
         # 돈 증가
 
     def update(self):

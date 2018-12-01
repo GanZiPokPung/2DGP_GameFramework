@@ -11,11 +11,16 @@ from ui import Numbers
 
 name = "TitleScene"
 image = None
+bgm = None
 
 def initialize():
     global image
     global mouse
+    global bgm
     image = load_image(os.path.join(os.getcwd(), 'resources', 'scene', 'title2.png'))
+    bgm = load_music(os.path.join(os.getcwd(), 'resources', 'sound', 'back', 'title.mp3'))
+    bgm.set_volume(40)
+    bgm.repeat_play()
     mouse = Mouse()
     game_world.add_object(mouse, MOUSE)
     game_world.add_object(Button(250, 250, 0.4, 0.38, 'start', 'start'), UIDEFAULT)
@@ -54,7 +59,5 @@ def resume():
     pass
 
 def exit():
-    global image
-    global mouse
-    del(image)
+    bgm.stop()
     game_world.clear_layer(UIDEFAULT)

@@ -13,6 +13,7 @@ import stage_scene
 
 
 class Boss:
+    sound = None
     def __init__(self, posX, posY, movespeed, sizeX, sizeY):
         self.posX = posX
         self.posY = posY
@@ -42,7 +43,56 @@ class Boss:
 
         self.deadCheck = False
 
+        if Boss.sound == None:
+            self.initialize_sound()
+
         # ability
+    def initialize_sound(self):
+        hit = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'effect', 'hit.wav'))
+        hit.set_volume(15)
+        explode = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'effect', 'explode.wav'))
+        explode.set_volume(8)
+        explode2 = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'effect', 'bigexplode.wav'))
+        explode2.set_volume(70)
+        laughing = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'boss', 'laughing.wav'))
+        laughing.set_volume(100)
+        laughing2 = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'boss', 'laughing2.wav'))
+        laughing2.set_volume(100)
+        god = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'boss', 'god.wav'))
+        god.set_volume(128)
+        hell = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'boss', 'hell.wav'))
+        hell.set_volume(128)
+        shoot = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'player', 'shoot.wav'))
+        shoot.set_volume(3)
+        lazer = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'boss', 'lazer.wav'))
+        lazer.set_volume(10)
+        lazer2 = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'boss', 'lazer2.wav'))
+        lazer2.set_volume(10)
+        dying = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'boss', 'dying.wav'))
+        dying.set_volume(30)
+        bossexplode = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'boss', 'bossExplode.wav'))
+        bossexplode.set_volume(30)
+        Boss.sound = {
+                'hit': hit,
+                # explode
+                '1': explode,
+                '2': explode2,
+                # att
+                'shoot': shoot,
+                'lazer': lazer,
+                'lazer2': lazer2,
+                # laughing
+                'laughing': laughing,
+                'laughing2': laughing2,
+                    # speak
+                'god': god,
+                'hell': hell,
+                    # dying
+                'dying': dying,
+                    # deadExplode
+                'bossexplode': bossexplode
+
+        }
 
     def get_rect(self):
         return self.posX - self.rectSizeX, self.posY - self.rectSizeY,\
@@ -51,6 +101,7 @@ class Boss:
     def collideActive(self, opponent):
         self.hp -= opponent.attackDamage
         game_world.curtain_object(PLAYER, 0).parsingScoreBar(opponent.attackDamage * random.randint(2, 5))
+        Boss.sound.get('hit').play()
 
     def update(self):
 
@@ -66,13 +117,16 @@ class Boss:
             self.update_anim()
 
         if (self.hp <= 0):
-            self.deadCheck = True
+            if self.deadCheck == False:
+                Boss.sound.get('dying').play()
+                self.deadCheck = True
             check = self.deadProcess()
             if check == True:
                 game_world.add_object(
                     Effect(self.posX, self.posY, 'random_effect', '', self.originSizeX * 3, self.originSizeY * 3),
                     EFFECT)
                 game_world.curtain_object(PLAYER, 0).parsingScoreBar(random.randint(1000, 5000) * self.difficulty)
+                Boss.sound.get('bossexplode').play()
                 return True
             else:
                 return False
@@ -296,14 +350,14 @@ class BossHead(Boss):
             self.patternTime = 0
 
         if self.patternHandTime > self.patternHandDelay:
-            self.attackOtherID = random.randint(1, 4)
+            self.attackOtherID = random.randint(4, 4)
             self.patternHandTime = 0
 
     def modify_difficulty(self, difficulty):
         self.hp *= (1 + difficulty / 4)
         self.attackDamage *= (1 + difficulty / 4)
-        self.patternHandDelay /= (1 + difficulty / 5)
-        self.patternDelay /= (1 + difficulty / 5)
+        self.patternHandDelay /= (1 + difficulty / 4)
+        self.patternDelay /= (1 + difficulty / 4)
         self.difficulty = difficulty
         self.BossHandLeft.modify_difficulty(self.difficulty)
         self.BossHandRight.modify_difficulty(self.difficulty)
@@ -341,6 +395,7 @@ class BossHead(Boss):
                                          random.randint(int(self.posY - self.sizeY // 3), int(self.posY + self.sizeY // 3)),
                                   'random_effect', '', (self.originSizeX / 2) * size, (self.originSizeY / 2) * size),
                                   EFFECT)
+            Boss.sound.get(str(random.randint(1, 2))).play()
             self.explodeTime = 0
 
     def Pattern_Normal(self):
@@ -394,6 +449,7 @@ class BossHead(Boss):
             self.delayCheck = False
 
             self.modify_abilities()
+            Boss.sound.get('god').play()
             self.attackInfoInit = True
 
         if self.delayCheck == False:
@@ -418,7 +474,7 @@ class BossHead(Boss):
                 game_world.add_object(Bullet(self.posX + 40, self.posY + 5, self.shootAngle,
                                              self.shootSpeed, 'Y', '', 'Anim',
                                              self.bulletsizeX, self.bulletsizeY, self.attackDamage), BOSS_BULLET)
-
+                Boss.sound.get('lazer').play()
             self.shootTime = 0
 
         if self.LR_decision == 0:
@@ -444,6 +500,7 @@ class BossHead(Boss):
             self.bulletsizeY = 1.5
             self.shootAngle = 0
             self.modify_abilities()
+            Boss.sound.get('laughing').play()
             self.shootCheck = True
             self.attackInfoInit = True
 
@@ -456,7 +513,7 @@ class BossHead(Boss):
             game_world.add_object(Bullet(self.posX + 40, self.posY, 360 - self.shootAngle,
                                          self.shootSpeed, 'BlueCircle_Anim', '', 'Anim',
                                          self.bulletsizeX, self.bulletsizeY, self.attackDamage), BOSS_BULLET)
-
+            Boss.sound.get('lazer2').play()
             self.shootTime = 0
 
 
@@ -506,7 +563,7 @@ class BossHead(Boss):
             if self.BossHandRight != None:
                 self.BossHandRight.moveMode = False
                 self.BossHandRight.attackID = 1
-
+            Boss.sound.get('god').play()
             self.handOnceCheck = True
 
         # 끝나는 체크
@@ -542,7 +599,7 @@ class BossHead(Boss):
                 if self.BossHandRight != None:
                     self.BossHandRight.moveMode = False
                     self.BossHandRight.attackID = 2
-
+            Boss.sound.get('laughing2').play()
             self.handOnceCheck = True
 
         # 끝나는 체크
@@ -575,7 +632,7 @@ class BossHead(Boss):
             else:
                 if self.BossHandRight != None:
                     self.BossHandRight.specialMoveMode = True
-
+            Boss.sound.get('hell').play()
             self.handOnceCheck = True
 
         #끝나는 체크
@@ -706,8 +763,10 @@ class BossHand(Boss):
                 if self.moveLocation == 0:
                     self.curvSpeedT = 50
                 elif self.moveLocation == 1:
-                    self.curvSpeedT = 200
+                    self.curvSpeedT = 300
                     self.Pattern_Normal_For_Special()
+                else:
+                    self.curvSpeedT = 150
 
                 self.posX, self.posY = custom_math.move_curve(self.curvPos[self.moveLocation - 3],
                                                               self.curvPos[self.moveLocation - 2],
@@ -785,7 +844,7 @@ class BossHand(Boss):
 
     def Pattern_Normal_For_Special(self):
         if self.attackInfoInit == False:
-            self.originShootDelay = 0.3
+            self.originShootDelay = 0.25
             self.shootSpeed = 20
             self.bulletsizeX = 2
             self.bulletsizeY = 2
@@ -799,7 +858,7 @@ class BossHand(Boss):
             game_world.add_object(Bullet(self.posX, self.posY - 10, 270,
                                                 self.shootSpeed, 'Y', '', 'Anim',
                                                 self.bulletsizeX, self.bulletsizeY, self.attackDamage), BOSS_BULLET)
-
+            Boss.sound.get('lazer').play()
             self.shootTime = 0
 
         return True
@@ -836,7 +895,7 @@ class BossHand(Boss):
                     self.shootCount += 1
                     self.tmpCount += 1
                     self.delayTime = 0
-
+                    Boss.sound.get('shoot').play()
                     if self.tmpCount > 2:
                         self.delayCheck = False
                         self.tmpCount = 0
@@ -856,7 +915,7 @@ class BossHand(Boss):
 
     def Pattern_Special_One(self):
         if self.attackInfoInit == False:
-            self.originShootDelay = 0.15
+            self.originShootDelay = 0.025
             self.shootSpeed = 80
             self.bulletsizeX = 2
             self.bulletsizeY = 2
@@ -873,7 +932,7 @@ class BossHand(Boss):
                                     self.bulletsizeX, self.bulletsizeY, self.attackDamage)
             tmpbullet.set_rotation(270)
             game_world.add_object(tmpbullet, BOSS_BULLET)
-
+            Boss.sound.get('shoot').play()
             self.shootTime = 0
             self.shootCount += 1
 

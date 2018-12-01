@@ -11,10 +11,12 @@ money = 0
 name = "ResultScene"
 image = None
 mouse = None
+bgm = None
 
 def initialize():
     global image
     global mouse
+    global bgm
     image = load_image(os.path.join(os.getcwd(), 'resources', 'scene', 'result.png'))
 
     mouse = Mouse()
@@ -27,6 +29,10 @@ def initialize():
     game_world.add_object(Money(300, 450, 1.8, 180, 3, 27, money), UIDEFAULT)
     # score
     game_world.add_object(Numbers(300, 350, 3, 3, 27, score), UIDEFAULT)
+
+    bgm = load_music(os.path.join(os.getcwd(), 'resources', 'sound', 'back', 'result.mp3'))
+    bgm.set_volume(40)
+    bgm.repeat_play()
 
 def handle_events():
     global mouse
@@ -67,4 +73,5 @@ def resume():
     pass
 
 def exit():
+    bgm.stop()
     game_world.clear()

@@ -51,12 +51,17 @@ stageCount = 0
 stageCountMax = 5
 
 # debug
-rectCheck = True
+rectCheck = False
 score = 0
 money = 0
+bgm = None
+bossbgm = None
 
 def initialize():
     global mouse
+    global stage
+    global stageCount
+    global stageCountMax
     #map
     global totalmap
     global map1
@@ -65,8 +70,16 @@ def initialize():
     global player
     global monsterpattern
 
+    global bgm
+    global bossbgm
     # mouse
     mouse = game_world.curtain_object(MOUSE, 0)
+
+    # stage
+    stage = 1
+    stageCount = 0
+    stageCountMax = 5
+
     # map
     # stage 별로 리스트에 보관
     map1 = [Map(1, 0, 2000, mapSpeed)]
@@ -78,6 +91,14 @@ def initialize():
     # monster
     monsterpattern = Monster_Pattern()
     game_world.add_object(player, PLAYER)
+
+    #
+    bgm = load_music(os.path.join(os.getcwd(), 'resources', 'sound', 'back', 'stage.mp3'))
+    bgm.set_volume(60)
+    bgm.repeat_play()
+
+    bossbgm = load_music(os.path.join(os.getcwd(), 'resources', 'sound', 'back', 'boss.mp3'))
+    bossbgm.set_volume(30)
 
 def handle_events():
     global rectCheck
@@ -93,6 +114,8 @@ def handle_events():
             for map in totalmap.get(2):
                 map.speed += 50
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_w):
+            mainframe.push_state(shop_state)
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_b):
             game_world.add_object(BossHead(), BOSS)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_e):
             game_world.clear_layer(MONSTER)
@@ -143,6 +166,9 @@ def updateStage():
             boss = BossHead()
             boss.modify_difficulty(Monster_Pattern.difficulty)
             game_world.add_object(boss, BOSS)
+            #
+            bgm.stop()
+            bossbgm.repeat_play()
             bossCheck = True
 
         elif bossCheck == True:
@@ -202,7 +228,7 @@ def draw():
     update_canvas()
 
 def pause():
-    pass
+    bgm.stop()
 
 def resume():
     # restart 후
@@ -226,7 +252,10 @@ def resume():
     player.velocityX = 0
     player.velocityY = 0
 
+    bgm.play()
+
 def exit():
+    bgm.stop()
     result_scene.score = score
     result_scene.money = money
     game_world.clear()

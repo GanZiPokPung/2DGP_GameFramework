@@ -85,6 +85,12 @@ class Button(UI):
 
         self.clickCheck = False
 
+        #sound
+        self.collideSound = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'ui', 'buttoncollide.wav'))
+        self.collideSound.set_volume(100)
+        self.clickSound = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'ui', 'click2_other.wav'))
+        self.clickSound.set_volume(50)
+
     def initialize_image(self):
         Button.image = {
             'start': load_image(os.path.join(os.getcwd(), 'resources', 'ui', 'button', 'start.png')),
@@ -121,7 +127,9 @@ class Button(UI):
                 self.additionalImage.sizeX = self.additionalImage.pngSizeX * self.additionalImage.originSizeX * 1.15
                 self.additionalImage.sizeY = self.additionalImage.pngSizeY * self.additionalImage.originSizeY * 1.15
 
-        self.collideCheck = True
+        if self.collideCheck == False:
+            self.collideSound.play()
+            self.collideCheck = True
 
     def collideInactive(self, opponent):
         self.sizeX = self.pngSizeX * self.originSizeX
@@ -136,7 +144,9 @@ class Button(UI):
         self.collideCheck = False
 
     def click(self):
-        self.clickCheck = True
+        if self.clickCheck == False:
+            self.clickSound.play()
+            self.clickCheck = True
 
     def unclick(self):
         self.clickCheck = False

@@ -23,8 +23,8 @@ class Monster_Pattern:
     def __init__(self):
         if Monster_Pattern.difficulty == None:
             Monster_Pattern.difficulty = 1
-        self.spawnTime = 0
         self.spawnDelay = 7
+        self.spawnTime = self.spawnDelay * 0.5
 
     def update(self):
         self.spawnTime += mainframe.frame_time
@@ -55,6 +55,7 @@ class Monster_Pattern:
                                                     len(warrior_pattern_left) + 1, 'Left', 'warrior_other'))
 
                 for monster in warrior_pattern_left :
+                    monster.modify_difficulty(Monster_Pattern.difficulty)
                     game_world.add_object(monster, MONSTER)
             # 오른쪽위치에서 오른쪽 방향
             elif subselect == 1:
@@ -64,6 +65,7 @@ class Monster_Pattern:
                                                      len(warrior_pattern_right) + 1, 'Right', 'warrior_other'))
 
                 for monster in warrior_pattern_right :
+                    monster.modify_difficulty(Monster_Pattern.difficulty)
                     game_world.add_object(monster, MONSTER)
             # 중앙 방향
             elif subselect == 2:
@@ -73,6 +75,7 @@ class Monster_Pattern:
                                                       len(warrior_pattern_center) + 1, '', 'warrior_other'))
 
                 for monster in warrior_pattern_center :
+                    monster.modify_difficulty(Monster_Pattern.difficulty)
                     game_world.add_object(monster, MONSTER)
             # 오른쪽위치에서 왼쪽 방향
             elif subselect == 3:
@@ -82,6 +85,7 @@ class Monster_Pattern:
                                                     len(warrior_pattern_left_other) + 1, 'Left', 'warrior_other'))
 
                 for monster in warrior_pattern_left_other :
+                    monster.modify_difficulty(Monster_Pattern.difficulty)
                     game_world.add_object(monster, MONSTER)
             # 왼쪽위치에서 오른쪽 방향
             elif subselect == 4:
@@ -91,6 +95,7 @@ class Monster_Pattern:
                                             len(warrior_pattern_right_other) + 1, 'Right', 'warrior_other'))
 
                 for monster in warrior_pattern_right_other :
+                    monster.modify_difficulty(Monster_Pattern.difficulty)
                     game_world.add_object(monster, MONSTER)
             # 양쪽에서 바깥쪽 방향
             elif subselect == 5:
@@ -195,6 +200,7 @@ class Monster_Pattern:
 
 # Monster Classes
 class Monster:
+    sound = None
     def __init__(self, posX, posY, moveSpeed, sizeX, sizeY):
         self.posX = posX
         self.posY = posY
@@ -215,11 +221,28 @@ class Monster:
         self.time = 0
         self.difficulty = 1
 
+        if Monster.sound == None:
+            self.initialize_sound()
+
         # 부모
         self.player = None
         if len(game_world.get_layer(PLAYER)) > 0:
             self.player = game_world.curtain_object(PLAYER, 0)
             self.playerAttackDamage = self.player.attackDamage
+
+    def initialize_sound(self):
+        hit = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'effect', 'hit.wav'))
+        hit.set_volume(15)
+        explode = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'effect', 'explode.wav'))
+        explode.set_volume(10)
+        explode2 = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'effect', 'bigexplode.wav'))
+        explode2.set_volume(40)
+        Monster.sound = {
+                'hit': hit,
+                # explode
+                '1': explode,
+                '2': explode2
+        }
 
     def get_rect(self):
         return self.posX - self.rectSizeX, self.posY - self.rectSizeY,\
@@ -231,6 +254,7 @@ class Monster:
     def collideActive(self, opponent):
         self.hp -= opponent.attackDamage
         game_world.curtain_object(PLAYER, 0).parsingScoreBar(opponent.attackDamage * random.randint(2, 5))
+        Monster.sound.get('hit').play()
 
     def update(self):
         self.time += mainframe.frame_time
@@ -257,6 +281,7 @@ class Monster:
                                   EFFECT)
             game_world.curtain_object(PLAYER, 0).parsingScoreBar(random.randint(100, 500) * self.difficulty)
             game_world.add_object(Coin(self.posX, self.posY, 1.5, 1.5, random.randint(1, 3) * self.difficulty * 100), COIN)
+            Monster.sound.get(str(random.randint(1, 2))).play()
             return True
         else:
             return False

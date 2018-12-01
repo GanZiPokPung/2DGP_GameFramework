@@ -3,9 +3,11 @@ import collision_manager
 from ui import *
 
 mouse = None
+bgm = None
 
 def initialize():
     global mouse
+    global bgm
     # background
     game_world.add_object(Others(250, 350, 1, 1, 'shop_back', 0.7), UIDEFAULT)
     # shop logo
@@ -41,6 +43,10 @@ def initialize():
     game_world.add_object(Button(250, 140, 0.8, 0.8, 'restart', 'resume'), UIDEFAULT)
 
     mouse = game_world.curtain_object(MOUSE, 0)
+
+    bgm = load_music(os.path.join(os.getcwd(), 'resources', 'sound', 'back', 'shop.mp3'))
+    bgm.set_volume(64)
+    bgm.repeat_play()
 
 def handle_events():
     global mouse
@@ -86,4 +92,5 @@ def resume():
     pass
 
 def exit():
+    bgm.stop()
     game_world.clear_layer(UIDEFAULT)

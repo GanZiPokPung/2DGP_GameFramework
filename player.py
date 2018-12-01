@@ -19,6 +19,7 @@ FRAMES_PER_ACTION = 7
 class Player:
     image = None
     data = None
+    sound = None
     def __init__(self):
         # position
         self.x = 250
@@ -57,6 +58,8 @@ class Player:
             Player.image = load_image(os.path.join(os.getcwd(), 'resources', 'player', 'player.png'))
         if Player.data == None:
             self.initializeData()
+        if Player.sound == None:
+            self.iniializeSound()
         # player abilities
         self.hp = 150
         self.score = 0
@@ -75,6 +78,11 @@ class Player:
         self.initPlayerUI()
         self.parsingAttData(self.parsingID)
         self.Modify_Abilities()
+
+        # sound
+        self.bomb_sound = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'player', 'bomb.wav'))
+        self.bomb_sound.set_volume(110)
+
 
     def initPlayerUI(self):
         uiHpCheck = 0
@@ -115,8 +123,6 @@ class Player:
 
     def initializeData(self):
         Player.data = {
-            'posion': [],
-            'megica': [],
             # bullet
             # 불렛 갯수 사이각 각도, 속도, 이미지 타입, 불릿 타입, 사이즈
             # 나중에 데미지도 (맨 뒤에)
@@ -133,6 +139,40 @@ class Player:
             '11': [3, 90, 'ExplodeMiss', 'Anim', 4, 4, 8],
             '12': [5, 100, 'BlueCircle', '', 1.25, 1.25, 7],
             '13': [1, 175, 'Eagle', 'RotateOnce', 3, 3, 15]
+        }
+    def iniializeSound(self):
+        lazer = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'player', 'lazer.wav'))
+        lazer.set_volume(10)
+        lazer2 = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'player', 'lazer2.wav'))
+        lazer2.set_volume(15)
+        lazer3 = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'player', 'lazer3.wav'))
+        lazer3.set_volume(25)
+        lazer4 = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'player', 'lazer4.wav'))
+        lazer4.set_volume(25)
+        shoot = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'player', 'shoot.wav'))
+        shoot.set_volume(5)
+        shoot2 = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'player', 'shoot2.wav'))
+        shoot2.set_volume(20)
+        hit = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'player', 'hit.WAV'))
+        hit.set_volume(20)
+        Player.sound = {
+            # bullet
+            '1': shoot2,
+            '2': shoot,
+            '3': shoot,
+            '4': lazer,
+            '5': lazer2,
+            '6': lazer3,
+            '7': lazer4,
+            '8': lazer,
+            '9': lazer2,
+            '10': lazer3,
+            '11': lazer4,
+            '12': lazer3,
+            '13': lazer2,
+
+            # hit
+            'hit' : hit
         }
 
     def get_rect(self):
@@ -236,6 +276,7 @@ class Player:
                 game_world.add_object(Bullet(100, 150, 90, 60, 'Thunder', 0, 'Anim_Stop', 6, 6, self.attackDamage * 2), BULLET_PLAYER)
                 game_world.add_object(Bullet(250, 150, 90, 60, 'Thunder', 0, 'Anim_Stop', 6, 6, self.attackDamage * 2), BULLET_PLAYER)
                 game_world.add_object(Bullet(400, 150, 90, 60, 'Thunder', 0, 'Anim_Stop', 6, 6, self.attackDamage * 2), BULLET_PLAYER)
+                self.bomb_sound.play()
                 self.bombCount -= 1
                 self.bombBar.setBombImage(self.bombCount)
                 self.pushBombcheck = True
@@ -303,6 +344,8 @@ class Player:
         else:
             self.hp -= opponent.attackDamage
             self.hpBar.setHPImage(self.hp)
+            if opponent.attackDamage > 0:
+                Player.sound.get('hit').play()
 
     def update(self):
         # dead
@@ -346,7 +389,7 @@ class Player:
         # 공격
         if self.pushAttcheck == True :
             if self.BulletTime > self.BulletDelay:
-
+                Player.sound.get(self.parsingID).play()
                 angleTerm = 0
                 angle = 90
                 for cnt in range(0, self.bulletCount):
@@ -354,7 +397,6 @@ class Player:
                            , self.bulletSizeX, self.bulletSizeY, self.attackDamage)
                     bullet.set_rotation(angle)
                     game_world.add_object(bullet, BULLET_PLAYER)
-
                     if angleTerm == 0:
                         angleTerm += 10
                     elif angleTerm > 0:
