@@ -378,9 +378,14 @@ class Player:
                 self.reformframe = self.reformframe - TimeToFrameQuantity
                 self.frame = self.reformframe
 
+
+        # print('Vel X = ', self.velocityX, '  Vel Y = ', self.velocityY)
+
         # 이동 계산
         self.y += self.velocityY * mainframe.frame_time
         self.x += self.velocityX * mainframe.frame_time
+
+        self.block_player()
 
         # 화면 내 이동
         # boy.x = clamp(25, boy.x, 1600 - 25)
@@ -421,17 +426,18 @@ class Player:
             if self.TickTime > self.TickDelay:
                 monsterLayer = game_world.get_layer(MONSTER)
                 for monster in monsterLayer:
-                    monster.hp -= self.bombDamage
+                    if monster.posY <= 700:
+                        monster.hp -= self.bombDamage
                 bossLayer = game_world.get_layer(BOSS)
                 for boss in bossLayer:
-                    boss.hp -= self.bombDamage
+                    if boss.posY <= 700:
+                        boss.hp -= self.bombDamage
                 self.TickTime = 0
 
             if self.BombTime > self.BombDelay:
                 self.BombTime = 0
                 self.TickTime = 0
                 self.pushBombcheck = False
-
 
         return False
 
@@ -448,4 +454,17 @@ class Player:
     def draw_rect(self):
         draw_rectangle(*self.get_rect())
 
+    def block_player(self):
+       left, bottom, right, top = self.get_rect()
 
+       if left < 0:
+           self.x -= self.velocityX * mainframe.frame_time
+
+       if right > 500:
+           self.x -= self.velocityX * mainframe.frame_time
+
+       if top > 700:
+           self.y -= self.velocityY * mainframe.frame_time
+
+       if bottom < 0:
+           self.y -= self.velocityY * mainframe.frame_time

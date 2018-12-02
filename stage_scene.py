@@ -48,7 +48,7 @@ bossCheck = False
 #stage
 stage = 1
 stageCount = 0
-stageCountMax = 5
+stageCountMax = 1
 
 # debug
 rectCheck = False
