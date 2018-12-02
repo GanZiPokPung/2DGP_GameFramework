@@ -62,6 +62,8 @@ def initialize():
     global stage
     global stageCount
     global stageCountMax
+    global monsterSpawnCheck
+    global bossCheck
     #map
     global totalmap
     global map1
@@ -79,6 +81,10 @@ def initialize():
     stage = 1
     stageCount = 0
     stageCountMax = 5
+    monsterpattern = None
+    monsterSpawnCheck = True
+    bossCheck = False
+
 
     # map
     # stage 별로 리스트에 보관

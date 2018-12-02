@@ -32,6 +32,7 @@ class Mouse:
         self.time = 0
         self.hideTime = 2.0
 
+        self.collideCheck = False
         self.drawCheck = True
         self.ui = None
 
@@ -66,11 +67,14 @@ class Mouse:
                (self.posX - self.pngSizeX / 2) + self.rectSizeX, (self.posY + self.pngSizeY / 2) + self.rectSizeY
 
     def collideActive(self, opponent):
+        self.collideCheck = True
         if opponent.uiID == 'button':
             self.ui = opponent
 
     def collideInactive(self, opponent):
-        pass
+        self.collideCheck = False
+        self.ui = None
+
 
     def update(self):
         self.time += mainframe.frame_time

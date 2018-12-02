@@ -28,6 +28,7 @@ def collide_check_other(groupA, groupB):
             if collide(objA, objB) == True:
                 objA.collideActive(objB)
                 objB.collideActive(objA)
+                return
             else:
                 objA.collideInactive(objB)
                 objB.collideInactive(objA)

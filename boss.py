@@ -59,9 +59,9 @@ class Boss:
         laughing2 = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'boss', 'laughing2.wav'))
         laughing2.set_volume(100)
         god = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'boss', 'god.wav'))
-        god.set_volume(128)
+        god.set_volume(120)
         hell = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'boss', 'hell.wav'))
-        hell.set_volume(128)
+        hell.set_volume(120)
         shoot = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'player', 'shoot.wav'))
         shoot.set_volume(3)
         lazer = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'boss', 'lazer.wav'))
@@ -342,15 +342,22 @@ class BossHead(Boss):
         self.patternHandTime += mainframe.frame_time
 
         if self.patternTime > self.patternDelay:
-            check = random.randint(0, 10)
-            if check < 7:
-                self.attackID = 1
+            if self.attackID != 99:
+                return
             else:
-                self.attackID = random.randint(2, 3)
+                check = random.randint(0, 10)
+                if check < 6:
+                    self.attackID = 1
+                else:
+                    self.attackID = random.randint(2, 3)
+
             self.patternTime = 0
 
         if self.patternHandTime > self.patternHandDelay:
-            self.attackOtherID = random.randint(4, 4)
+            if self.attackOtherID != 99:
+                return
+            else:
+                self.attackOtherID = random.randint(1, 4)
             self.patternHandTime = 0
 
     def modify_difficulty(self, difficulty):
@@ -599,7 +606,7 @@ class BossHead(Boss):
                 if self.BossHandRight != None:
                     self.BossHandRight.moveMode = False
                     self.BossHandRight.attackID = 2
-            Boss.sound.get('laughing2').play()
+            #Boss.sound.get('laughing2').play()
             self.handOnceCheck = True
 
         # 끝나는 체크
@@ -869,7 +876,7 @@ class BossHand(Boss):
             self.shootSpeed = 55
             self.bulletsizeX = 2
             self.bulletsizeY = 2
-            self.shootMax = 30
+            self.shootMax = 8
 
             self.time = 0
             self.tmpCount = 0
