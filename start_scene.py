@@ -15,8 +15,6 @@ def initialize():
     global image
     image = load_image(os.path.join(os.getcwd(), 'resources', 'scene', 'kpu_credit.png'))
 
-
-
 def handle_events():
     #events = get_events()
     pass

@@ -12,7 +12,8 @@ def initialize():
     game_world.add_object(Others(250, 350, 1, 1, 'shop_back', 0.7), UIDEFAULT)
     # shop logo
     game_world.add_object(Others(250, 600, 1, 1, 'shop_logo', 1.0), UIDEFAULT)
-    # money cap
+
+    # money cap(not use)
     # game_world.add_object(Others(400, 570, 1.3, 1.3, 'money_capacity', 1.0), UIDEFAULT)
 
     # attUpgrade button
@@ -44,6 +45,7 @@ def initialize():
 
     mouse = game_world.curtain_object(MOUSE, 0)
 
+    # bgm
     bgm = load_music(os.path.join(os.getcwd(), 'resources', 'sound', 'back', 'shop.mp3'))
     bgm.set_volume(64)
     bgm.repeat_play()
@@ -63,10 +65,11 @@ def handle_events():
 def update():
     collision_manager.collide_update()
 
-    # ui만 업데이트
+    # shop ui
     for ui in game_world.get_layer(UIDEFAULT):
         ui.update()
 
+    # player ui
     for ui in game_world.get_layer(UIINGAME):
         ui.update()
 
@@ -75,6 +78,7 @@ def update():
 def draw():
     clear_canvas()
 
+    # 뒷 배경이 반투명하게 보여야하므로
     for map in stage_scene.totalmap.get(stage_scene.currentmap):
         map.draw()
 

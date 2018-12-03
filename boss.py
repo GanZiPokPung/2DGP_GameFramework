@@ -10,8 +10,6 @@ import game_world
 import random
 import stage_scene
 
-
-
 class Boss:
     sound = None
     def __init__(self, posX, posY, movespeed, sizeX, sizeY):
@@ -84,14 +82,13 @@ class Boss:
                 # laughing
                 'laughing': laughing,
                 'laughing2': laughing2,
-                    # speak
+                # speak
                 'god': god,
                 'hell': hell,
-                    # dying
+                # dying
                 'dying': dying,
-                    # deadExplode
+                # deadExplode
                 'bossexplode': bossexplode
-
         }
 
     def get_rect(self):
@@ -254,88 +251,70 @@ class BossHead(Boss):
             self.almost_die(1)
         # move
        if self.firstMode == True:
-            if self.moveT >= 100:
-                self.firstMode = False
-                self.moveMode = True
-                self.moveT = 0
-
-            else:
-                self.moveT += self.speedT * mainframe.frame_time
-                self.posX, self.posY = custom_math.move_line(self.originPos,
-                                                             self.startPos,
-                                                             self.moveT)
+            self.spawn_move()
        else:
            if self.moveMode == True:
+                self.move()
 
-                if self.moveT_Curv >= 100:
-                    self.moveT_Curv = 0
-                    if self.moveLocation == 4:
-                        self.moveLocation = 0
-                    else:
-                        self.moveLocation += 1
-                else:
-                    self.moveT_Curv += self.curvSpeedT * mainframe.frame_time
-                    self.posX, self.posY = custom_math.move_curve(self.movePattern[self.moveLocation - 3],
-                                                                  self.movePattern[self.moveLocation - 2],
-                                                                  self.movePattern[self.moveLocation - 1],
-                                                                  self.movePattern[self.moveLocation],
-                                                                  self.moveT_Curv)
+           self.attack()
 
-           self.pattern_check()
-           # head
-           if self.attackID == 1:
-               check = self.Pattern_Normal()
-               if check == False:
-                   self.attackID = 99
-           elif self.attackID == 2:
-               check = self.Pattern_Lazer_One()
-               if check == False:
-                   self.attackID = 99
-           elif self.attackID == 3:
-                check = self.Pattern_Lazer_Two()
-                if check == False:
-                    self.attackID = 99
+    def spawn_move(self):
+        if self.moveT >= 100:
+            self.firstMode = False
+            self.moveMode = True
+            self.moveT = 0
+        else:
+            self.moveT += self.speedT * mainframe.frame_time
+            self.posX, self.posY = custom_math.move_line(self.originPos,
+                                                         self.startPos,
+                                                         self.moveT)
+    def move(self):
+        if self.moveT_Curv >= 100:
+            self.moveT_Curv = 0
+            if self.moveLocation == 4:
+                self.moveLocation = 0
+            else:
+                self.moveLocation += 1
+        else:
+            self.moveT_Curv += self.curvSpeedT * mainframe.frame_time
+            self.posX, self.posY = custom_math.move_curve(self.movePattern[self.moveLocation - 3],
+                                                          self.movePattern[self.moveLocation - 2],
+                                                          self.movePattern[self.moveLocation - 1],
+                                                          self.movePattern[self.moveLocation],
+                                                          self.moveT_Curv)
+    def attack(self):
+        self.pattern_check()
+        # head
+        if self.attackID == 1:
+            check = self.Pattern_Normal()
+            if check == False:
+                self.attackID = 99
+        elif self.attackID == 2:
+            check = self.Pattern_Lazer_One()
+            if check == False:
+                self.attackID = 99
+        elif self.attackID == 3:
+            check = self.Pattern_Lazer_Two()
+            if check == False:
+                self.attackID = 99
 
-           # hand
-           if self.attackOtherID == 1:
-                check = self.Pattern_Hand_Normal()
-                if check == False:
-                    self.attackOtherID = 99
-           elif self.attackOtherID == 2:
-                check = self.Pattern_Hand_One()
-                if check == False:
-                    self.attackOtherID = 99
-           elif self.attackOtherID == 3:
-               check = self.Pattern_Hand_Two()
-               if check == False:
-                   self.attackOtherID = 99
-           elif self.attackOtherID == 4:
-                check = self.Pattern_Hand_Three()
-                if check == False:
-                    self.attackOtherID = 99
-
-                        # normal attack
-                    # self.Pattern_Normal()
-                    # self.Pattern_Lazer_One()
-                    # self.Pattern_Lazer_Two()
-
-                    # self.moveMode = False
-                    # self.currentPos = [self.posX, self.posY]
-
-
-
-           # special attack
-           # else:
-           #     if self.attackMode == False:
-           #         if self.moveT >= 100:
-           #             self.attackMode = True
-           #             self.moveT = 0
-           #             self.moveLocation = 2
-           #         else:
-           #             self.moveT += self.speedT * 2
-           #             self.posX, self.posY = custom_math.move_line(self.currentPos,
-           #                                                          self.startPos,
-           #                                                          self.moveT)
+        # hand
+        if self.attackOtherID == 1:
+            check = self.Pattern_Hand_Normal()
+            if check == False:
+                self.attackOtherID = 99
+        elif self.attackOtherID == 2:
+            check = self.Pattern_Hand_One()
+            if check == False:
+                self.attackOtherID = 99
+        elif self.attackOtherID == 3:
+            check = self.Pattern_Hand_Two()
+            if check == False:
+                self.attackOtherID = 99
+        elif self.attackOtherID == 4:
+            check = self.Pattern_Hand_Three()
+            if check == False:
+                self.attackOtherID = 99
 
     def pattern_check(self):
         self.patternTime += mainframe.frame_time
@@ -753,93 +732,106 @@ class BossHand(Boss):
 
     def update_AI(self):
         if self.specialMoveMode == True:
-            self.initialize_course()
-            if self.moveT_Curv >= 100:
-                self.moveT_Curv = 0
-                if self.moveLocation == 3:
-                    self.moveLocation = 0
-                    self.specialMoveMode = False
-                    self.shootCount = 0
-                    self.shootTime = 0
-                    self.shootCheck = False
-                    self.attackInfoInit = False
-                else:
-                    self.moveLocation += 1
-            else:
-                self.moveT_Curv += self.curvSpeedT * mainframe.frame_time
-                if self.moveLocation == 0:
-                    self.curvSpeedT = 50
-                elif self.moveLocation == 1:
-                    self.curvSpeedT = 300
-                    self.Pattern_Normal_For_Special()
-                else:
-                    self.curvSpeedT = 150
-
-                self.posX, self.posY = custom_math.move_curve(self.curvPos[self.moveLocation - 3],
-                                                              self.curvPos[self.moveLocation - 2],
-                                                              self.curvPos[self.moveLocation - 1],
-                                                              self.curvPos[self.moveLocation],
-                                                              self.moveT_Curv)
+            self.special_move_attack()
             return
 
         if self.moveMode == True :
             if self.attackMode == False:
                 # 보스를 따라 움직일때
-                if self.type == 'Left':
-                    self.originPosX = self.headinfo.posX - 160
-                    self.originPosY = self.headinfo.posY - 100
-                    self.angle += self.angleSpeed * mainframe.frame_time
-
-                elif self.type == 'Right':
-                    self.originPosX = self.headinfo.posX + 160
-                    self.originPosY = self.headinfo.posY - 100
-                    self.angle -= self.angleSpeed * mainframe.frame_time
-
-                self.startPos = [self.originPosX, self.originPosY]
-                self.posX = self.originPosX + math.cos(math.radians(self.angle)) * 400 * mainframe.frame_time
-                self.posY = self.originPosY + math.sin(math.radians(self.angle)) * 400 * mainframe.frame_time
-                self.currentPos = [self.posX, self.posY]
-
-                if self.attackID == 0:
-                    check = self.Pattern_Normal()
-                    if check == False:
-                        self.attackID = 99
-
+                self.move_and_norm_attack()
             # 팔 접기
             else:
-                if self.moveT >= 100:
-                    self.attackMode = False
-                    self.moveT = 0
-                    self.angle = 270
-                else:
-                    self.moveT += self.speedT * 5 * mainframe.frame_time
-                    self.posX, self.posY = custom_math.move_line([self.startPos[0], self.startPos[1] - 90],
-                                                                 self.startPos,
-                                                                 self.moveT)
+                self.end_special_attack()
         else:
             # 팔 뻗기
             if self.attackMode == False:
-                if self.moveT >= 100:
-                    self.attackMode = True
-                    self.moveT = 0
-                    self.angle = 270
-                else:
-                    self.moveT += self.speedT * 5 * mainframe.frame_time
-                    self.posX, self.posY = custom_math.move_line(self.currentPos,
-                                                                 [self.startPos[0], self.startPos[1] - 90],
-                                                                 self.moveT)
+                self.start_special_attack()
             # 공격
             else:
-                if self.attackID == 1:
-                    check = self.Pattern_Special_One()
-                    if check == False:
-                        self.moveMode = True
-                        self.attackID = 99
-                elif self.attackID == 2:
-                    check = self.Pattern_Special_Two()
-                    if check == False:
-                        self.moveMode = True
-                        self.attackID = 99
+                self.special_attack()
+
+
+    def special_move_attack(self):
+        self.initialize_course()
+        if self.moveT_Curv >= 100:
+            self.moveT_Curv = 0
+            if self.moveLocation == 3:
+                self.moveLocation = 0
+                self.specialMoveMode = False
+                self.shootCount = 0
+                self.shootTime = 0
+                self.shootCheck = False
+                self.attackInfoInit = False
+            else:
+                self.moveLocation += 1
+        else:
+            self.moveT_Curv += self.curvSpeedT * mainframe.frame_time
+            if self.moveLocation == 0:
+                self.curvSpeedT = 50
+            elif self.moveLocation == 1:
+                self.curvSpeedT = 300
+                self.Pattern_Normal_For_Special()
+            else:
+                self.curvSpeedT = 150
+
+            self.posX, self.posY = custom_math.move_curve(self.curvPos[self.moveLocation - 3],
+                                                          self.curvPos[self.moveLocation - 2],
+                                                          self.curvPos[self.moveLocation - 1],
+                                                          self.curvPos[self.moveLocation],
+                                                          self.moveT_Curv)
+
+    def move_and_norm_attack(self):
+        if self.type == 'Left':
+            self.originPosX = self.headinfo.posX - 160
+            self.originPosY = self.headinfo.posY - 100
+            self.angle += self.angleSpeed * mainframe.frame_time
+        elif self.type == 'Right':
+            self.originPosX = self.headinfo.posX + 160
+            self.originPosY = self.headinfo.posY - 100
+            self.angle -= self.angleSpeed * mainframe.frame_time
+
+        self.startPos = [self.originPosX, self.originPosY]
+        self.posX = self.originPosX + math.cos(math.radians(self.angle)) * 400 * mainframe.frame_time
+        self.posY = self.originPosY + math.sin(math.radians(self.angle)) * 400 * mainframe.frame_time
+        self.currentPos = [self.posX, self.posY]
+
+        if self.attackID == 0:
+            check = self.Pattern_Normal()
+            if check == False:
+                self.attackID = 99
+
+    def start_special_attack(self):
+        if self.moveT >= 100:
+            self.attackMode = True
+            self.moveT = 0
+            self.angle = 270
+        else:
+            self.moveT += self.speedT * 5 * mainframe.frame_time
+            self.posX, self.posY = custom_math.move_line(self.currentPos,
+                                                         [self.startPos[0], self.startPos[1] - 90],
+                                                         self.moveT)
+    def special_attack(self):
+        if self.attackID == 1:
+            check = self.Pattern_Special_One()
+            if check == False:
+                self.moveMode = True
+                self.attackID = 99
+        elif self.attackID == 2:
+            check = self.Pattern_Special_Two()
+            if check == False:
+                self.moveMode = True
+                self.attackID = 99
+
+    def end_special_attack(self):
+        if self.moveT >= 100:
+            self.attackMode = False
+            self.moveT = 0
+            self.angle = 270
+        else:
+            self.moveT += self.speedT * 5 * mainframe.frame_time
+            self.posX, self.posY = custom_math.move_line([self.startPos[0], self.startPos[1] - 90],
+                                                         self.startPos,
+                                                         self.moveT)
 
     def modify_difficulty(self, difficulty):
         self.hp *= (1 + difficulty / 4)

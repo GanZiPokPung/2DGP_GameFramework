@@ -28,21 +28,14 @@ class Monster_Pattern:
 
     def update(self):
         self.spawnTime += mainframe.frame_time
-
         if self.spawnTime > (self.spawnDelay / (1 + Monster_Pattern.difficulty / 3)):
             self.get_monster()
             self.spawnTime = 0
             return True
-
         return False
 
     def get_monster(self):
-
         select = random.randint(1, 10)
-
-        # debug
-        # select = random.randint(7, 7)
-
         if select < 8:
             subselect = random.randint(0, 8)
             warrior_count = random.randint(4, 7 + Monster_Pattern.difficulty)
@@ -262,13 +255,9 @@ class Monster:
         if self.shootCheck == True:
             self.shootTime += mainframe.frame_time
 
+        # update
         self.update_AI()
         self.update_anim()
-
-        # # 충돌하면 몬스터를 없앤다.
-        # if self.collideCheck == True:
-        #     self.hp -= self.playerAttackDamage
-        #     self.collideCheck = False
 
         # 맵 밖을 나가면 몬스터를 없앤다.
         if (self.posX < 0 - self.sizeX) or (self.posX > static.canvas_width + self.sizeX):
@@ -508,59 +497,71 @@ class Bird(Monster):
             self.animSpeed = 50
             # 처음 등장시
             if self.firstMode == True:
-                if self.moveT >= 100:
-                    self.firstMode = False
-                    self.moveMode = False
-                    self.moveT = 0
-                    self.shootCheck = True
-                else:
-                    self.moveT += self.speedT * mainframe.frame_time
-                    self.posX, self.posY = custom_math.move_line(self.originPos,
-                                                             self.movePattern[self.moveLocation],
-                                                             self.moveT)
+                self.spawn_move()
             # 이후
             else:
-                if self.moveT >= 100:
-                    self.moveMode = False
-                    self.shootCheck = True
-                    self.moveT = 0
-                    if self.moveLocation == 1:
-                        self.moveLocation = 0
-                    else:
-                        self.moveLocation = 1
-                else:
-                    self.moveT += self.speedT * mainframe.frame_time
-                    if self.moveLocation == 1:
-                        self.posX, self.posY = custom_math.move_line(self.movePattern[1],
-                                                                     self.movePattern[0],
-                                                                     self.moveT)
-                    else:
-                        self.posX, self.posY = custom_math.move_line(self.movePattern[0],
-                                                                     self.movePattern[1],
-                                                                     self.moveT)
+                self.move()
         #공격시
         elif self.shootCheck == True:
             self.animSpeed = 50 * 0.5
-            startShootPos = 15
-            if self.shootCount == 0 and self.shootTime > self.shootDelay:
-                game_world.add_object(Bullet(self.posX, self.posY - startShootPos, 270 - 20, self.shootSpeed, 'RedSun', '', '',
-                                             self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
-                game_world.add_object(Bullet(self.posX, self.posY - startShootPos, 270, self.shootSpeed, 'RedSun', '', '',
-                                             self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
-                game_world.add_object(Bullet(self.posX, self.posY - startShootPos, 270 + 20, self.shootSpeed, 'RedSun', '', '',
-                                             self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
-                self.shootCount += 1
-            elif self.shootCount == 1 and self.shootTime > self.shootDelay * 1.25:
-                game_world.add_object(Bullet(self.posX - 5, self.posY - startShootPos, 270 - 10, self.shootSpeed, 'RedSun', '', '',
-                                             self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
-                game_world.add_object(Bullet(self.posX + 5, self.posY - startShootPos, 270 + 10, self.shootSpeed, 'RedSun', '', '',
-                                             self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
-                self.shootCount += 1
-            elif self.shootCount == 2 and self.shootTime > self.shootDelay * 1.5:
-                self.shootTime = 0
-                self.shootCount = 0
-                self.moveMode = True
-                self.shootCheck = False
+            self.attack()
+
+    def spawn_move(self):
+        if self.moveT >= 100:
+            self.firstMode = False
+            self.moveMode = False
+            self.moveT = 0
+            self.shootCheck = True
+        else:
+            self.moveT += self.speedT * mainframe.frame_time
+            self.posX, self.posY = custom_math.move_line(self.originPos,
+                                                         self.movePattern[self.moveLocation],
+                                                         self.moveT)
+    def move(self):
+        if self.moveT >= 100:
+            self.moveMode = False
+            self.shootCheck = True
+            self.moveT = 0
+            if self.moveLocation == 1:
+                self.moveLocation = 0
+            else:
+                self.moveLocation = 1
+        else:
+            self.moveT += self.speedT * mainframe.frame_time
+            if self.moveLocation == 1:
+                self.posX, self.posY = custom_math.move_line(self.movePattern[1],
+                                                             self.movePattern[0],
+                                                             self.moveT)
+            else:
+                self.posX, self.posY = custom_math.move_line(self.movePattern[0],
+                                                             self.movePattern[1],
+                                                             self.moveT)
+
+    def attack(self):
+        startShootPos = 15
+        if self.shootCount == 0 and self.shootTime > self.shootDelay:
+            game_world.add_object(
+                Bullet(self.posX, self.posY - startShootPos, 270 - 20, self.shootSpeed, 'RedSun', '', '',
+                       self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
+            game_world.add_object(Bullet(self.posX, self.posY - startShootPos, 270, self.shootSpeed, 'RedSun', '', '',
+                                         self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
+            game_world.add_object(
+                Bullet(self.posX, self.posY - startShootPos, 270 + 20, self.shootSpeed, 'RedSun', '', '',
+                       self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
+            self.shootCount += 1
+        elif self.shootCount == 1 and self.shootTime > self.shootDelay * 1.25:
+            game_world.add_object(
+                Bullet(self.posX - 5, self.posY - startShootPos, 270 - 10, self.shootSpeed, 'RedSun', '', '',
+                       self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
+            game_world.add_object(
+                Bullet(self.posX + 5, self.posY - startShootPos, 270 + 10, self.shootSpeed, 'RedSun', '', '',
+                       self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
+            self.shootCount += 1
+        elif self.shootCount == 2 and self.shootTime > self.shootDelay * 1.5:
+            self.shootTime = 0
+            self.shootCount = 0
+            self.moveMode = True
+            self.shootCheck = False
 
     def modify_difficulty(self, difficulty):
         self.originShootDelay /= (1 + difficulty / 10)
@@ -641,96 +642,118 @@ class Dragon(Monster):
         self.modify_abilities()
         # 처음 등장시
         if self.firstMode == True:
-            self.animSpeed = 60
-            if self.moveT >= 100:
-                self.firstMode = False
-                self.moveT = 0
-                self.shootCheck = True
-            else:
-                self.moveT += self.speedT * mainframe.frame_time
-                self.posX, self.posY = custom_math.move_line(self.originPos,
-                                                             self.movePattern[2],
-                                                             self.moveT)
+            self.spawn_move()
         # 이후
         else:
-            if self.moveT >= 100:
-                self.moveT = 0
-                if self.moveLocation == 3:
-                    self.moveLocation = 0
-                else:
-                    self.moveLocation += 1
-            else:
-                self.moveT += self.speedT * mainframe.frame_time
-                if self.moveLocation == 3:
-                    dstLocation = 0
-                else:
-                    dstLocation = self.moveLocation + 1
-                self.posX, self.posY = custom_math.move_curve(self.movePattern[self.moveLocation - 3],
-                                                              self.movePattern[self.moveLocation - 2],
-                                                              self.movePattern[self.moveLocation - 1],
-                                                              self.movePattern[self.moveLocation],
-                                                              self.moveT)
+            self.move()
 
+        self.attack()
+        # print(self.shootCount)
+
+    def spawn_move(self):
+        self.animSpeed = 60
+        if self.moveT >= 100:
+            self.firstMode = False
+            self.moveT = 0
+            self.shootCheck = True
+        else:
+            self.moveT += self.speedT * mainframe.frame_time
+            self.posX, self.posY = custom_math.move_line(self.originPos,
+                                                         self.movePattern[2],
+                                                         self.moveT)
+
+    def move(self):
+        if self.moveT >= 100:
+            self.moveT = 0
+            if self.moveLocation == 3:
+                self.moveLocation = 0
+            else:
+                self.moveLocation += 1
+        else:
+            self.moveT += self.speedT * mainframe.frame_time
+            if self.moveLocation == 3:
+                dstLocation = 0
+            else:
+                dstLocation = self.moveLocation + 1
+            self.posX, self.posY = custom_math.move_curve(self.movePattern[self.moveLocation - 3],
+                                                          self.movePattern[self.moveLocation - 2],
+                                                          self.movePattern[self.moveLocation - 1],
+                                                          self.movePattern[self.moveLocation],
+                                                          self.moveT)
+
+    def attack(self):
         startShootPos = (self.pngSizeY / 2 + 15)
-        if (self.shootTime > self.shootDelay - self.shootDelay)\
-                and (self.shootTime < self.shootDelay - self.shootDelay + 0.1)\
+        if (self.shootTime > self.shootDelay - self.shootDelay) \
+                and (self.shootTime < self.shootDelay - self.shootDelay + 0.1) \
                 and (self.shootCount == 0):
-            game_world.add_object(Bullet(self.posX, self.posY - startShootPos, 270 - 30, self.shootSpeed, 'RedCircle', '', 'Rotate',
-                                         self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
-            game_world.add_object(Bullet(self.posX, self.posY - startShootPos, 270 + 30, self.shootSpeed, 'RedCircle', '', 'Rotate',
-                                         self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
+            game_world.add_object(
+                Bullet(self.posX, self.posY - startShootPos, 270 - 30, self.shootSpeed, 'RedCircle', '', 'Rotate',
+                       self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
+            game_world.add_object(
+                Bullet(self.posX, self.posY - startShootPos, 270 + 30, self.shootSpeed, 'RedCircle', '', 'Rotate',
+                       self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
             self.shootCount += 1
-        elif (self.shootTime > self.shootDelay - (self.shootDelay * 0.8) - 0.1)\
+        elif (self.shootTime > self.shootDelay - (self.shootDelay * 0.8) - 0.1) \
                 and (self.shootTime < self.shootDelay - (self.shootDelay * 0.8) + 0.1) \
                 and (self.shootCount == 1):
-            game_world.add_object(Bullet(self.posX - 5, self.posY - startShootPos, 270 - 5, self.shootSpeed, 'RedCircle', '', 'Rotate',
-                                         self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
-            game_world.add_object(Bullet(self.posX + 5, self.posY - startShootPos, 270 + 5, self.shootSpeed, 'RedCircle', '', 'Rotate',
-                                         self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
+            game_world.add_object(
+                Bullet(self.posX - 5, self.posY - startShootPos, 270 - 5, self.shootSpeed, 'RedCircle', '', 'Rotate',
+                       self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
+            game_world.add_object(
+                Bullet(self.posX + 5, self.posY - startShootPos, 270 + 5, self.shootSpeed, 'RedCircle', '', 'Rotate',
+                       self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
             self.shootCount += 1
-        elif (self.shootTime > self.shootDelay - (self.shootDelay * 0.6) - 0.1)\
+        elif (self.shootTime > self.shootDelay - (self.shootDelay * 0.6) - 0.1) \
                 and (self.shootTime < self.shootDelay - (self.shootDelay * 0.6) + 0.1) \
                 and (self.shootCount == 2):
-            game_world.add_object(Bullet(self.posX, self.posY - startShootPos, 270 - 40, self.shootSpeed, 'RedCircle', '', 'Rotate',
-                                         self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
-            game_world.add_object(Bullet(self.posX, self.posY - startShootPos, 270, self.shootSpeed, 'RedCircle', '', 'Rotate',
-                                         self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
-            game_world.add_object(Bullet(self.posX, self.posY - startShootPos, 270 + 40, self.shootSpeed, 'RedCircle', '', 'Rotate',
-                                         self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
+            game_world.add_object(
+                Bullet(self.posX, self.posY - startShootPos, 270 - 40, self.shootSpeed, 'RedCircle', '', 'Rotate',
+                       self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
+            game_world.add_object(
+                Bullet(self.posX, self.posY - startShootPos, 270, self.shootSpeed, 'RedCircle', '', 'Rotate',
+                       self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
+            game_world.add_object(
+                Bullet(self.posX, self.posY - startShootPos, 270 + 40, self.shootSpeed, 'RedCircle', '', 'Rotate',
+                       self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
             self.shootCount += 1
         elif (self.shootTime > self.shootDelay - (self.shootDelay * 0.4) - 0.1) \
-             and (self.shootTime < self.shootDelay - (self.shootDelay * 0.4) + 0.1) \
-             and (self.shootCount == 3):
-            game_world.add_object(Bullet(self.posX - 5, self.posY - startShootPos, 270 - 5, self.shootSpeed, 'RedCircle', '', 'Rotate',
-                                         self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
-            game_world.add_object(Bullet(self.posX + 5, self.posY - startShootPos, 270 + 5, self.shootSpeed, 'RedCircle', '', 'Rotate',
-                                         self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
+                and (self.shootTime < self.shootDelay - (self.shootDelay * 0.4) + 0.1) \
+                and (self.shootCount == 3):
+            game_world.add_object(
+                Bullet(self.posX - 5, self.posY - startShootPos, 270 - 5, self.shootSpeed, 'RedCircle', '', 'Rotate',
+                       self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
+            game_world.add_object(
+                Bullet(self.posX + 5, self.posY - startShootPos, 270 + 5, self.shootSpeed, 'RedCircle', '', 'Rotate',
+                       self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
             self.shootCount += 1
         elif (self.shootTime > self.shootDelay - (self.shootDelay * 0.2) - 0.1) \
-             and (self.shootTime < self.shootDelay - (self.shootDelay * 0.2) + 0.1) \
-             and (self.shootCount == 4):
-            game_world.add_object(Bullet(self.posX, self.posY - startShootPos, 270 - 30, self.shootSpeed, 'RedCircle', '', 'Rotate',
-                                         self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
-            game_world.add_object(Bullet(self.posX, self.posY - startShootPos, 270 + 30, self.shootSpeed, 'RedCircle', '', 'Rotate',
-                                         self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
+                and (self.shootTime < self.shootDelay - (self.shootDelay * 0.2) + 0.1) \
+                and (self.shootCount == 4):
+            game_world.add_object(
+                Bullet(self.posX, self.posY - startShootPos, 270 - 30, self.shootSpeed, 'RedCircle', '', 'Rotate',
+                       self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
+            game_world.add_object(
+                Bullet(self.posX, self.posY - startShootPos, 270 + 30, self.shootSpeed, 'RedCircle', '', 'Rotate',
+                       self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
             self.shootCount += 1
         elif (self.shootTime > self.shootDelay - 0 - 0.1) \
                 and (self.shootTime < self.shootDelay - 0) \
                 and (self.shootCount == 5):
-            game_world.add_object(Bullet(self.posX, self.posY - startShootPos, 270 - 40, self.shootSpeed, 'RedCircle', '', 'Rotate',
-                                         self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
-            game_world.add_object(Bullet(self.posX, self.posY - startShootPos, 270, self.shootSpeed, 'RedCircle', '', 'Rotate',
-                                         self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
-            game_world.add_object(Bullet(self.posX, self.posY - startShootPos, 270 + 40, self.shootSpeed, 'RedCircle', '', 'Rotate',
-                                         self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
+            game_world.add_object(
+                Bullet(self.posX, self.posY - startShootPos, 270 - 40, self.shootSpeed, 'RedCircle', '', 'Rotate',
+                       self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
+            game_world.add_object(
+                Bullet(self.posX, self.posY - startShootPos, 270, self.shootSpeed, 'RedCircle', '', 'Rotate',
+                       self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
+            game_world.add_object(
+                Bullet(self.posX, self.posY - startShootPos, 270 + 40, self.shootSpeed, 'RedCircle', '', 'Rotate',
+                       self.bulletsizeX, self.bulletsizeY, self.attackDamage), BULLET)
             self.shootCount += 1
         elif self.shootCount == 6:
             self.shootCount = 0
 
         if self.shootTime > self.shootDelay * 1.15:
             self.shootTime = 0
-
-        # print(self.shootCount)
 
     def modify_difficulty(self, difficulty):
         self.originShootDelay /= (1 + difficulty / 10)

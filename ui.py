@@ -28,15 +28,15 @@ class UI:
     def set_additionalimage(self, x, y, sizeX, sizeY, ID, opacify):
         self.additionalImage = Others(x, y, sizeX, sizeY, ID, opacify)
 
+    def get_rect(self):
+        return self.posX - self.rectSizeX, self.posY - self.rectSizeY, \
+               self.posX + self.rectSizeX, self.posY + self.rectSizeY
+
     def update_numbers(self, number):
         pass
 
     def update_additionalImage(self, idx):
         pass
-
-    def get_rect(self):
-        return self.posX - self.rectSizeX, self.posY - self.rectSizeY, \
-               self.posX + self.rectSizeX, self.posY + self.rectSizeY
 
     def collideActive(self, opponent):
         pass
@@ -64,25 +64,32 @@ class Button(UI):
     size = None
     def __init__(self, x, y, sizeX, sizeY, imageID, processID):
         UI.__init__(self)
-        self.posX, self.posY = x, y
-        if Button.image == None:
-            self.initialize_image()
-        if Button.size == None:
-            self.initialize_size()
+        # ID
         self.uiID = 'button'
         self.buttonImageID = imageID
         self.buttonProcessID = processID
+
+        # position
+        self.posX, self.posY = x, y
+
+        # image
+        if Button.image == None:
+            self.initialize_image()
         self.image = Button.image.get(self.buttonImageID)
+
+        # size
+        if Button.size == None:
+            self.initialize_size()
         self.originSizeX = sizeX
         self.originSizeY = sizeY
         self.pngSizeX = Button.size.get(self.buttonImageID)[0]
         self.pngSizeY = Button.size.get(self.buttonImageID)[1]
         self.sizeX = self.pngSizeX * self.originSizeX
         self.sizeY = self.pngSizeY * self.originSizeY
-
         self.rectSizeX = self.sizeX / 2
         self.rectSizeY = self.sizeY / 2
 
+        # check
         self.clickCheck = False
 
         #sound
@@ -110,19 +117,25 @@ class Button(UI):
         }
 
     def collideActive(self, opponent):
+        # clicked
         if self.clickCheck == True:
             self.sizeX = self.pngSizeX * self.originSizeX * 0.9
             self.sizeY = self.pngSizeY * self.originSizeY * 0.9
+            # Number size change
             if self.numbers != None:
                 self.numbers.setSize(0.9, 0.9)
+            # AdditionalImage size change
             if self.additionalImage != None:
                 self.additionalImage.sizeX = self.additionalImage.pngSizeX * self.additionalImage.originSizeX * 0.9
                 self.additionalImage.sizeY = self.additionalImage.pngSizeY * self.additionalImage.originSizeY * 0.9
+        # non clicked
         else:
             self.sizeX = self.pngSizeX * self.originSizeX * 1.15
             self.sizeY = self.pngSizeY * self.originSizeY * 1.15
+            # Number size change
             if self.numbers != None:
                 self.numbers.setSize(1.15, 1.15)
+            # AdditionalImage size change
             if self.additionalImage != None:
                 self.additionalImage.sizeX = self.additionalImage.pngSizeX * self.additionalImage.originSizeX * 1.15
                 self.additionalImage.sizeY = self.additionalImage.pngSizeY * self.additionalImage.originSizeY * 1.15
@@ -135,8 +148,10 @@ class Button(UI):
         self.sizeX = self.pngSizeX * self.originSizeX
         self.sizeY = self.pngSizeY * self.originSizeY
 
+        # Number size change
         if self.numbers != None:
             self.numbers.setOriginSize()
+        # AdditionalImage size change
         if self.additionalImage != None:
             self.additionalImage.sizeX = self.additionalImage.pngSizeX * self.additionalImage.originSizeX
             self.additionalImage.sizeY = self.additionalImage.pngSizeY * self.additionalImage.originSizeY
@@ -154,6 +169,11 @@ class Button(UI):
             mainframe.change_state(stage_scene)
         elif self.buttonProcessID == 'quit':
             mainframe.quit()
+        elif self.buttonProcessID == 'resume':
+            mainframe.pop_state()
+        elif self.buttonProcessID == 'confirm':
+            mainframe.change_state(title_scene)
+        # shop upgrade buttons
         elif self.buttonProcessID == 'attUpgrade':
             moneyCheck = game_world.curtain_object(PLAYER, 0).parsingMoneyBar(-1500)
             if moneyCheck == False:
@@ -178,14 +198,12 @@ class Button(UI):
             bombCheck = game_world.curtain_object(PLAYER, 0).parsingBombBar(1)
             if bombCheck == False:
                 game_world.curtain_object(PLAYER, 0).parsingMoneyBar(-1000)
-        elif self.buttonProcessID == 'resume':
-            mainframe.pop_state()
-        elif self.buttonProcessID == 'confirm':
-            mainframe.change_state(title_scene)
+
 #
 class Numbers(UI):
     def __init__(self, x, y, sizeX, sizeY, between, num):
         UI.__init__(self)
+        self.uiID = 'numbers'
         self.numberList = []
         self.numberValueList = []
         self.x = x
@@ -195,8 +213,8 @@ class Numbers(UI):
         self.between = between
         self.num = 0
         self.setNumbers(num)
-        self.uiID = 'numbers'
 
+    # 숫자를 쪼개어 알맞는 스프라이트로 만들어주는 작업
     def setNumbers(self, num):
         self.num = num
         self.numberList.clear()
@@ -220,10 +238,12 @@ class Numbers(UI):
             self.numberList.append(Number(self.x - (self.between * betweenCnt), self.y, self.sizeX, self.sizeY, value))
             betweenCnt += 1
 
+    # change size
     def setSize(self, sizeX, sizeY):
         for n in self.numberList:
             n.setSize(sizeX, sizeY)
 
+    # change size
     def setOriginSize(self):
         for n in self.numberList:
             n.setOriginSize()
@@ -237,22 +257,26 @@ class Number(UI):
     size = None
     def __init__(self, x, y, sizeX, sizeY, idx):
         UI.__init__(self)
+        self.uiID = 'number'
+        # position
         self.posX, self.posY = x, y
+        # image
         if Number.image == None:
             Number.image = load_image(os.path.join(os.getcwd(), 'resources', 'ui', 'Number',  'number2.png'))
+        # size
         self.originSizeX = sizeX
         self.originSizeY = sizeY
         self.pngSizeX = 10
         self.pngSizeY = 14
         self.sizeX = self.pngSizeX * self.originSizeX
         self.sizeY = self.pngSizeY * self.originSizeY
-        self.uiID = 'number'
-
+        # frame
         self.frame = idx;
 
     def setNumberIdx(self, idx):
         self.frame = idx;
 
+    # change size
     def setSize(self, sizeX, sizeY):
         self.pngSizeX = 10
         self.pngSizeY = 14
@@ -272,10 +296,10 @@ class Number(UI):
 class BombBar(UI):
     def __init__(self, x, y, bombCount):
         UI.__init__(self)
-        self.posX, self.posY = x, y
-        self.bombCount = bombCount
         self.uiID = 'bombbar'
+        self.posX, self.posY = x, y
         self.bombs = []
+        self.bombCount = bombCount
         self.setBombImage(bombCount)
 
     def setBombImage(self, bombCount):
@@ -292,7 +316,14 @@ class Bomb(UI):
     image = None
     def __init__(self, x, y):
         UI.__init__(self)
+        self.uiID = 'bomb'
+        # image
+        if Bomb.image == None:
+            Bomb.image = load_image(os.path.join(os.getcwd(), 'resources', 'ui', 'Ingame', 'thunder.png'))
+        self.image = Bomb.image
+        # position
         self.posX, self.posY = x, y
+        # size
         self.originSizeX = 0.015
         self.originSizeY = 0.015
         self.moveSizeX = self.originSizeX
@@ -301,21 +332,18 @@ class Bomb(UI):
         self.pngSizeY = 2400
         self.sizeX = self.pngSizeX * self.originSizeX
         self.sizeY = self.pngSizeY * self.originSizeY
-        self.uiID = 'bomb'
-        if Bomb.image == None:
-            Bomb.image = load_image(os.path.join(os.getcwd(), 'resources', 'ui', 'Ingame', 'thunder.png'))
-        self.image = Bomb.image
 
 class HPBar(UI):
     def __init__(self, x, y, hp):
         UI.__init__(self)
-        self.posX, self.posY = x, y
-        self.hp = hp
         self.uiID = 'hpbar'
-        self.divideNum = 50
+        self.posX, self.posY = x, y
         self.hearts = []
+        self.divideNum = 50
+        self.hp = hp
         self.setHPImage(hp)
 
+    # 체력에 맞게 HP 이미지를 만들어 주는 작업
     def setHPImage(self, hp):
         self.hearts.clear()
 
@@ -347,23 +375,32 @@ class Heart(UI):
     image = None
     def __init__(self, x, y, hp, divide):
         UI.__init__(self)
-        self.posX, self.posY = x, y
-        self.hp = hp
-        self.originSizeX = 0.25 * (self.hp * (1 / divide))
-        self.originSizeY = 0.25 * (self.hp * (1 / divide))
-        self.moveSizeX = self.originSizeX
-        self.moveSizeY = self.originSizeY
-        self.moveID = 'big'
-        self.pngSizeX = 170
-        self.pngSizeY = 150
-        self.sizeX = self.pngSizeX * self.originSizeX
-        self.sizeY = self.pngSizeY * self.originSizeY
         self.uiID = 'heart'
-        self.hpDifferSpeed = 0.5
+        self.moveID = 'big'
+        # position
+        self.posX, self.posY = x, y
+        # image
         if Heart.image == None:
             Heart.image = load_image(os.path.join(os.getcwd(), 'resources', 'ui', 'Ingame', 'heart.png'))
         self.image = Heart.image
 
+        self.hp = hp
+
+        # size
+        self.originSizeX = 0.25 * (self.hp * (1 / divide))
+        self.originSizeY = 0.25 * (self.hp * (1 / divide))
+        self.moveSizeX = self.originSizeX
+        self.moveSizeY = self.originSizeY
+        self.pngSizeX = 170
+        self.pngSizeY = 150
+        self.sizeX = self.pngSizeX * self.originSizeX
+        self.sizeY = self.pngSizeY * self.originSizeY
+
+
+        # heart가 움직이는 속도
+        self.hpDifferSpeed = 0.5
+
+    # 하트를 움직임
     def update(self, time):
         if self.moveID == 'big':
             self.moveSizeX += time * self.hpDifferSpeed
@@ -385,12 +422,13 @@ class Score(UI):
     image = None
     def __init__(self, x, y, score):
         UI.__init__(self)
+        self.uiID = 'score'
         self.posX, self.posY = x, y
         self.score = score
-        self.uiID = 'score'
         self.numbers = Numbers(self.posX, self.posY, 2, 2, 17, self.score)
 
     def setScore(self, score):
+        # 스코어 숫자에 제한을 걸음
         if score > 99999999:
             return
         self.score = score
@@ -403,19 +441,24 @@ class Money(UI):
     image = None
     def __init__(self, x, y, sizeImg, imgFar, sizeNum, between, money):
         UI.__init__(self)
-        self.posX, self.posY = x, y
-        self.money = money
         self.uiID = 'money'
-        self.numbers = Numbers(self.posX, self.posY, sizeNum, sizeNum, between, self.money)
+        # position
+        self.posX, self.posY = x, y
+        # image
         if Money.image == None:
             Money.image =  load_image(os.path.join(os.getcwd(), 'resources', 'ui', 'Ingame', 'money.png'))
+        # size
         self.originSizeX = 0.05 * sizeImg
         self.originSizeY = 0.05 * sizeImg
         self.pngSizeX = 600
         self.pngSizeY = 600
         self.sizeX = self.pngSizeX * self.originSizeX
         self.sizeY = self.pngSizeY * self.originSizeY
+
         self.far = imgFar
+        self.money = money
+        self.numbers = Numbers(self.posX, self.posY, sizeNum, sizeNum, between, self.money)
+
 
     def setMoney(self, money):
         if money > 99999999:
@@ -432,23 +475,29 @@ class Others(UI):
     size = None
     def __init__(self, x, y, sizeX, sizeY, ID, opacify):
         UI.__init__(self)
-        self.posX, self.posY = x, y
-        if Others.image == None:
-            self.initialize_image()
-        if Others.size == None:
-            self.initialize_size()
         self.uiID = 'others'
         self.othersID = ID
+        # position
+        self.posX, self.posY = x, y
+        # image
+        if Others.image == None:
+            self.initialize_image()
         self.image = Others.image.get(self.othersID)
+        # size
+        if Others.size == None:
+            self.initialize_size()
         self.originSizeX = sizeX
         self.originSizeY = sizeY
         self.pngSizeX = Others.size.get(self.othersID)[0]
         self.pngSizeY = Others.size.get(self.othersID)[1]
         self.sizeX = self.pngSizeX * self.originSizeX
         self.sizeY = self.pngSizeY * self.originSizeY
+
+        # alpha
         self.opacify = opacify
         self.image.opacify(self.opacify)
 
+    # default image
     def setOtherImageID(self, ID):
         self.othersID = ID
         self.image = Others.image.get(self.othersID)
@@ -457,6 +506,7 @@ class Others(UI):
         self.sizeX = self.pngSizeX * self.originSizeX
         self.sizeY = self.pngSizeY * self.originSizeY
 
+    # for att upgrade bullet image
     def setOtherImageToIndex(self, idx):
         if idx > 13:
             return
@@ -503,6 +553,7 @@ class Others(UI):
 
             # bullet
             # 사이즈 조정 필요
+            # pngSizeXY, SizeXY
             '1': [8, 8, 4, 4],
             '2': [16, 16, 2.7, 2.7],
             '3': [24, 24, 1.5, 1.5],

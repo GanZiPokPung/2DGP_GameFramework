@@ -19,17 +19,16 @@ def initialize():
     global bgm
     image = load_image(os.path.join(os.getcwd(), 'resources', 'scene', 'result.png'))
 
+    # mouse
     mouse = Mouse()
     game_world.add_object(mouse, MOUSE)
-
     # restart button
     game_world.add_object(Button(250, 100, 0.8, 0.8, 'confirm', 'confirm'), UIDEFAULT)
-
     # money
     game_world.add_object(Money(300, 450, 1.8, 180, 3, 27, money), UIDEFAULT)
     # score
     game_world.add_object(Numbers(300, 350, 3, 3, 27, score), UIDEFAULT)
-
+    # bgm
     bgm = load_music(os.path.join(os.getcwd(), 'resources', 'sound', 'back', 'result.mp3'))
     bgm.set_volume(40)
     bgm.repeat_play()
@@ -49,7 +48,7 @@ def handle_events():
 def update():
     collision_manager.collide_update()
 
-    # ui만 업데이트
+    # ui
     for ui in game_world.get_layer(UIDEFAULT):
         ui.update()
 

@@ -7,35 +7,39 @@ class Mouse:
     frames = None
     def __init__(self):
         self.posX, self.posY = 0, 0
+        # image
         if Mouse.images == None:
             self.initialize_images()
+        # frame
         if Mouse.frames == None:
             self.initialize_frames()
+
+        # size
         self.pngSizeX, self.pngSizeY = 32, 32
         sizeX, sizeY = 1, 1
-
         self.sizeX = self.pngSizeX * sizeX
         self.sizeY = self.pngSizeY * sizeY
-
         self.rectSizeX = self.sizeX / 4
         self.rectSizeY = self.sizeY / 4
 
-        self.collideCheck = False
         self.mouseID = 'normal'
 
+        # animation
         self.frame = 0
         self.frameMax = Mouse.frames.get(self.mouseID)[0]
-
         self.timePerAction = Mouse.frames.get(self.mouseID)[1]
         self.actionPerTime = 1.0 / self.timePerAction
 
+        # time
         self.time = 0
         self.hideTime = 2.0
 
+        # check
         self.collideCheck = False
         self.drawCheck = True
         self.ui = None
 
+        # font
         self.font = load_font('ENCR10B.TTF', 16)
 
     def initialize_images(self):
@@ -97,23 +101,29 @@ class Mouse:
             self.time = 0
             self.posX, self.posY = event.x,  static.canvas_height - 1 - event.y
         elif event.type == SDL_MOUSEBUTTONDOWN :
-            self.time = 0
-            if event.button == SDL_BUTTON_LEFT:
-                self.change_ID('click')
-                if self.ui != None:
-                    self.ui.click()
-            if event.button == SDL_BUTTON_RIGHT:
-                self.change_ID('gate')
+            self.button_down_check(event)
         elif event.type == SDL_MOUSEBUTTONUP:
-            self.time = 0
-            if event.button == SDL_BUTTON_LEFT:
-                self.frame = 1
-                if self.ui != None:
-                    self.ui.unclick()
-                    self.ui = None
-            if event.button == SDL_BUTTON_RIGHT:
-                self.change_ID('normal')
+            self.button_up_check(event)
         #elif event.type == SDL_MOUSEBUTTONDOWN
+
+    def button_down_check(self, event):
+        self.time = 0
+        if event.button == SDL_BUTTON_LEFT:
+            self.change_ID('click')
+            if self.ui != None:
+                self.ui.click()
+        if event.button == SDL_BUTTON_RIGHT:
+            self.change_ID('gate')
+
+    def button_up_check(self, event):
+        self.time = 0
+        if event.button == SDL_BUTTON_LEFT:
+            self.frame = 1
+            if self.ui != None:
+                self.ui.unclick()
+                self.ui = None
+        if event.button == SDL_BUTTON_RIGHT:
+            self.change_ID('normal')
 
     def draw(self):
         if self.drawCheck == True:

@@ -56,10 +56,9 @@ class Player:
         # image
         if Player.image == None:
             Player.image = load_image(os.path.join(os.getcwd(), 'resources', 'player', 'player.png'))
+        # data
         if Player.data == None:
             self.initializeData()
-        if Player.sound == None:
-            self.iniializeSound()
         # player abilities
         self.hp = 150
         self.score = 0
@@ -80,6 +79,8 @@ class Player:
         self.Modify_Abilities()
 
         # sound
+        if Player.sound == None:
+            self.iniializeSound()
         self.bomb_sound = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'player', 'bomb.wav'))
         self.bomb_sound.set_volume(110)
 
@@ -348,6 +349,9 @@ class Player:
                 Player.sound.get('hit').play()
 
     def update(self):
+        # player_time
+        self.BulletTime += mainframe.frame_time
+
         # dead
         if (self.hp <= 0):
             game_world.add_object(Effect(self.x, self.y, 'random_effect', '', 70 * 3, 70 * 3),
@@ -356,17 +360,31 @@ class Player:
             stage_scene.money = self.money
             return True
 
-        #player_time
-        self.BulletTime += mainframe.frame_time
+        # animation
+        self.animation_update()
 
+        # attack
+        self.attack_normal()
+        self.attack_bomb()
+
+        # 이동 계산
+        self.y += self.velocityY * mainframe.frame_time
+        self.x += self.velocityX * mainframe.frame_time
+
+        # 벽을 못나가도록
+        self.block_player()
+
+        return False
+
+    def animation_update(self):
         TimeToFrameQuantity = FRAMES_PER_ACTION * ACTION_PER_TIME * mainframe.frame_time
 
         if self.turncheck == True:
             # 회전 이동 상태일때
             # 회전 스프라이트 끝 장면에 프레임을 고정
             if self.frame < 6:
-               # self.frame = (self.frame + 1) % 7
-               self.frame = (self.frame + TimeToFrameQuantity) % 7
+                # self.frame = (self.frame + 1) % 7
+                self.frame = (self.frame + TimeToFrameQuantity) % 7
         else:
             # 만약 회전 이동 상태가 아니라면 IDLE 상태로 돌아오는
             # 스프라이트를 재생한다.(프레임을 거꾸로 돌린다)
@@ -378,30 +396,20 @@ class Player:
                 self.reformframe = self.reformframe - TimeToFrameQuantity
                 self.frame = self.reformframe
 
-
-        # print('Vel X = ', self.velocityX, '  Vel Y = ', self.velocityY)
-
-        # 이동 계산
-        self.y += self.velocityY * mainframe.frame_time
-        self.x += self.velocityX * mainframe.frame_time
-
-        self.block_player()
-
-        # 화면 내 이동
-        # boy.x = clamp(25, boy.x, 1600 - 25)
-
-
+    def attack_normal(self):
         # 공격
-        if self.pushAttcheck == True :
+        if self.pushAttcheck == True:
             if self.BulletTime > self.BulletDelay:
                 Player.sound.get(self.parsingID).play()
                 angleTerm = 0
                 angle = 90
                 for cnt in range(0, self.bulletCount):
-                    bullet = Bullet(self.x + 5, self.y + 20, angle + angleTerm, self.bulletSpeed, self.bulletImage, 0, self.bulletType
-                           , self.bulletSizeX, self.bulletSizeY, self.attackDamage)
+                    bullet = Bullet(self.x + 5, self.y + 20, angle + angleTerm, self.bulletSpeed, self.bulletImage, 0,
+                                    self.bulletType
+                                    , self.bulletSizeX, self.bulletSizeY, self.attackDamage)
                     bullet.set_rotation(angle)
                     game_world.add_object(bullet, BULLET_PLAYER)
+
                     if angleTerm == 0:
                         angleTerm += 10
                     elif angleTerm > 0:
@@ -410,9 +418,9 @@ class Player:
                         angleTerm *= -1
                         angleTerm += 10
 
-
                 self.BulletTime = 0
 
+    def attack_bomb(self):
         # 폭탄
         if self.pushBombcheck == True:
             self.BombTime += mainframe.frame_time
@@ -439,11 +447,8 @@ class Player:
                 self.TickTime = 0
                 self.pushBombcheck = False
 
-        return False
-
     def draw(self):
         Player.image.clip_draw(int(self.frame) * 70, self.frameID * 70, 70, 70, self.x, self.y)
-
 
         # DEBUG
         # print(str(self.pushLcheck) + " " + str(self.pushRcheck))

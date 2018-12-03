@@ -7,7 +7,6 @@ from map import Map
 from player import Player
 from monster import *
 from boss import *
-from coin import Coin
 
 import game_world
 import collision_manager
@@ -29,26 +28,20 @@ map1 = None
 map2 = None
 mapSpeed = 150
 
-#player
+# player
 player = None
 
-# #bullet
-# bullets = []
-
-#
-# #monster
-# monsterpatterns = []
-# monsters = []
+# monster pattern
 monsterpattern = None
 monsterSpawnCheck = True
 
 # boss
 bossCheck = False
 
-#stage
+# stage
 stage = 1
 stageCount = 0
-stageCountMax = 1
+stageCountMax = 5
 
 # debug
 rectCheck = False
@@ -59,19 +52,21 @@ bossbgm = None
 
 def initialize():
     global mouse
+    # stage
     global stage
     global stageCount
     global stageCountMax
+    # spawn
     global monsterSpawnCheck
     global bossCheck
-    #map
+    # map
     global totalmap
     global map1
     global map2
-    #player
+    # player
     global player
     global monsterpattern
-
+    # bgm
     global bgm
     global bossbgm
     # mouse
@@ -81,6 +76,7 @@ def initialize():
     stage = 1
     stageCount = 0
     stageCountMax = 5
+    # spawn
     monsterpattern = None
     monsterSpawnCheck = True
     bossCheck = False
@@ -91,14 +87,14 @@ def initialize():
     map1 = [Map(1, 0, 2000, mapSpeed)]
     map2 = [Map(2, 0, 2000, mapSpeed)]
     # 리스트 별로 딕셔너리에 스테이지 번호와 함께 보관
-    totalmap = {1:map1, 2:map2}
+    totalmap = {1: map1, 2: map2}
     # player
     player = Player()
     # monster
     monsterpattern = Monster_Pattern()
     game_world.add_object(player, PLAYER)
 
-    #
+    # bgm
     bgm = load_music(os.path.join(os.getcwd(), 'resources', 'sound', 'back', 'stage.mp3'))
     bgm.set_volume(60)
     bgm.repeat_play()
@@ -107,45 +103,52 @@ def initialize():
     bossbgm.set_volume(30)
 
 def handle_events():
-    global rectCheck
-    global mouse
-    global monsterSpawnCheck
+    # 치트키 필요
     events = get_events()
     for event in events:
         if event.type == SDL_QUIT:
             mainframe.quit()
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_q):
-            monsterSpawnCheck = True
-            Monster_Pattern.difficulty += 1
-            for map in totalmap.get(2):
-                map.speed += 50
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_w):
-            mainframe.push_state(shop_state)
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_b):
-            game_world.add_object(BossHead(), BOSS)
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_e):
-            game_world.clear_layer(MONSTER)
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_m):
-            player.hp = 0
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_1):
-            game_world.curtain_object(BOSS, 2).attackID = 1
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_2):
-            game_world.curtain_object(BOSS, 2).attackID = 2
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_3):
-            game_world.curtain_object(BOSS, 2).attackOtherID = 3
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_4):
-            game_world.curtain_object(BOSS, 2).attackOtherID = 4
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_5):
-            game_world.curtain_object(BOSS, 2).attackID = 4
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_p):
-            if rectCheck == False:
-                rectCheck = True
-            else:
-                rectCheck = False
-        #player
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_ESCAPE):
+            mainframe.quit()
+        # cheats
+        cheat_key(event)
+        # player
         player.handle_events(event)
-        #mouse
+        # mouse
         mouse.handle_events(event)
+
+def cheat_key(event):
+    global monsterSpawnCheck
+    global rectCheck
+
+    if (event.type, event.key) == (SDL_KEYDOWN, SDLK_q):
+        monsterSpawnCheck = True
+        Monster_Pattern.difficulty += 1
+        for map in totalmap.get(2):
+            map.speed += 50
+    elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_w):
+        mainframe.push_state(shop_state)
+    elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_b):
+        game_world.add_object(BossHead(), BOSS)
+    elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_e):
+        game_world.clear_layer(MONSTER)
+    elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_m):
+        player.hp = 0
+    elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_1):
+        game_world.curtain_object(BOSS, 2).attackID = 1
+    elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_2):
+        game_world.curtain_object(BOSS, 2).attackID = 2
+    elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_3):
+        game_world.curtain_object(BOSS, 2).attackOtherID = 3
+    elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_4):
+        game_world.curtain_object(BOSS, 2).attackOtherID = 4
+    elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_5):
+        game_world.curtain_object(BOSS, 2).attackID = 4
+    elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_p):
+        if rectCheck == False:
+            rectCheck = True
+        else:
+            rectCheck = False
 
 def updateStage():
     global stage
@@ -195,7 +198,6 @@ def updateStage():
 def update():
     # map
     # 현재 스테이지 리스트를 딕셔너리에서 가져옴
-
     currentmaplist = totalmap.get(currentmap)
     # list loop
     for map in currentmaplist:
@@ -209,15 +211,17 @@ def update():
     # collider Check
     collision_manager.collide_update()
 
+    # end check
     if len(game_world.get_layer(PLAYER)) == 0:
         mainframe.change_state(result_scene)
 
+    # update game obj
     for game_object in game_world.all_objects():
         erase = game_object.update()
         if erase == True :
             game_world.remove_object(game_object)
 
-    #delay(0.015)
+
 
 def draw():
     clear_canvas()
@@ -225,6 +229,7 @@ def draw():
     for map in totalmap.get(currentmap):
         map.draw()
 
+    # game obj
     for game_object in game_world.all_objects():
         game_object.draw()
         # debug
@@ -249,6 +254,8 @@ def resume():
     stageCount = 0
     stageCountMax += 5
     Monster_Pattern.difficulty += 1
+
+    # 맵 이동 속도 증가
     for map in totalmap.get(2):
         map.speed += 50
 
@@ -262,6 +269,7 @@ def resume():
 
 def exit():
     bgm.stop()
+    # score, money parsing
     result_scene.score = score
     result_scene.money = money
     game_world.clear()
