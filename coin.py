@@ -1,6 +1,8 @@
 import mainframe
 from static import *
 from pico2d import *
+import game_world
+from effect import Effect
 
 # Action Speed
 TIME_PER_ACTION = 0.2
@@ -53,6 +55,8 @@ class Coin:
 
     def collideActive(self, opponent):
         self.collideCheck = True
+        game_world.add_object(Effect(self.posX, self.posY, '', 'HitEffect02', self.originSizeX, self.originSizeY),
+                              EFFECT)
         opponent.parsingMoneyBar(self.coinAmount)
         Coin.sound.play()
         # 돈 증가

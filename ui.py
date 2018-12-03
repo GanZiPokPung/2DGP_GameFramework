@@ -197,7 +197,7 @@ class Button(UI):
                 return
             bombCheck = game_world.curtain_object(PLAYER, 0).parsingBombBar(1)
             if bombCheck == False:
-                game_world.curtain_object(PLAYER, 0).parsingMoneyBar(-1000)
+                game_world.curtain_object(PLAYER, 0).parsingMoneyBar(1000)
 
 #
 class Numbers(UI):

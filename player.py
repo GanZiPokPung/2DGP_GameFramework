@@ -50,7 +50,7 @@ class Player:
         self.BombTime = 0
         self.BombDelay = 5
         self.TickTime = 0
-        self.TickDelay = 0.4
+        self.TickDelay = 0.2
         # speed
         self.moveSpeed = 30
         # image
@@ -66,7 +66,7 @@ class Player:
         self.attackDamage = 10
         self.bomb = None
         self.bombCount = 3
-        self.bombDamage = 2
+        self.bombDamage = 5
         self.parsingID = '1'
 
         # modify
@@ -346,6 +346,9 @@ class Player:
             self.hp -= opponent.attackDamage
             self.hpBar.setHPImage(self.hp)
             if opponent.attackDamage > 0:
+                game_world.add_object(
+                    Effect(self.x + 30, self.y + 20, '', 'HitEffect03', 2, 2),
+                    EFFECT)
                 Player.sound.get('hit').play()
 
     def update(self):

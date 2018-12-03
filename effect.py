@@ -59,6 +59,8 @@ class Effect:
         # speed anim
         self.timePerAction = Effect.others.get(self.imgType)[0]
         self.actionPerTime = 1.0 / self.timePerAction
+
+        self.parent = None
     def initialize_image(self):
         Effect.image = {
             #'Effect01': load_image(os.path.join(os.getcwd(), 'resources', 'effect', 'Effect1.png')),
@@ -67,7 +69,8 @@ class Effect:
             'Effect04': load_image(os.path.join(os.getcwd(), 'resources', 'effect', 'Effect4.png')),
             'HitEffect01': load_image(os.path.join(os.getcwd(), 'resources', 'effect', 'HitEffect1.png')),
             'HitEffect02': load_image(os.path.join(os.getcwd(), 'resources', 'effect', 'HitEffect2.png')),
-            'BombEffect': load_image(os.path.join(os.getcwd(), 'resources', 'effect', 'BombEffect.png')),
+            'HitEffect03': load_image(os.path.join(os.getcwd(), 'resources', 'effect', 'HitEffect3.png')),
+            'BombEffect': load_image(os.path.join(os.getcwd(), 'resources', 'effect', 'BombEffect.png'))
         }
 
 
@@ -79,7 +82,8 @@ class Effect:
             'Effect04':              [4420 // 26, 170, 26],
             'HitEffect01':           [390 // 13, 30, 13],
             'HitEffect02':           [120 // 3, 40, 3],
-            'BombEffect':            [2300 // 23, 200, 23],
+            'HitEffect03':           [400 // 8, 50, 8],
+            'BombEffect':            [2300 // 23, 200, 23]
         }
 
     def initialize_index(self):
@@ -96,7 +100,8 @@ class Effect:
             'Effect04':              [0.6, 0.5],
             'HitEffect01':           [0.3, 1.5],
             'HitEffect02':           [0.15, 1.5],
-            'BombEffect':            [0.5,  1],
+            'HitEffect03':           [0.2, 1.0],
+            'BombEffect':            [0.5,  1]
         }
 
     def get_rect(self):

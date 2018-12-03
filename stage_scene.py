@@ -264,6 +264,7 @@ def resume():
     player.dirY = 0
     player.velocityX = 0
     player.velocityY = 0
+    player.pushAttcheck = False
 
     bgm.play()
 

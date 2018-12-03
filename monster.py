@@ -227,9 +227,9 @@ class Monster:
         hit = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'effect', 'hit.wav'))
         hit.set_volume(15)
         explode = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'effect', 'explode.wav'))
-        explode.set_volume(10)
+        explode.set_volume(6)
         explode2 = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'effect', 'bigexplode.wav'))
-        explode2.set_volume(40)
+        explode2.set_volume(25)
         Monster.sound = {
                 'hit': hit,
                 # explode
@@ -245,9 +245,13 @@ class Monster:
         pass
 
     def collideActive(self, opponent):
-        self.hp -= opponent.attackDamage
-        game_world.curtain_object(PLAYER, 0).parsingScoreBar(opponent.attackDamage * random.randint(2, 5))
-        Monster.sound.get('hit').play()
+        if opponent.bulletType == 'Anim_Stop':
+            return
+
+        if self.posY <= 700:
+            self.hp -= opponent.attackDamage
+            game_world.curtain_object(PLAYER, 0).parsingScoreBar(opponent.attackDamage * random.randint(2, 5))
+            Monster.sound.get('hit').play()
 
     def update(self):
         self.time += mainframe.frame_time
@@ -363,12 +367,12 @@ class Warrior(Monster):
             # 돌진
             self.anglespeed = 0
         if self.imageType == 'warrior':
-            self.originShootDelay = random.randint(5, 10)
+            self.originShootDelay = random.randint(10, 20)
             self.shootSpeed = 20
             self.bulletsizeX = 1
             self.bulletsizeY = 1
         if self.imageType == 'warrior_other':
-            self.originShootDelay = random.randint(3, 7)
+            self.originShootDelay = random.randint(6, 14)
             self.shootSpeed = 40
             self.bulletsizeX = 2
             self.bulletsizeY = 2
@@ -412,11 +416,13 @@ class Warrior(Monster):
             self.shootTime = 0
 
     def modify_difficulty(self, difficulty):
-        self.originShootDelay /= (1 + difficulty / 10)
-        self.shootSpeed *= (1 + difficulty / 10)
-        self.moveSpeed  *= (1 + difficulty / 10)
-        self.hp *= (1 + difficulty / 10)
-        self.attackDamage *= (1 + difficulty / 10)
+        difficulty -= 1
+        self.originShootDelay /= (1 + difficulty / 2)
+        self.shootSpeed *= (1 + difficulty / 2)
+        self.moveSpeed  *= (1 + difficulty / 2)
+        self.hp *= (1 + difficulty / 2)
+        self.attackDamage *= (1 + difficulty / 2)
+        difficulty += 1
         self.difficulty = difficulty
         self.Modify_Abilities()
 
@@ -564,11 +570,13 @@ class Bird(Monster):
             self.shootCheck = False
 
     def modify_difficulty(self, difficulty):
-        self.originShootDelay /= (1 + difficulty / 10)
-        self.shootSpeed *= (1 + difficulty / 10)
+        difficulty -= 1
+        self.originShootDelay /= (1 + difficulty / 2)
+        self.shootSpeed *= (1 + difficulty / 2)
         self.speedT     += difficulty // 2
-        self.hp *= (1 + difficulty / 10)
-        self.attackDamage *= (1 + difficulty / 10)
+        self.hp *= (1 + difficulty / 2)
+        self.attackDamage *= (1 + difficulty / 2)
+        difficulty += 1
         self.difficulty = difficulty
         self.modify_abilities()
 
@@ -756,11 +764,13 @@ class Dragon(Monster):
             self.shootTime = 0
 
     def modify_difficulty(self, difficulty):
-        self.originShootDelay /= (1 + difficulty / 10)
-        self.shootSpeed *= (1 + difficulty / 10)
+        difficulty -= 1
+        self.originShootDelay /= (1 + difficulty / 2)
+        self.shootSpeed *= (1 + difficulty / 2)
         self.speedT     += difficulty // 2
-        self.hp *= (1 + difficulty / 10)
-        self.attackDamage *= (1 + difficulty / 10)
+        self.hp *= (1 + difficulty / 2)
+        self.attackDamage *= (1 + difficulty / 2)
+        difficulty += 1
         self.difficulty = difficulty
         self.modify_abilities()
 
@@ -871,11 +881,13 @@ class Dragon_Strong(Monster):
             self.shootTime = 0
 
     def modify_difficulty(self, difficulty):
-        self.originShootDelay /= (1 + difficulty / 10)
-        self.shootSpeed *= (1 + difficulty / 10)
-        self.anglespeed *= (1 + difficulty / 10)
-        self.hp *= (1 + difficulty / 10)
-        self.attackDamage *= (1 + difficulty / 10)
+        difficulty -= 1
+        self.originShootDelay /= (1 + difficulty / 2)
+        self.shootSpeed *= (1 + difficulty / 2)
+        self.anglespeed *= (1 + difficulty / 2)
+        self.hp *= (1 + difficulty / 2)
+        self.attackDamage *= (1 + difficulty / 2)
+        difficulty += 1
         self.difficulty = difficulty
         self.modify_abilities()
 

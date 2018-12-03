@@ -96,9 +96,13 @@ class Boss:
                self.posX + self.rectSizeX, self.posY + self.rectSizeY
 
     def collideActive(self, opponent):
-        self.hp -= opponent.attackDamage
-        game_world.curtain_object(PLAYER, 0).parsingScoreBar(opponent.attackDamage * random.randint(2, 5))
-        Boss.sound.get('hit').play()
+        if opponent.bulletType == 'Anim_Stop':
+            return
+
+        if self.posY <= 700:
+            self.hp -= opponent.attackDamage
+            game_world.curtain_object(PLAYER, 0).parsingScoreBar(opponent.attackDamage * random.randint(2, 5))
+            Boss.sound.get('hit').play()
 
     def update(self):
 
@@ -340,10 +344,12 @@ class BossHead(Boss):
             self.patternHandTime = 0
 
     def modify_difficulty(self, difficulty):
-        self.hp *= (1 + difficulty / 4)
-        self.attackDamage *= (1 + difficulty / 4)
-        self.patternHandDelay /= (1 + difficulty / 4)
-        self.patternDelay /= (1 + difficulty / 4)
+        difficulty -= 1
+        self.hp *= (1 + difficulty / 2)
+        self.attackDamage *= (1 + difficulty / 2)
+        self.patternHandDelay /= (1 + difficulty / 2)
+        self.patternDelay /= (1 + difficulty / 2)
+        difficulty += 1
         self.difficulty = difficulty
         self.BossHandLeft.modify_difficulty(self.difficulty)
         self.BossHandRight.modify_difficulty(self.difficulty)
@@ -834,8 +840,10 @@ class BossHand(Boss):
                                                          self.moveT)
 
     def modify_difficulty(self, difficulty):
-        self.hp *= (1 + difficulty / 4)
-        self.attackDamage *= (1 + difficulty / 4)
+        difficulty -= 1
+        self.hp *= (1 + difficulty / 2)
+        self.attackDamage *= (1 + difficulty / 2)
+        difficulty += 1
         self.difficulty = difficulty
 
     def modify_abilities(self):
