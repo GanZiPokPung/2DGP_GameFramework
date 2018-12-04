@@ -304,6 +304,8 @@ class Player:
 
     def parsingHPBar(self, healAmount):
         if (self.hp + healAmount) >= 500:
+            self.hp = 500
+            self.hpBar.setHPImage(self.hp)
             return False
 
         self.hp += healAmount

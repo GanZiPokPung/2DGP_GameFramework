@@ -117,38 +117,65 @@ def handle_events():
         # mouse
         mouse.handle_events(event)
 
+# 치트키
 def cheat_key(event):
     global monsterSpawnCheck
     global rectCheck
+    global stage
+    global stageCountMax
+    global stageCount
 
+    # 난이도 조절
     if (event.type, event.key) == (SDL_KEYDOWN, SDLK_q):
         monsterSpawnCheck = True
+        stage -= 1
+        stageCount = 0
+        stageCountMax -= 5
+        Monster_Pattern.difficulty -= 1
+        for map in totalmap.get(2):
+            map.speed -= 50
+    elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_w):
+        monsterSpawnCheck = True
+        stage += 1
+        stageCount = 0
+        stageCountMax += 5
         Monster_Pattern.difficulty += 1
         for map in totalmap.get(2):
             map.speed += 50
-    elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_w):
-        mainframe.push_state(shop_state)
-    elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_b):
-        game_world.add_object(BossHead(), BOSS)
-    elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_e):
-        game_world.clear_layer(MONSTER)
-    elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_m):
-        player.hp = 0
-    elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_1):
-        game_world.curtain_object(BOSS, 2).attackID = 1
-    elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_2):
-        game_world.curtain_object(BOSS, 2).attackID = 2
-    elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_3):
-        game_world.curtain_object(BOSS, 2).attackOtherID = 3
-    elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_4):
-        game_world.curtain_object(BOSS, 2).attackOtherID = 4
-    elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_5):
-        game_world.curtain_object(BOSS, 2).attackID = 4
+    # 충돌체 보이고 안보이고
     elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_p):
         if rectCheck == False:
             rectCheck = True
         else:
             rectCheck = False
+    # 플레이어 체력 조절
+    elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_z):
+        player.parsingHPBar(50)
+    elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_x):
+        player.parsingBombBar(1)
+    elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_c):
+        player.parsingMoneyBar(10000)
+
+    # 보스 패턴
+    elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_1):
+        if game_world.curtain_object(BOSS, 2) != None:
+            game_world.curtain_object(BOSS, 2).attackID = 1
+    elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_2):
+        if game_world.curtain_object(BOSS, 2) != None:
+            game_world.curtain_object(BOSS, 2).attackID = 2
+    elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_3):
+        if game_world.curtain_object(BOSS, 2) != None:
+            game_world.curtain_object(BOSS, 2).attackID = 3
+    elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_4):
+        if game_world.curtain_object(BOSS, 2) != None:
+            game_world.curtain_object(BOSS, 2).attackID = 4
+    elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_5):
+        if game_world.curtain_object(BOSS, 2) != None:
+            game_world.curtain_object(BOSS, 2).attackID = 5
+    elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_6):
+        if game_world.curtain_object(BOSS, 2) != None:
+            game_world.curtain_object(BOSS, 2).attackID = 6
+
 
 def updateStage():
     global stage
