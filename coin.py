@@ -55,7 +55,8 @@ class Coin:
 
     def collideActive(self, opponent):
         self.collideCheck = True
-        game_world.add_object(Effect(self.posX, self.posY, '', 'HitEffect02', self.originSizeX, self.originSizeY),
+        game_world.add_object(Effect(self.posX, self.posY, '', 'HitEffect02',
+                                     self.originSizeX * 0.55, self.originSizeY * 0.55),
                               EFFECT)
         opponent.parsingMoneyBar(self.coinAmount)
         Coin.sound.play()

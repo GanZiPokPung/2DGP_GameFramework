@@ -200,7 +200,7 @@ def updateStage():
         if len(monsterLayer) == 0 and bossCheck == False:
             # 보스 등장
             boss = BossHead()
-            boss.modify_difficulty(Monster_Pattern.difficulty)
+            boss.modify_difficulty(Monster_Pattern.difficulty + 1)
             game_world.add_object(boss, BOSS)
             #
             bgm.stop()

@@ -7,6 +7,7 @@ from bullet import Bullet
 from effect import Effect
 from ui import *
 import game_world
+from monster import *
 
 # Action Speed
 TIME_PER_ACTION = 0.4
@@ -125,21 +126,21 @@ class Player:
     def initializeData(self):
         Player.data = {
             # bullet
-            # 불렛 갯수 사이각 각도, 속도, 이미지 타입, 불릿 타입, 사이즈
-            # 나중에 데미지도 (맨 뒤에)
-            '1': [3, 110, 'SmallCircle', 'RotateOnce', 2, 2, 1],
-            '2': [3, 100, 'SmallMiss', 'RotateOnce', 2.7, 2.7, 2],
-            '3': [3, 130, 'Rug', 'Rotate', 2, 2, 3],
-            '4': [3, 90, 'GreenWeak', 'RotateOnce', 2, 2, 4],
-            '5': [3, 90, 'PurpleWeak', 'RotateOnce', 2.5, 2.5, 4],
-            '6': [5, 80, 'GreenNormal', 'RotateOnce', 2, 2, 5],
-            '7': [5, 80, 'PurpleNormal', 'RotateOnce', 1.75, 1.75, 5],
-            '8': [3, 100, 'GreenStrong', 'RotateOnce', 2, 2, 6],
-            '9': [3, 100, 'PurpleStrong', 'RotateOnce', 1.75, 1.75, 6],
-            '10': [1, 150, 'PurpleMax', 'RotateOnce', 3, 3, 7],
-            '11': [3, 90, 'ExplodeMiss', 'Anim', 4, 4, 8],
-            '12': [5, 100, 'BlueCircle', '', 1.25, 1.25, 7],
-            '13': [1, 175, 'Eagle', 'RotateOnce', 3, 3, 15]
+            # 불렛 갯수 사이각 각도, 속도, 이미지 타입, 불릿 타입, 사이즈, 데미지, 딜레이,
+            #  self.BulletDelay = 0.15
+            '1': [3, 110, 'SmallCircle', 'RotateOnce', 2, 2, 1, 0.12],
+            '2': [3, 100, 'SmallMiss', 'RotateOnce', 2.7, 2.7, 2, 0.12],
+            '3': [3, 130, 'Rug', 'Rotate', 2, 2, 3, 0.12],
+            '4': [3, 90, 'GreenWeak', 'RotateOnce', 2, 2, 4, 0.12],
+            '5': [3, 90, 'PurpleWeak', 'RotateOnce', 2.5, 2.5, 4, 0.12],
+            '6': [5, 80, 'GreenNormal', 'RotateOnce', 2, 2, 5, 0.12],
+            '7': [5, 80, 'PurpleNormal', 'RotateOnce', 1.75, 1.75, 5, 0.12],
+            '8': [3, 100, 'GreenStrong', 'RotateOnce', 2, 2, 6, 0.12],
+            '9': [3, 100, 'PurpleStrong', 'RotateOnce', 1.75, 1.75, 6, 0.12],
+            '10': [1, 180, 'PurpleMax', 'RotateOnce', 3, 3, 7, 0.05],
+            '11': [3, 90, 'ExplodeMiss', 'Anim', 4, 4, 8, 0.12],
+            '12': [5, 100, 'BlueCircle', '', 1.25, 1.25, 7, 0.12],
+            '13': [1, 250, 'Eagle', 'RotateOnce', 3, 3, 15, 0.05]
         }
     def iniializeSound(self):
         lazer = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'player', 'lazer.wav'))
@@ -177,7 +178,7 @@ class Player:
         }
 
     def get_rect(self):
-        return self.x - 10, self.y - 20, self.x + 10, self.y + 20
+        return self.x - 5, self.y - 10, self.x + 5, self.y + 10
 
     def handle_events(self, event):
         # 이동 구현
@@ -290,7 +291,8 @@ class Player:
     def parsingAttData(self, parsingID):
         # 불렛 갯수 /사이각 각도/, 속도, 이미지 타입, 불릿 타입, 사이즈
         if int(parsingID) >= 13 and self.parsingID == parsingID:
-            return False
+            self.attackDamage += 1
+            return True
 
         self.parsingID = parsingID
         self.bulletCount = Player.data.get(parsingID)[0]
@@ -300,6 +302,7 @@ class Player:
         self.bulletSizeX = Player.data.get(parsingID)[4]
         self.bulletSizeY = Player.data.get(parsingID)[5]
         self.attackDamage = Player.data.get(parsingID)[6]
+        self.BulletDelay = Player.data.get(parsingID)[7]
         return True
 
     def parsingHPBar(self, healAmount):
@@ -349,7 +352,7 @@ class Player:
             self.hpBar.setHPImage(self.hp)
             if opponent.attackDamage > 0:
                 game_world.add_object(
-                    Effect(self.x + 30, self.y + 20, '', 'HitEffect03', 2, 2),
+                    Effect(self.x + 30, self.y + 20, '', 'HitEffect03', 2.75, 2.75),
                     EFFECT)
                 Player.sound.get('hit').play()
 
@@ -440,11 +443,11 @@ class Player:
                 monsterLayer = game_world.get_layer(MONSTER)
                 for monster in monsterLayer:
                     if monster.posY <= 700:
-                        monster.hp -= self.bombDamage
+                        monster.hp -= self.bombDamage * (1 + Monster_Pattern.difficulty)
                 bossLayer = game_world.get_layer(BOSS)
                 for boss in bossLayer:
                     if boss.posY <= 700:
-                        boss.hp -= self.bombDamage
+                        boss.hp -= self.bombDamage * (1 + Monster_Pattern.difficulty)
                 self.TickTime = 0
 
             if self.BombTime > self.BombDelay:

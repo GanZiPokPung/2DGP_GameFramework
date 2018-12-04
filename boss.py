@@ -329,7 +329,7 @@ class BossHead(Boss):
                 return
             else:
                 check = random.randint(0, 10)
-                if check < 6:
+                if check < 5:
                     self.attackID = 1
                 else:
                     self.attackID = random.randint(2, 3)
@@ -340,15 +340,15 @@ class BossHead(Boss):
             if self.attackOtherID != 99:
                 return
             else:
-                self.attackOtherID = random.randint(1, 4)
+                self.attackOtherID = random.randint(3, 3)
             self.patternHandTime = 0
 
     def modify_difficulty(self, difficulty):
         difficulty -= 1
-        self.hp *= (1 + difficulty / 2)
-        self.attackDamage *= (1 + difficulty / 2)
-        self.patternHandDelay /= (1 + difficulty / 2)
-        self.patternDelay /= (1 + difficulty / 2)
+        self.hp *= (1 + difficulty / 1)
+        self.attackDamage *= (1 + difficulty / 10)
+        self.patternHandDelay /= (1 + difficulty / 3)
+        self.patternDelay /= (1 + difficulty / 3)
         difficulty += 1
         self.difficulty = difficulty
         self.BossHandLeft.modify_difficulty(self.difficulty)
@@ -392,11 +392,11 @@ class BossHead(Boss):
 
     def Pattern_Normal(self):
         if self.attackInfoInit == False:
-            self.originShootDelay = 0.5
-            self.shootSpeed = 50
-            self.bulletsizeX = 1
-            self.bulletsizeY = 1
-            self.shootMax = 30
+            self.originShootDelay = 1.0 / (1 + self.difficulty / 3)
+            self.shootSpeed = 30 * (1 + self.difficulty / 10)
+            self.bulletsizeX = 1.12
+            self.bulletsizeY = 1.12
+            self.shootMax = 15 * (1 + self.difficulty / 5)
             self.modify_abilities()
             self.shootCheck = True
             self.attackInfoInit = True
@@ -422,8 +422,8 @@ class BossHead(Boss):
 
     def Pattern_Lazer_One(self):
         if self.attackInfoInit == False:
-            self.originShootDelay = 0.5
-            self.shootSpeed = 100
+            self.originShootDelay = 0.5 / (1 + self.difficulty / 5)
+            self.shootSpeed = 100 * (1 + self.difficulty / 4)
             self.bulletsizeX = 0.7
             self.bulletsizeY = 0.7
             self.shootCheck = True
@@ -435,8 +435,8 @@ class BossHead(Boss):
                 self.shootAngle = 270 + 80
 
             self.time = 0
-            self.attackingTime = 0.75
-            self.delayTerm = 0.5
+            self.attackingTime = 0.75 / (1 + self.difficulty / 5)
+            self.delayTerm = 0.5 / (1 + self.difficulty / 10)
 
             self.delayCheck = False
 
@@ -454,9 +454,9 @@ class BossHead(Boss):
                 self.time = 0
 
         if self.LR_decision == 0:
-            self.shootAngle += 0.5
+            self.shootAngle += 0.5 * (1 + self.difficulty / 5)
         else:
-            self.shootAngle -= 0.5
+            self.shootAngle -= 0.5 * (1 + self.difficulty / 5)
 
         if self.shootTime > self.shootDelay:
             if self.delayCheck == False:
@@ -486,7 +486,7 @@ class BossHead(Boss):
 
     def Pattern_Lazer_Two(self):
         if self.attackInfoInit == False:
-            self.originShootDelay = 0.5
+            self.originShootDelay = 0.5 / (1 + self.difficulty / 3)
             self.shootSpeed = 100
             self.bulletsizeX = 1.5
             self.bulletsizeY = 1.5
@@ -496,7 +496,7 @@ class BossHead(Boss):
             self.shootCheck = True
             self.attackInfoInit = True
 
-        self.shootAngle += 0.4
+        self.shootAngle += 0.4 * (1 + self.difficulty / 3)
 
         if self.shootTime > self.shootDelay:
             game_world.add_object(Bullet(self.posX - 40, self.posY, 180 + self.shootAngle,
@@ -773,12 +773,12 @@ class BossHand(Boss):
         else:
             self.moveT_Curv += self.curvSpeedT * mainframe.frame_time
             if self.moveLocation == 0:
-                self.curvSpeedT = 50
+                self.curvSpeedT = 50 * (1 + self.difficulty / 3)
             elif self.moveLocation == 1:
-                self.curvSpeedT = 300
+                self.curvSpeedT = 300 * (1 + self.difficulty / 3)
                 self.Pattern_Normal_For_Special()
             else:
-                self.curvSpeedT = 150
+                self.curvSpeedT = 150 * (1 + self.difficulty / 3)
 
             self.posX, self.posY = custom_math.move_curve(self.curvPos[self.moveLocation - 3],
                                                           self.curvPos[self.moveLocation - 2],
@@ -841,8 +841,8 @@ class BossHand(Boss):
 
     def modify_difficulty(self, difficulty):
         difficulty -= 1
-        self.hp *= (1 + difficulty / 2)
-        self.attackDamage *= (1 + difficulty / 2)
+        self.hp *= (1 + difficulty / 1)
+        self.attackDamage *= 1
         difficulty += 1
         self.difficulty = difficulty
 
@@ -851,8 +851,8 @@ class BossHand(Boss):
 
     def Pattern_Normal_For_Special(self):
         if self.attackInfoInit == False:
-            self.originShootDelay = 0.25
-            self.shootSpeed = 20
+            self.originShootDelay = 0.25 / (1 + self.difficulty / 3)
+            self.shootSpeed = 20 * (1 + self.difficulty / 3)
             self.bulletsizeX = 2
             self.bulletsizeY = 2
             self.time = 0
@@ -872,15 +872,15 @@ class BossHand(Boss):
 
     def Pattern_Normal(self):
         if self.attackInfoInit == False:
-            self.originShootDelay = random.randint(2, 3)
-            self.shootSpeed = 55
+            self.originShootDelay = random.randint(2, 3) / (1 + self.difficulty / 3)
+            self.shootSpeed = 55 * (1 + self.difficulty / 10)
             self.bulletsizeX = 2
             self.bulletsizeY = 2
-            self.shootMax = 8
+            self.shootMax = 5
 
             self.time = 0
             self.tmpCount = 0
-            self.delayTerm = 0.15
+            self.delayTerm = 0.15 / (1 + self.difficulty / 3)
 
             self.delayCheck = False
             self.shootCheck = True
@@ -909,7 +909,7 @@ class BossHand(Boss):
 
             if self.delayCheck == False:
                 self.shootTime = 0
-                self.shootDelay = random.randint(5, 7)
+                self.shootDelay = random.randint(2, 3)
 
         if self.shootCount > self.shootMax:
             self.shootCount = 0
@@ -922,11 +922,11 @@ class BossHand(Boss):
 
     def Pattern_Special_One(self):
         if self.attackInfoInit == False:
-            self.originShootDelay = 0.025
+            self.originShootDelay = 0.025 / (1 + self.difficulty / 3)
             self.shootSpeed = 80
             self.bulletsizeX = 2
             self.bulletsizeY = 2
-            self.shootMax = 70
+            self.shootMax = 70 * (1 + self.difficulty / 8)
             self.modify_abilities()
             self.shootCheck = True
             self.attackInfoInit = True
@@ -956,20 +956,20 @@ class BossHand(Boss):
     def Pattern_Special_Two(self):
         # 손에서 나가게 할 예정
         if self.attackInfoInit == False:
-            self.originShootDelay = 0.2
-            self.shootSpeed = 40
+            self.originShootDelay = 0.3 / (1 + self.difficulty / 10)
+            self.shootSpeed = 30 * (1 + self.difficulty / 10)
             self.bulletsizeX = 1
             self.bulletsizeY = 1
             self.shootAngle = 0
-            self.shootMax = 100
+            self.shootMax = 30 * (1 + self.difficulty / 10)
             self.modify_abilities()
             self.shootCheck = True
             self.attackInfoInit = True
 
         if self.type == 'Left':
-            self.shootAngle += 300 * mainframe.frame_time
+            self.shootAngle += 300 * (1 + self.difficulty / 10) * mainframe.frame_time
         else:
-            self.shootAngle -= 300 * mainframe.frame_time
+            self.shootAngle -= 300 * (1 + self.difficulty / 10) * mainframe.frame_time
 
         if self.shootTime > self.shootDelay:
             game_world.add_object(Bullet(self.posX, self.posY - 50, self.shootAngle,

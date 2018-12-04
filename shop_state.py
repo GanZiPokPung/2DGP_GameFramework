@@ -1,4 +1,5 @@
 import collision_manager
+import game_world
 
 from ui import *
 
@@ -59,6 +60,8 @@ def handle_events():
         else:
             if (event.type, event.key) == (SDL_KEYDOWN, SDLK_ESCAPE):
                 mainframe.quit()
+            elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_c):
+                game_world.curtain_object(PLAYER, 0).parsingMoneyBar(10000)
 
         mouse.handle_events(event)
 
