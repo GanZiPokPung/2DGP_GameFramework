@@ -75,6 +75,7 @@ class Player:
         self.scoreBar = None
         self.moneyBar = None
         self.bombBar = None
+        self.stage_number = None
         self.initPlayerUI()
         self.parsingAttData(self.parsingID)
         self.Modify_Abilities()
@@ -93,6 +94,8 @@ class Player:
         uiBombCheck = 0
         uiLayer = game_world.get_layer(UIINGAME)
 
+        uiStage = 0
+
         for ui in uiLayer:
             if ui.uiID == 'hpbar':
                 self.hpBar = ui
@@ -106,6 +109,10 @@ class Player:
             elif ui.uiID == 'bomb':
                 self.bombBar = ui
                 uiBombCheck = 1
+            elif ui.uiID == 'numbers':
+                self.stage_number = ui
+                uiStage = 1
+
 
         if uiHpCheck == 0:
             self.hpBar = HPBar(470, 30, self.hp)
@@ -123,24 +130,29 @@ class Player:
             self.moneyBar = Money(480, 680, 1, 120, 2, 17, self.money)
             game_world.add_object(self.moneyBar, UIINGAME)
 
+        if uiStage == 0:
+            self.stage_number = Numbers(120, 650, 2, 2, 17, stage_scene.stage)
+            game_world.add_object(self.stage_number, UIINGAME)
+
+
     def initializeData(self):
         Player.data = {
             # bullet
             # 불렛 갯수 사이각 각도, 속도, 이미지 타입, 불릿 타입, 사이즈, 데미지, 딜레이,
             #  self.BulletDelay = 0.15
-            '1': [3, 110, 'SmallCircle', 'RotateOnce', 2, 2, 1, 0.12],
-            '2': [3, 100, 'SmallMiss', 'RotateOnce', 2.7, 2.7, 2, 0.12],
-            '3': [3, 130, 'Rug', 'Rotate', 2, 2, 3, 0.12],
-            '4': [3, 90, 'GreenWeak', 'RotateOnce', 2, 2, 4, 0.12],
-            '5': [3, 90, 'PurpleWeak', 'RotateOnce', 2.5, 2.5, 4, 0.12],
-            '6': [5, 80, 'GreenNormal', 'RotateOnce', 2, 2, 5, 0.12],
-            '7': [5, 80, 'PurpleNormal', 'RotateOnce', 1.75, 1.75, 5, 0.12],
-            '8': [3, 100, 'GreenStrong', 'RotateOnce', 2, 2, 6, 0.12],
-            '9': [3, 100, 'PurpleStrong', 'RotateOnce', 1.75, 1.75, 6, 0.12],
-            '10': [1, 180, 'PurpleMax', 'RotateOnce', 3, 3, 7, 0.05],
-            '11': [3, 90, 'ExplodeMiss', 'Anim', 4, 4, 8, 0.12],
-            '12': [5, 100, 'BlueCircle', '', 1.25, 1.25, 7, 0.12],
-            '13': [1, 250, 'Eagle', 'RotateOnce', 3, 3, 15, 0.05]
+            '1': [3, 130, 'SmallCircle', 'RotateOnce', 2, 2, 1, 0.09],
+            '2': [3, 120, 'SmallMiss', 'RotateOnce', 2.7, 2.7, 2, 0.12],
+            '3': [3, 150, 'Rug', 'Rotate', 2, 2, 3, 0.11],
+            '4': [3, 120, 'GreenWeak', 'RotateOnce', 2, 2, 4, 0.12],
+            '5': [4, 120, 'PurpleWeak', 'RotateOnce', 2.5, 2.5, 4, 0.1],
+            '6': [5, 110, 'GreenNormal', 'RotateOnce', 2, 2, 5, 0.12],
+            '7': [5, 110, 'PurpleNormal', 'RotateOnce', 1.75, 1.75, 5, 0.09],
+            '8': [3, 130, 'GreenStrong', 'RotateOnce', 2, 2, 6, 0.07],
+            '9': [3, 130, 'PurpleStrong', 'RotateOnce', 1.75, 1.75, 6, 0.055],
+            '10': [1, 210, 'PurpleMax', 'RotateOnce', 3, 3, 18, 0.05],
+            '11': [3, 90, 'ExplodeMiss', 'Anim', 4, 4, 8, 0.1],
+            '12': [5, 170, 'BlueCircle', '', 1.25, 1.25, 7, 0.09],
+            '13': [1, 270, 'Eagle', 'RotateOnce', 3, 3, 35, 0.05]
         }
     def iniializeSound(self):
         lazer = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'player', 'lazer.wav'))

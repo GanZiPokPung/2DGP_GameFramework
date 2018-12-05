@@ -50,6 +50,9 @@ money = 0
 bgm = None
 bossbgm = None
 
+# cheat
+shop_cheat = False
+
 def initialize():
     global mouse
     # stage
@@ -92,6 +95,7 @@ def initialize():
     player = Player()
     # monster
     monsterpattern = Monster_Pattern()
+    Monster_Pattern.difficulty = 1
     game_world.add_object(player, PLAYER)
 
     # bgm
@@ -124,6 +128,7 @@ def cheat_key(event):
     global stage
     global stageCountMax
     global stageCount
+    global shop_cheat
 
     # 난이도 조절
     if (event.type, event.key) == (SDL_KEYDOWN, SDLK_q):
@@ -134,6 +139,7 @@ def cheat_key(event):
         Monster_Pattern.difficulty -= 1
         for map in totalmap.get(2):
             map.speed -= 50
+        player.stage_number.setNumbers(stage)
     elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_w):
         monsterSpawnCheck = True
         stage += 1
@@ -142,6 +148,7 @@ def cheat_key(event):
         Monster_Pattern.difficulty += 1
         for map in totalmap.get(2):
             map.speed += 50
+        player.stage_number.setNumbers(stage)
     # 충돌체 보이고 안보이고
     elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_p):
         if rectCheck == False:
@@ -151,6 +158,7 @@ def cheat_key(event):
     # 상점
     elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_n):
         mainframe.push_state(shop_state)
+        shop_cheat = True
 
     # 플레이어 체력 조절
     elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_z):
@@ -158,7 +166,7 @@ def cheat_key(event):
     elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_x):
         player.parsingBombBar(1)
     elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_c):
-        player.parsingMoneyBar(10000)
+        player.parsingMoneyBar(1000000)
 
     # 보스 패턴
     elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_1):
@@ -279,6 +287,20 @@ def resume():
     global stageCount
     global stageCountMax
     global monsterSpawnCheck
+    global shop_cheat
+
+    # 플레이어 버그
+    player.dirX = 0
+    player.dirY = 0
+    player.velocityX = 0
+    player.velocityY = 0
+    player.pushAttcheck = False
+    player.turncheck = False
+
+
+    if shop_cheat == True:
+        shop_cheat = False
+        return
 
     monsterSpawnCheck = True
     stage += 1
@@ -290,12 +312,7 @@ def resume():
     for map in totalmap.get(2):
         map.speed += 50
 
-    # 플레이어 버그
-    player.dirX = 0
-    player.dirY = 0
-    player.velocityX = 0
-    player.velocityY = 0
-    player.pushAttcheck = False
+    player.stage_number.setNumbers(stage)
 
     bgm.play()
 

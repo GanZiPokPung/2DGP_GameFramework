@@ -250,7 +250,7 @@ class Monster:
 
         if self.posY <= 700:
             self.hp -= opponent.attackDamage
-            game_world.curtain_object(PLAYER, 0).parsingScoreBar(opponent.attackDamage * random.randint(2, 5))
+            game_world.curtain_object(PLAYER, 0).parsingScoreBar(opponent.attackDamage * random.randint(1, 5))
             Monster.sound.get('hit').play()
 
     def update(self):
@@ -273,7 +273,7 @@ class Monster:
             game_world.add_object(Effect(self.posX, self.posY, 'random_effect', '', self.originSizeX, self.originSizeY),
                                   EFFECT)
             game_world.curtain_object(PLAYER, 0).parsingScoreBar(random.randint(100, 500) * self.difficulty)
-            game_world.add_object(Coin(self.posX, self.posY, 1.5, 1.5, random.randint(1, 3) * self.difficulty * 100), COIN)
+            game_world.add_object(Coin(self.posX, self.posY, 1.5, 1.5, random.randint(1, 5) * (self.difficulty * 3) * 500), COIN)
             Monster.sound.get(str(random.randint(1, 2))).play()
             return True
         else:

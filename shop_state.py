@@ -38,14 +38,14 @@ def initialize():
     lifeUpgradeButton.set_additionalimage(lifeUpgradeButton.posX, lifeUpgradeButton.posY, 1, 1, 'posion', 1)
     game_world.add_object(lifeUpgradeButton, UIDEFAULT)
     # 가격
-    game_world.add_object(Numbers(368, 370, 1.5, 1.5, 17, 500), UIDEFAULT)
+    game_world.add_object(Numbers(368, 370, 1.5, 1.5, 17, 1000), UIDEFAULT)
 
     # magicaUpgrade button
     magicaUpgradeButton = Button(250, 280, 1, 1, 'default', 'magicaUpgrade')
     magicaUpgradeButton.set_additionalimage(magicaUpgradeButton.posX, magicaUpgradeButton.posY, 1, 1, 'magica', 1)
     game_world.add_object(magicaUpgradeButton, UIDEFAULT)
     # 가격
-    game_world.add_object(Numbers(275, 210, 1.5, 1.5, 17, 1000), UIDEFAULT)
+    game_world.add_object(Numbers(275, 210, 1.5, 1.5, 17, 10000), UIDEFAULT)
 
     # restart button
     game_world.add_object(Button(250, 140, 0.8, 0.8, 'restart', 'resume'), UIDEFAULT)
@@ -67,7 +67,7 @@ def handle_events():
             if (event.type, event.key) == (SDL_KEYDOWN, SDLK_ESCAPE):
                 mainframe.quit()
             elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_c):
-                game_world.curtain_object(PLAYER, 0).parsingMoneyBar(10000)
+                game_world.curtain_object(PLAYER, 0).parsingMoneyBar(1000000)
 
         mouse.handle_events(event)
 

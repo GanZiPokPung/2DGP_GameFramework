@@ -195,19 +195,19 @@ class Button(UI):
             self.numbers_others[1].setNumbers(int(price))
             shop_state.price = price
         elif self.buttonProcessID == 'lifeUpgrade':
-            moneyCheck = game_world.curtain_object(PLAYER, 0).parsingMoneyBar(-500)
+            moneyCheck = game_world.curtain_object(PLAYER, 0).parsingMoneyBar(-1000)
             if moneyCheck == False:
                  return
             heartCheck = game_world.curtain_object(PLAYER, 0).parsingHPBar(50)
             if heartCheck == False:
-                game_world.curtain_object(PLAYER, 0).parsingMoneyBar(500)
+                game_world.curtain_object(PLAYER, 0).parsingMoneyBar(1000)
         elif self.buttonProcessID == 'magicaUpgrade':
-            moneyCheck = game_world.curtain_object(PLAYER, 0).parsingMoneyBar(-1000)
+            moneyCheck = game_world.curtain_object(PLAYER, 0).parsingMoneyBar(-10000)
             if moneyCheck == False:
                 return
             bombCheck = game_world.curtain_object(PLAYER, 0).parsingBombBar(1)
             if bombCheck == False:
-                game_world.curtain_object(PLAYER, 0).parsingMoneyBar(1000)
+                game_world.curtain_object(PLAYER, 0).parsingMoneyBar(10000)
 
     def click_right(self):
         if self.clickCheck == False:

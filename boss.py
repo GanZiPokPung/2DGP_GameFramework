@@ -40,6 +40,7 @@ class Boss:
         self.difficulty = 1
 
         self.deadCheck = False
+        self.type = ''
 
         if Boss.sound == None:
             self.initialize_sound()
@@ -118,6 +119,17 @@ class Boss:
             self.update_anim()
 
         if (self.hp <= 0):
+            # hand
+            if self.type == 'Left' or self.type == 'Right':
+                self.type = 'None'
+                game_world.add_object(
+                    Effect(self.posX, self.posY, 'random_effect', '', self.originSizeX * 2, self.originSizeY * 2),
+                    EFFECT)
+                game_world.curtain_object(PLAYER, 0).parsingScoreBar(random.randint(1, 10) * self.difficulty * 1000)
+                Boss.sound.get('bossexplode').play()
+                return True
+
+            # head
             if self.deadCheck == False:
                 Boss.sound.get('dying').play()
                 self.deadCheck = True
@@ -126,7 +138,7 @@ class Boss:
                 game_world.add_object(
                     Effect(self.posX, self.posY, 'random_effect', '', self.originSizeX * 3, self.originSizeY * 3),
                     EFFECT)
-                game_world.curtain_object(PLAYER, 0).parsingScoreBar(random.randint(1000, 5000) * self.difficulty)
+                game_world.curtain_object(PLAYER, 0).parsingScoreBar(random.randint(1, 10) * self.difficulty * 5000)
                 Boss.sound.get('bossexplode').play()
                 return True
             else:
@@ -222,6 +234,7 @@ class BossHead(Boss):
 
         #abilities
         self.hp = 200
+        self.max_hp = self.hp
         self.attackDamage = 10
 
 
@@ -235,6 +248,8 @@ class BossHead(Boss):
         self.coinTime = 0
         self.coinDelay = 0.15
         self.coinCount = 0
+
+        self.type = 'Head'
 
     def initializeHands(self):
         self.BossHandLeft = BossHand('Left', self)
@@ -251,8 +266,15 @@ class BossHead(Boss):
         pass
 
     def update_AI(self):
-       if self.hp < (self.hp * 0.3):
-            self.almost_die(1)
+
+       # hand debuging
+       if self.BossHandLeft != None and self.BossHandLeft.type == 'None':
+           self.BossHandLeft = None
+       elif self.BossHandRight != None and self.BossHandRight.type == 'None':
+           self.BossHandRight = None
+
+       if self.hp < (self.max_hp * 0.35):
+            self.almost_die(0.5)
         # move
        if self.firstMode == True:
             self.spawn_move()
@@ -261,6 +283,9 @@ class BossHead(Boss):
                 self.move()
 
            self.attack()
+
+
+
 
     def spawn_move(self):
         if self.moveT >= 100:
@@ -340,12 +365,13 @@ class BossHead(Boss):
             if self.attackOtherID != 99:
                 return
             else:
-                self.attackOtherID = random.randint(3, 3)
+                self.attackOtherID = random.randint(1, 4)
             self.patternHandTime = 0
 
     def modify_difficulty(self, difficulty):
         difficulty -= 1
         self.hp *= (1 + difficulty / 1)
+        self.max_hp = self.hp
         self.attackDamage *= (1 + difficulty / 10)
         self.patternHandDelay /= (1 + difficulty / 3)
         self.patternDelay /= (1 + difficulty / 3)
@@ -371,7 +397,7 @@ class BossHead(Boss):
         if self.coinTime > self.coinDelay:
             game_world.add_object(Coin(random.randint(int(self.posX - self.sizeX // 2), int(self.posX + self.sizeX // 2)),
                                         random.randint(int(self.posY - self.sizeY // 3), int(self.posY + self.sizeY // 3)),
-                                        1.5, 1.5, random.randint(3, 5) * self.difficulty * 100), COIN)
+                                        1.5, 1.5, random.randint(5, 10) * (self.difficulty * 3) * 1000), COIN)
             self.coinTime = 0
             self.coinCount += 1
 
@@ -392,11 +418,11 @@ class BossHead(Boss):
 
     def Pattern_Normal(self):
         if self.attackInfoInit == False:
-            self.originShootDelay = 1.0 / (1 + self.difficulty / 3)
-            self.shootSpeed = 30 * (1 + self.difficulty / 10)
+            self.originShootDelay = 1.3 / (1 + self.difficulty / 3)
+            self.shootSpeed = 27 * (1 + self.difficulty / 10)
             self.bulletsizeX = 1.12
             self.bulletsizeY = 1.12
-            self.shootMax = 15 * (1 + self.difficulty / 5)
+            self.shootMax = 10 * (1 + self.difficulty / 5)
             self.modify_abilities()
             self.shootCheck = True
             self.attackInfoInit = True
@@ -527,7 +553,12 @@ class BossHead(Boss):
             self.handOnceCheck = True
 
             # 끝나는 체크
-        if self.BossHandLeft == None:
+        if self.BossHandLeft == None and self.BossHandRight == None:
+            doCheckR = 99
+            if doCheckR == 99:
+                self.handOnceCheck = False
+                return False
+        elif self.BossHandLeft == None:
             doCheckR = self.BossHandRight.attackID
             if doCheckR == 99:
                 self.handOnceCheck = False
@@ -559,7 +590,12 @@ class BossHead(Boss):
             self.handOnceCheck = True
 
         # 끝나는 체크
-        if self.BossHandLeft == None:
+        if self.BossHandLeft == None and self.BossHandRight == None:
+            doCheckR = 99
+            if doCheckR == 99:
+                self.handOnceCheck = False
+                return False
+        elif self.BossHandLeft == None:
             doCheckR = self.BossHandRight.attackID
             if doCheckR == 99:
                 self.handOnceCheck = False
@@ -595,7 +631,12 @@ class BossHead(Boss):
             self.handOnceCheck = True
 
         # 끝나는 체크
-        if self.BossHandLeft == None:
+        if self.BossHandLeft == None and self.BossHandRight == None:
+            doCheckR = 99
+            if doCheckR == 99:
+                self.handOnceCheck = False
+                return False
+        elif self.BossHandLeft == None:
             doCheckR = self.BossHandRight.attackID
             if doCheckR == 99:
                 self.handOnceCheck = False
@@ -628,7 +669,12 @@ class BossHead(Boss):
             self.handOnceCheck = True
 
         #끝나는 체크
-        if self.BossHandLeft == None:
+        if self.BossHandLeft == None and self.BossHandRight == None:
+            doCheckR = 99
+            if doCheckR == 99:
+                self.handOnceCheck = False
+                return False
+        elif self.BossHandLeft == None:
             checkR = self.BossHandRight.specialMoveMode
             if checkR == False:
                 self.handOnceCheck = False
@@ -873,14 +919,14 @@ class BossHand(Boss):
     def Pattern_Normal(self):
         if self.attackInfoInit == False:
             self.originShootDelay = random.randint(2, 3) / (1 + self.difficulty / 3)
-            self.shootSpeed = 55 * (1 + self.difficulty / 10)
+            self.shootSpeed = 50 * (1 + self.difficulty / 10)
             self.bulletsizeX = 2
             self.bulletsizeY = 2
             self.shootMax = 5
 
             self.time = 0
             self.tmpCount = 0
-            self.delayTerm = 0.15 / (1 + self.difficulty / 3)
+            self.delayTerm = 0.12 / (1 + self.difficulty / 3)
 
             self.delayCheck = False
             self.shootCheck = True
