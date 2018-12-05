@@ -5,6 +5,7 @@ from ui import *
 
 mouse = None
 bgm = None
+price = None
 
 def initialize():
     global mouse
@@ -23,9 +24,14 @@ def initialize():
     attUpgradeButton.set_numbers(attUpgradeButton.posX + 30, attUpgradeButton.posY - 25, 2, 2, 17, int(playerAttID))
     attUpgradeButton.set_additionalimage(attUpgradeButton.posX, attUpgradeButton.posY + 10, 1, 1, playerAttID, 1)
     attUpgradeButton.additionalImage.setOtherImageToIndex(int(playerAttID))
+    # 가격
+    if price == None:
+        attUpgradeButton.numbers_others[1] = Numbers(190, 370, 1.5, 1.5, 17, 1500)
+    else:
+        attUpgradeButton.numbers_others[1] = Numbers(190, 370, 1.5, 1.5, 17, price)
     game_world.add_object(attUpgradeButton, UIDEFAULT)
     # 가격
-    game_world.add_object(Numbers(175, 370, 1.5, 1.5, 17, 1500), UIDEFAULT)
+    # game_world.add_object(Numbers(175, 370, 1.5, 1.5, 17, 1500), UIDEFAULT)
 
     # lifeUpgrade button
     lifeUpgradeButton = Button(350, 440, 1, 1, 'default', 'lifeUpgrade')

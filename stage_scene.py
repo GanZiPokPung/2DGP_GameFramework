@@ -148,6 +148,10 @@ def cheat_key(event):
             rectCheck = True
         else:
             rectCheck = False
+    # 상점
+    elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_n):
+        mainframe.push_state(shop_state)
+
     # 플레이어 체력 조절
     elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_z):
         player.parsingHPBar(50)

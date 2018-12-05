@@ -120,7 +120,7 @@ class Player:
             game_world.add_object(self.scoreBar, UIINGAME)
 
         if uiMoneyCheck == 0:
-            self.moneyBar = Money(480, 680, 1, 100, 2, 17, self.money)
+            self.moneyBar = Money(480, 680, 1, 120, 2, 17, self.money)
             game_world.add_object(self.moneyBar, UIINGAME)
 
     def initializeData(self):

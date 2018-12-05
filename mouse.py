@@ -114,6 +114,8 @@ class Mouse:
                 self.ui.click()
         if event.button == SDL_BUTTON_RIGHT:
             self.change_ID('gate')
+            if self.ui != None:
+                self.ui.click_right()
 
     def button_up_check(self, event):
         self.time = 0
@@ -124,6 +126,8 @@ class Mouse:
                 self.ui = None
         if event.button == SDL_BUTTON_RIGHT:
             self.change_ID('normal')
+            if self.ui != None:
+                self.ui.unclick_right()
 
     def draw(self):
         if self.drawCheck == True:

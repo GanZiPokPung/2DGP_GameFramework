@@ -4,6 +4,7 @@ import title_scene
 import stage_scene
 import game_world
 from static import *
+import shop_state
 
 class UI:
     def __init__(self):
@@ -16,6 +17,7 @@ class UI:
         self.uiID = 'default'
         self.image = None
         self.numbers = None
+        self.numbers_others = {}
         self.additionalImage = None
         self.additionalIdx = 0
 
@@ -52,6 +54,10 @@ class UI:
 
         if self.numbers != None:
             self.numbers.draw()
+
+        if len(self.numbers_others) != 0:
+            for numbers in self.numbers_others.values():
+                numbers.draw()
 
         if self.additionalImage != None:
             self.additionalImage.draw()
@@ -175,7 +181,8 @@ class Button(UI):
             mainframe.change_state(title_scene)
         # shop upgrade buttons
         elif self.buttonProcessID == 'attUpgrade':
-            moneyCheck = game_world.curtain_object(PLAYER, 0).parsingMoneyBar(-1500)
+            price = self.numbers_others[1].num
+            moneyCheck = game_world.curtain_object(PLAYER, 0).parsingMoneyBar(-price)
             if moneyCheck == False:
                 return
             if self.numbers.num < 13:
@@ -183,7 +190,10 @@ class Button(UI):
             self.additionalImage.setOtherImageToIndex(int(self.additionalImage.othersID) + 1)
             attCheck =  game_world.curtain_object(PLAYER, 0).parsingAttData(self.additionalImage.othersID)
             if attCheck == False:
-                game_world.curtain_object(PLAYER, 0).parsingMoneyBar(1500)
+                game_world.curtain_object(PLAYER, 0).parsingMoneyBar(price)
+            price *= 2
+            self.numbers_others[1].setNumbers(int(price))
+            shop_state.price = price
         elif self.buttonProcessID == 'lifeUpgrade':
             moneyCheck = game_world.curtain_object(PLAYER, 0).parsingMoneyBar(-500)
             if moneyCheck == False:
@@ -198,6 +208,28 @@ class Button(UI):
             bombCheck = game_world.curtain_object(PLAYER, 0).parsingBombBar(1)
             if bombCheck == False:
                 game_world.curtain_object(PLAYER, 0).parsingMoneyBar(1000)
+
+    def click_right(self):
+        if self.clickCheck == False:
+            self.clickSound.play()
+            self.clickCheck = True
+
+    def unclick_right(self):
+        self.clickCheck = False
+        if self.buttonProcessID == 'attUpgrade':
+            if self.numbers.num - 1 > 0:
+                self.set_numbers(0, 0, 0, 0, 0, self.numbers.num - 1)
+            else:
+                return
+            price = self.numbers_others[1].num
+            self.additionalImage.setOtherImageToIndex(int(self.additionalImage.othersID) - 1)
+            attCheck = game_world.curtain_object(PLAYER, 0).parsingAttData(self.additionalImage.othersID)
+            if attCheck == False:
+                game_world.curtain_object(PLAYER, 0).parsingMoneyBar(price)
+            price //= 2
+            game_world.curtain_object(PLAYER, 0).parsingMoneyBar(price)
+            self.numbers_others[1].setNumbers(int(price))
+            shop_state.price = price
 
 #
 class Numbers(UI):
