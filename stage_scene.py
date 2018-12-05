@@ -84,6 +84,8 @@ def initialize():
     monsterSpawnCheck = True
     bossCheck = False
 
+    # shop state
+    shop_state.price = 500
 
     # map
     # stage 별로 리스트에 보관
