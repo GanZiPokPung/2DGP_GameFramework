@@ -129,6 +129,7 @@ def cheat_key(event):
     global stageCountMax
     global stageCount
     global shop_cheat
+    global bossCheck
 
     # 난이도 조절
     if (event.type, event.key) == (SDL_KEYDOWN, SDLK_q):
@@ -138,29 +139,44 @@ def cheat_key(event):
         stageCountMax -= 5
         Monster_Pattern.difficulty -= 1
         for map in totalmap.get(2):
-            map.speed -= 50
+            map.speed -= 100
         player.stage_number.setNumbers(stage)
     elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_w):
         monsterSpawnCheck = True
         stage += 1
         stageCount = 0
-        stageCountMax += 5
+        stageCountMax += 1
         Monster_Pattern.difficulty += 1
         for map in totalmap.get(2):
-            map.speed += 50
+            map.speed += 100
         player.stage_number.setNumbers(stage)
+
     # 충돌체 보이고 안보이고
     elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_p):
         if rectCheck == False:
             rectCheck = True
         else:
             rectCheck = False
+
+    # 바로 보스
+    elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_b):
+        monsterSpawnCheck = False
+        game_world.clear_layer(MONSTER)
+
+
     # 상점
     elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_n):
         mainframe.push_state(shop_state)
         shop_cheat = True
 
-    # 플레이어 체력 조절
+    # 바로 죽음
+    elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_m):
+        player.hp = 0
+
+
+
+
+    # 플레이어 능력치 조절
     elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_z):
         player.parsingHPBar(50)
     elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_x):
@@ -297,6 +313,7 @@ def resume():
     player.pushAttcheck = False
     player.turncheck = False
 
+    bgm.play()
 
     if shop_cheat == True:
         shop_cheat = False
@@ -305,16 +322,16 @@ def resume():
     monsterSpawnCheck = True
     stage += 1
     stageCount = 0
-    stageCountMax += 5
+    stageCountMax += 1
     Monster_Pattern.difficulty += 1
 
     # 맵 이동 속도 증가
     for map in totalmap.get(2):
-        map.speed += 50
+        map.speed += 100
 
     player.stage_number.setNumbers(stage)
 
-    bgm.play()
+
 
 def exit():
     bgm.stop()

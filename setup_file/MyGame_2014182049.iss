@@ -5,14 +5,14 @@
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppId={{CD3C79B7-C909-49CC-AB3B-C10BD132D798}
+AppId={{3E8D305A-96B8-46F0-843C-0AB0DC3A96A9}
 AppName=MyGame_2014182049
 AppVersion=1.5
 ;AppVerName=MyGame_2014182049 1.5
-AppPublisher=My Company, Inc.
-AppPublisherURL=http://www.example.com/
-AppSupportURL=http://www.example.com/
-AppUpdatesURL=http://www.example.com/
+AppPublisher=KPU
+AppPublisherURL=http://www.kpu.ac.kr
+AppSupportURL=http://www.kpu.ac.kr
+AppUpdatesURL=http://www.kpu.ac.kr
 DefaultDirName={pf}\MyGame_2014182049
 DisableProgramGroupPage=yes
 OutputBaseFilename=MyGameSetup_2014182049

@@ -48,6 +48,8 @@ class Player:
         # time
         self.BulletTime = 0
         self.BulletDelay = 0.15
+        self.bullet_term = 10
+        self.bullet_type = 'spread'
         self.BombTime = 0
         self.BombDelay = 5
         self.TickTime = 0
@@ -140,19 +142,19 @@ class Player:
             # bullet
             # 불렛 갯수 사이각 각도, 속도, 이미지 타입, 불릿 타입, 사이즈, 데미지, 딜레이,
             #  self.BulletDelay = 0.15
-            '1': [3, 130, 'SmallCircle', 'RotateOnce', 2, 2, 1, 0.09],
-            '2': [3, 120, 'SmallMiss', 'RotateOnce', 2.7, 2.7, 2, 0.12],
-            '3': [3, 150, 'Rug', 'Rotate', 2, 2, 3, 0.11],
-            '4': [3, 120, 'GreenWeak', 'RotateOnce', 2, 2, 4, 0.12],
-            '5': [4, 120, 'PurpleWeak', 'RotateOnce', 2.5, 2.5, 4, 0.1],
-            '6': [5, 110, 'GreenNormal', 'RotateOnce', 2, 2, 5, 0.12],
-            '7': [5, 110, 'PurpleNormal', 'RotateOnce', 1.75, 1.75, 5, 0.09],
-            '8': [3, 130, 'GreenStrong', 'RotateOnce', 2, 2, 6, 0.07],
-            '9': [3, 130, 'PurpleStrong', 'RotateOnce', 1.75, 1.75, 6, 0.055],
-            '10': [1, 210, 'PurpleMax', 'RotateOnce', 3, 3, 18, 0.05],
-            '11': [3, 90, 'ExplodeMiss', 'Anim', 4, 4, 8, 0.1],
-            '12': [5, 170, 'BlueCircle', '', 1.25, 1.25, 7, 0.09],
-            '13': [1, 270, 'Eagle', 'RotateOnce', 3, 3, 35, 0.05]
+            '1': [3, 130, 'SmallCircle', 'RotateOnce', 2, 2, 1, 0.09, 8, 'spread'],
+            '2': [3, 120, 'SmallMiss', 'RotateOnce', 2.7, 2.7, 2, 0.11, 20, 'forward'],
+            '3': [3, 150, 'Rug', 'Rotate', 2, 2, 3, 0.1, 10, 'spread'],
+            '4': [3, 120, 'GreenWeak', 'RotateOnce', 2, 2, 4, 0.09, 8, 'spread'],
+            '5': [3, 120, 'PurpleWeak', 'RotateOnce', 2.5, 2.5, 4, 0.08, 20, 'forward'],
+            '6': [5, 110, 'GreenNormal', 'RotateOnce', 2, 2, 5, 0.10, 10, 'spread'],
+            '7': [5, 110, 'PurpleNormal', 'RotateOnce', 1.75, 1.75, 5, 0.07, 20, 'forward'],
+            '8': [3, 130, 'GreenStrong', 'RotateOnce', 2, 2, 6, 0.06, 6, 'spread'],
+            '9': [3, 130, 'PurpleStrong', 'RotateOnce', 1.75, 1.75, 6, 0.045, 25, 'forward'],
+            '10': [1, 210, 'PurpleMax', 'RotateOnce', 3, 3, 18, 0.04, 10, 'spread'],
+            '11': [3, 90, 'ExplodeMiss', 'Anim', 4, 4, 8, 0.1, 25, 'forward'],
+            '12': [5, 170, 'BlueCircle', '', 1.25, 1.25, 6, 0.09, 10, 'spread'],
+            '13': [1, 270, 'Eagle', 'RotateOnce', 3, 3, 35, 0.035, 10, 'spread']
         }
     def iniializeSound(self):
         lazer = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'player', 'lazer.wav'))
@@ -303,7 +305,7 @@ class Player:
     def parsingAttData(self, parsingID):
         # 불렛 갯수 /사이각 각도/, 속도, 이미지 타입, 불릿 타입, 사이즈
         if int(parsingID) >= 13 and self.parsingID == parsingID:
-            self.attackDamage += 1
+            self.attackDamage += 20
             return True
 
         self.parsingID = parsingID
@@ -315,6 +317,8 @@ class Player:
         self.bulletSizeY = Player.data.get(parsingID)[5]
         self.attackDamage = Player.data.get(parsingID)[6]
         self.BulletDelay = Player.data.get(parsingID)[7]
+        self.bullet_term = Player.data.get(parsingID)[8]
+        self.bullet_type = Player.data.get(parsingID)[9]
         return True
 
     def parsingHPBar(self, healAmount):
@@ -338,14 +342,20 @@ class Player:
         return True
 
     def parsingScoreBar(self, scoreAmount):
-         self.score += scoreAmount
+         if self.score + scoreAmount > 9999999:
+             self.score = 9999999
+         else:
+            self.score += scoreAmount
          self.scoreBar.setScore(self.score)
 
     def parsingMoneyBar(self, moneyAmount):
         if (self.money + moneyAmount) < 0:
             return False
 
-        self.money += moneyAmount
+        if self.money + moneyAmount > 9999999:
+            self.money = 9999999
+        else:
+            self.money += moneyAmount
         self.moneyBar.setMoney(self.money)
 
         return True
@@ -421,22 +431,34 @@ class Player:
         if self.pushAttcheck == True:
             if self.BulletTime > self.BulletDelay:
                 Player.sound.get(self.parsingID).play()
-                angleTerm = 0
-                angle = 90
-                for cnt in range(0, self.bulletCount):
-                    bullet = Bullet(self.x + 5, self.y + 20, angle + angleTerm, self.bulletSpeed, self.bulletImage, 0,
-                                    self.bulletType
-                                    , self.bulletSizeX, self.bulletSizeY, self.attackDamage)
-                    bullet.set_rotation(angle)
-                    game_world.add_object(bullet, BULLET_PLAYER)
 
-                    if angleTerm == 0:
-                        angleTerm += 10
-                    elif angleTerm > 0:
-                        angleTerm *= -1
-                    elif angleTerm < 0:
-                        angleTerm *= -1
-                        angleTerm += 10
+                if self.bullet_type == 'spread':
+                    angleTerm = 0
+                    angle = 90
+                    for cnt in range(0, self.bulletCount):
+                        bullet = Bullet(self.x + 5, self.y + 20, angle + angleTerm, self.bulletSpeed, self.bulletImage, 0,
+                                        self.bulletType
+                                        , self.bulletSizeX, self.bulletSizeY, self.attackDamage)
+                        bullet.set_rotation(angle)
+                        game_world.add_object(bullet, BULLET_PLAYER)
+
+                        if angleTerm == 0:
+                            angleTerm += self.bullet_term
+                        elif angleTerm > 0:
+                            angleTerm *= -1
+                        elif angleTerm < 0:
+                            angleTerm *= -1
+                            angleTerm += self.bullet_term
+                elif self.bullet_type == 'forward':
+                    posterm = self.bullet_term
+                    pos = -((self.bulletCount // 2) * self.bullet_term)
+                    for cnt in range(0, self.bulletCount):
+                        bullet = Bullet(self.x + pos, self.y + 20, 90, self.bulletSpeed, self.bulletImage,
+                                        0,
+                                        self.bulletType
+                                        , self.bulletSizeX, self.bulletSizeY, self.attackDamage)
+                        game_world.add_object(bullet, BULLET_PLAYER)
+                        pos += posterm
 
                 self.BulletTime = 0
 

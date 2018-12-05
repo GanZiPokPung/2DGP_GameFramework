@@ -25,9 +25,9 @@ def initialize():
     # restart button
     game_world.add_object(Button(250, 100, 0.8, 0.8, 'confirm', 'confirm'), UIDEFAULT)
     # money
-    game_world.add_object(Money(300, 450, 1.8, 180, 3, 27, money), UIDEFAULT)
+    game_world.add_object(Money(320, 450, 1.8, 205, 3, 27, money), UIDEFAULT)
     # score
-    game_world.add_object(Numbers(300, 350, 3, 3, 27, score), UIDEFAULT)
+    game_world.add_object(Numbers(320, 350, 3, 3, 27, score), UIDEFAULT)
     # bgm
     bgm = load_music(os.path.join(os.getcwd(), 'resources', 'sound', 'back', 'result.mp3'))
     bgm.set_volume(40)

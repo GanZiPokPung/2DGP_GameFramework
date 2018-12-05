@@ -23,12 +23,12 @@ class Monster_Pattern:
     def __init__(self):
         if Monster_Pattern.difficulty == None:
             Monster_Pattern.difficulty = 1
-        self.spawnDelay = 7
-        self.spawnTime = self.spawnDelay * 0.5
+        self.spawnDelay = 10
+        self.spawnTime = self.spawnDelay * 0.75
 
     def update(self):
         self.spawnTime += mainframe.frame_time
-        if self.spawnTime > (self.spawnDelay / (1 + Monster_Pattern.difficulty / 3)):
+        if self.spawnTime > (self.spawnDelay / (1 + Monster_Pattern.difficulty / 7)):
             self.get_monster()
             self.spawnTime = 0
             return True
@@ -273,7 +273,7 @@ class Monster:
             game_world.add_object(Effect(self.posX, self.posY, 'random_effect', '', self.originSizeX, self.originSizeY),
                                   EFFECT)
             game_world.curtain_object(PLAYER, 0).parsingScoreBar(random.randint(100, 500) * self.difficulty)
-            game_world.add_object(Coin(self.posX, self.posY, 1.5, 1.5, random.randint(1, 5) * (self.difficulty * 3) * 500), COIN)
+            game_world.add_object(Coin(self.posX, self.posY, 1.5, 1.5, random.randint(1, 5) * (self.difficulty) * 100), COIN)
             Monster.sound.get(str(random.randint(1, 2))).play()
             return True
         else:
@@ -417,10 +417,10 @@ class Warrior(Monster):
 
     def modify_difficulty(self, difficulty):
         difficulty -= 1
-        self.originShootDelay /= (1 + difficulty / 3)
+        self.originShootDelay /= (1 + difficulty / 10)
         self.shootSpeed *= (1 + difficulty / 10)
-        self.moveSpeed  *= (1 + difficulty / 3)
-        self.hp *= (1 + difficulty / 3)
+        self.moveSpeed  *= (1 + difficulty / 10)
+        self.hp *= (1 + difficulty / 5)
         self.attackDamage *= (1 + difficulty / 10)
         difficulty += 1
         self.difficulty = difficulty
@@ -573,8 +573,8 @@ class Bird(Monster):
         difficulty -= 1
         self.originShootDelay /= (1 + difficulty / 10)
         self.shootSpeed *= (1 + difficulty / 10)
-        self.speedT     *= (1 + difficulty / 2)
-        self.hp *= (1 + difficulty / 3)
+        self.speedT     *= (1 + difficulty / 10)
+        self.hp *= (1 + difficulty / 5)
         self.attackDamage *= (1 + difficulty / 10)
         difficulty += 1
         self.difficulty = difficulty
@@ -765,10 +765,10 @@ class Dragon(Monster):
 
     def modify_difficulty(self, difficulty):
         difficulty -= 1
-        self.originShootDelay /= (1 + difficulty / 5)
+        self.originShootDelay /= (1 + difficulty / 15)
         self.shootSpeed *= (1 + difficulty / 10)
-        self.speedT     *= (1 + difficulty / 2)
-        self.hp *= (1 + difficulty / 3)
+        self.speedT     *= (1 + difficulty / 10)
+        self.hp *= (1 + difficulty / 5)
         self.attackDamage *= (1 + difficulty / 10)
         difficulty += 1
         self.difficulty = difficulty
@@ -884,7 +884,7 @@ class Dragon_Strong(Monster):
         difficulty -= 1
         self.originShootDelay /= (1 + difficulty / 10)
         self.shootSpeed *= (1 + difficulty / 10)
-        self.hp *= (1 + difficulty / 3)
+        self.hp *= (1 + difficulty / 7)
         self.attackDamage *= (1 + difficulty / 10)
         difficulty += 1
         self.difficulty = difficulty

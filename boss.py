@@ -68,7 +68,7 @@ class Boss:
         lazer2 = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'boss', 'lazer2.wav'))
         lazer2.set_volume(10)
         dying = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'boss', 'dying.wav'))
-        dying.set_volume(30)
+        dying.set_volume(70)
         bossexplode = load_wav(os.path.join(os.getcwd(), 'resources', 'sound', 'boss', 'bossExplode.wav'))
         bossexplode.set_volume(30)
         Boss.sound = {
@@ -138,7 +138,7 @@ class Boss:
                 game_world.add_object(
                     Effect(self.posX, self.posY, 'random_effect', '', self.originSizeX * 3, self.originSizeY * 3),
                     EFFECT)
-                game_world.curtain_object(PLAYER, 0).parsingScoreBar(random.randint(1, 10) * self.difficulty * 5000)
+                game_world.curtain_object(PLAYER, 0).parsingScoreBar(random.randint(1, 5) * self.difficulty * 200)
                 Boss.sound.get('bossexplode').play()
                 return True
             else:
@@ -397,7 +397,7 @@ class BossHead(Boss):
         if self.coinTime > self.coinDelay:
             game_world.add_object(Coin(random.randint(int(self.posX - self.sizeX // 2), int(self.posX + self.sizeX // 2)),
                                         random.randint(int(self.posY - self.sizeY // 3), int(self.posY + self.sizeY // 3)),
-                                        1.5, 1.5, random.randint(5, 10) * (self.difficulty * 3) * 1000), COIN)
+                                        1.5, 1.5, random.randint(5, 10) * (self.difficulty) * 100), COIN)
             self.coinTime = 0
             self.coinCount += 1
 

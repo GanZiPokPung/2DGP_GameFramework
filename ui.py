@@ -185,8 +185,7 @@ class Button(UI):
             moneyCheck = game_world.curtain_object(PLAYER, 0).parsingMoneyBar(-price)
             if moneyCheck == False:
                 return
-            if self.numbers.num < 13:
-                self.set_numbers(0, 0, 0, 0, 0, self.numbers.num + 1)
+            self.set_numbers(0, 0, 0, 0, 0, self.numbers.num + 1)
             self.additionalImage.setOtherImageToIndex(int(self.additionalImage.othersID) + 1)
             attCheck =  game_world.curtain_object(PLAYER, 0).parsingAttData(self.additionalImage.othersID)
             if attCheck == False:
@@ -195,19 +194,19 @@ class Button(UI):
             self.numbers_others[1].setNumbers(int(price))
             shop_state.price = price
         elif self.buttonProcessID == 'lifeUpgrade':
-            moneyCheck = game_world.curtain_object(PLAYER, 0).parsingMoneyBar(-1000)
+            moneyCheck = game_world.curtain_object(PLAYER, 0).parsingMoneyBar(-500)
             if moneyCheck == False:
                  return
             heartCheck = game_world.curtain_object(PLAYER, 0).parsingHPBar(50)
             if heartCheck == False:
-                game_world.curtain_object(PLAYER, 0).parsingMoneyBar(1000)
+                game_world.curtain_object(PLAYER, 0).parsingMoneyBar(500)
         elif self.buttonProcessID == 'magicaUpgrade':
-            moneyCheck = game_world.curtain_object(PLAYER, 0).parsingMoneyBar(-10000)
+            moneyCheck = game_world.curtain_object(PLAYER, 0).parsingMoneyBar(-5000)
             if moneyCheck == False:
                 return
             bombCheck = game_world.curtain_object(PLAYER, 0).parsingBombBar(1)
             if bombCheck == False:
-                game_world.curtain_object(PLAYER, 0).parsingMoneyBar(10000)
+                game_world.curtain_object(PLAYER, 0).parsingMoneyBar(5000)
 
     def click_right(self):
         if self.clickCheck == False:
@@ -222,10 +221,13 @@ class Button(UI):
             else:
                 return
             price = self.numbers_others[1].num
-            self.additionalImage.setOtherImageToIndex(int(self.additionalImage.othersID) - 1)
-            attCheck = game_world.curtain_object(PLAYER, 0).parsingAttData(self.additionalImage.othersID)
-            if attCheck == False:
-                game_world.curtain_object(PLAYER, 0).parsingMoneyBar(price)
+
+            if int(self.numbers.num) < 13:
+                self.additionalImage.setOtherImageToIndex(int(self.additionalImage.othersID) - 1)
+                attCheck = game_world.curtain_object(PLAYER, 0).parsingAttData(self.additionalImage.othersID)
+                if attCheck == False:
+                    game_world.curtain_object(PLAYER, 0).parsingMoneyBar(price)
+
             price //= 2
             game_world.curtain_object(PLAYER, 0).parsingMoneyBar(price)
             self.numbers_others[1].setNumbers(int(price))
@@ -493,8 +495,9 @@ class Money(UI):
 
 
     def setMoney(self, money):
-        if money > 99999999:
+        if money > 9999999:
             return
+
         self.money = money
         self.numbers.setNumbers(self.money)
 
